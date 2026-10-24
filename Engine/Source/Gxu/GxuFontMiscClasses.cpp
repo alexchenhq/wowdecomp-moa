@@ -83,15 +83,22 @@ void GLYPHBITMAPDATA::CopyFrom(GLYPHBITMAPDATA* source) {
         SMemFree(this->m_data, __FILE__, __LINE__, 0);
     }
 
+    if (this->m_sdfData) {
+        SMemFree(this->m_sdfData, __FILE__, __LINE__, 0);
+    }
+
     this->m_data = nullptr;
+    this->m_sdfData = nullptr;
     *this = *source;
     source->m_data = nullptr;
+    source->m_sdfData = nullptr;
 }
 
 // VERIFY: 1a45e3fa auto
 // OFFSET: 0x006C4340
 GLYPHBITMAPDATA::GLYPHBITMAPDATA() {
     this->m_data = nullptr;
+    this->m_sdfData = nullptr;
     this->m_dataSize = 0;
     this->m_textureCoords.minY = 0.0f;
     this->m_textureCoords.minX = 0.0f;
@@ -106,7 +113,12 @@ GLYPHBITMAPDATA::~GLYPHBITMAPDATA() {
         SMemFree(this->m_data, __FILE__, __LINE__, 0);
     }
 
+    if (this->m_sdfData) {
+        SMemFree(this->m_sdfData, __FILE__, __LINE__, 0);
+    }
+
     this->m_data = nullptr;
+    this->m_sdfData = nullptr;
 }
 
 // VERIFY: d966ef03 manual

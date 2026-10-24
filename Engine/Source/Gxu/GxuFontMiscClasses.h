@@ -30,6 +30,11 @@ struct GLYPHBITMAPDATA {
     /* 0024 */ uint32_t m_yStart;
     /* 0028 */ CRect m_textureCoords;
 
+    // MODIFIED: distance field built from the glyph outline, one byte per pixel
+    // with a row stride of m_glyphWidth. Null when the outline could not be
+    // decomposed, in which case the bitmap path is used instead.
+    /* NEW */ uint8_t* m_sdfData;
+
     GLYPHBITMAPDATA();
     ~GLYPHBITMAPDATA();
     void CopyFrom(GLYPHBITMAPDATA* source);

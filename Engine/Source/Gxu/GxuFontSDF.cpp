@@ -89,10 +89,34 @@ inline uint32_t PackGray(uint32_t v) {
     return (v << 24) | (v << 16) | (v << 8) | v;
 }
 
+inline float DistanceSqToSegment(float px, float py, float ax, float ay, float bx, float by) {
+    const float dx = bx - ax;
+    const float dy = by - ay;
+    const float len2 = dx * dx + dy * dy;
+
+    float t = 0.0f;
+
+    if (len2 > 1e-12f) {
+        t = ((px - ax) * dx + (py - ay) * dy) / len2;
+
+        if (t < 0.0f) {
+            t = 0.0f;
+        } else if (t > 1.0f) {
+            t = 1.0f;
+        }
+    }
+
+    const float cx = ax + t * dx;
+    const float cy = ay + t * dy;
+    const float ex = px - cx;
+    const float ey = py - cy;
+
+    return ex * ex + ey * ey;
+}
+
 } // namespace
 
-void ClearCell(uint32_t cellW, uint32_t cellH, uint32_t* dest, uint32_t destStride) {
-    for (uint32_t y = 0; y < cellH; y++) {
+void ClearCell(uint32_t cellW, uint32_t cellH, uint32_t* dest, uint32_t destStride) {    for (uint32_t y = 0; y < cellH; y++) {
         uint32_t* row = dest + static_cast<size_t>(y) * destStride;
         for (uint32_t x = 0; x < cellW; x++) {
             row[x] = 0;
@@ -189,6 +213,115 @@ void BuildCell(const uint8_t* gray, uint32_t gw, uint32_t gh, uint32_t pitch,
             encoded = std::min(1.0f, std::max(0.0f, encoded));
 
             row[x] = PackGray(static_cast<uint32_t>(encoded * 255.0f + 0.5f));
+        }
+    }
+}
+
+bool BuildFromPolygons(const float* pts, int pointCount,                       const int* contourStart, int contourCount,
+                       float originX, float originY,
+                       uint32_t gw, uint32_t gh, uint8_t* out) {
+    if (!pts || pointCount < 2 || !contourStart || contourCount < 1 || !out || !gw || !gh) {
+        return false;
+    }
+
+    // Reject degenerate input up front.
+    bool any = false;
+
+    for (int c = 0; c < contourCount; c++) {
+        const int s = contourStart[c];
+        const int e = (c + 1 < contourCount) ? contourStart[c + 1] : pointCount;
+
+        if (s < 0 || e > pointCount || e - s >= 2) {
+            any = true;
+        }
+    }
+
+    if (!any) {
+        return false;
+    }
+
+    const float invScale = 1.0f / (2.0f * kSpread);
+
+    // Every sample is evaluated against the real outline, so the distance is
+    // exact instead of being quantized to the rasterizer's pixel grid.
+    for (uint32_t y = 0; y < gh; y++) {
+        // Pixel centre in glyph space. y counts down in the bitmap, up in glyph space.
+        const float py = originY - (static_cast<float>(y) + 0.5f);
+
+        for (uint32_t x = 0; x < gw; x++) {
+            const float px = originX + (static_cast<float>(x) + 0.5f);
+
+            float bestSq = 3.0e38f;
+            int crossings = 0;
+
+            for (int c = 0; c < contourCount; c++) {
+                const int s = contourStart[c];
+                const int e = (c + 1 < contourCount) ? contourStart[c + 1] : pointCount;
+
+                if (e - s < 2) {
+                    continue;
+                }
+
+                for (int i = s; i < e; i++) {
+                    const int j = (i + 1 < e) ? (i + 1) : s; // contours are implicitly closed
+
+                    const float ax = pts[2 * i];
+                    const float ay = pts[2 * i + 1];
+                    const float bx = pts[2 * j];
+                    const float by = pts[2 * j + 1];
+
+                    const float d2 = DistanceSqToSegment(px, py, ax, ay, bx, by);
+
+                    if (d2 < bestSq) {
+                        bestSq = d2;
+                    }
+
+                    // Even-odd crossing test along +x.
+                    if ((ay <= py) != (by <= py)) {
+                        const float t = (py - ay) / (by - ay);
+                        const float xCross = ax + t * (bx - ax);
+
+                        if (xCross > px) {
+                            crossings++;
+                        }
+                    }
+                }
+            }
+
+            const float dist = std::sqrt(bestSq);
+            const float signedDistance = (crossings & 1) ? dist : -dist;
+
+            float encoded = 0.5f + signedDistance * invScale;
+            encoded = std::min(1.0f, std::max(0.0f, encoded));
+
+            out[static_cast<size_t>(y) * gw + x] = static_cast<uint8_t>(encoded * 255.0f + 0.5f);
+        }
+    }
+
+    return true;
+}
+
+void BlitDistance(const uint8_t* sdf, uint32_t sdfWidth, uint32_t sdfHeight,
+                  uint32_t cellW, uint32_t cellH, uint32_t yStart,
+                  uint32_t* dest, uint32_t destStride) {
+    ClearCell(cellW, cellH, dest, destStride);
+
+    if (!sdf || !sdfWidth || !sdfHeight) {
+        return;
+    }
+
+    for (uint32_t y = 0; y < sdfHeight; y++) {
+        const uint32_t cellRow = yStart + y;
+
+        if (cellRow >= cellH) {
+            break;
+        }
+
+        const uint8_t* src = sdf + static_cast<size_t>(y) * sdfWidth;
+        uint32_t* row = dest + static_cast<size_t>(cellRow) * destStride;
+
+        for (uint32_t x = 0; x < sdfWidth && x < cellW; x++) {
+            row[x] = PackGray(src[x]);
         }
     }
 }
