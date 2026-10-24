@@ -1,7 +1,9 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
+#include <cstdio>
 #include "Engine/Source/Gxu/GxuFontMiscClasses.h"
+#include "Engine/Source/Gxu/GxuFontSDFShader.h"
 #include "Engine/Source/Gx/CGxBuf.h"
 #include "Engine/Source/Gx/CGxDevice/CGxDevice.h"
 #include "Engine/Source/Gx/CGxDevice/CGxShader.h"
@@ -15,6 +17,36 @@
 #include "Engine/Source/Tempest/C44Matrix.h"
 
 static const double ONEOVERTEXSIZE = (1.0 / 256.0);
+
+// MODIFIED: pixel shader that turns the distance field in the glyph atlas back
+// into a coverage value. Created from embedded ps_3_0 bytecode because the
+// original client only loads shaders from its own data files.
+static CGxShader* s_gxuFontSdfShader = nullptr;
+
+static CGxShader* GxuGetFontSdfShader() {
+    if (s_gxuFontSdfShader && s_gxuFontSdfShader->Valid()) {
+        return s_gxuFontSdfShader;
+    }
+
+    CGxShader* shader = new CGxShader;
+
+    shader->m_target = GxSh_Pixel;
+    shader->m_code.SetCount(g_gxuFontSdfPixelShaderSize);
+    memcpy(shader->m_code.m_data, g_gxuFontSdfPixelShader, g_gxuFontSdfPixelShaderSize);
+    shader->m_loaded = 0;
+
+    s_gxuFontSdfShader = shader;
+
+    if (!shader->Valid()) {
+        // Prints to the console window WowClient opens for the crash logger.
+        printf("[DragonUI-SDF] font SDF pixel shader FAILED to create (ps_3_0 unsupported?)\n");
+        return nullptr;
+    }
+
+    printf("[DragonUI-SDF] font SDF pixel shader active (ps_3_0)\n");
+
+    return shader;
+}
 
 // STATIC: 0x00AD9BCC
 TSList<TEXTLINETEXTURE, TSGetLink<TEXTLINETEXTURE> > TEXTLINETEXTURE::s_freeTextLineTextures;
@@ -301,6 +333,36 @@ void BATCHEDRENDERFONTDESC::RenderBatch() {
         this->m_face->m_textureCache[i].UpdateDirty();
     }
 
+    // MODIFIED: the atlas stores a signed distance field, so the fixed-function
+    // texture stage can no longer produce the glyph coverage. Bind the SDF
+    // shader for the duration of this batch and restore the previous state.
+    g_theGxDevicePtr->RsPush();
+
+    CGxShader* sdfShader = GxuGetFontSdfShader();
+
+    if (sdfShader) {
+        GxRsSet(GxRs_PixelShader, sdfShader);
+
+        // c0 = (1 / atlasWidth, 1 / atlasHeight). The shader multiplies by this
+        // to turn normalized UVs into texel coordinates before taking ddx/ddy,
+        // so the edge sharpness follows the real on-screen scale instead of a
+        // hardcoded assumption.
+        float atlasSize[4] = { ONEOVERTEXSIZE, ONEOVERTEXSIZE, 256.0f, 256.0f };
+        GxShaderConstantsSet(GxSh_Pixel, 0, atlasSize, 1);
+
+        // c1 = (outline width in texels, outline alpha). The distance field holds
+        // the glyph body only, so the rim has to be expanded here. fontFlags bit
+        // 0 = outlined, bit 3 = thick outline (two texels instead of one).
+        const uint32_t fontFlags = this->m_face->m_fontFlags;
+        const float outlineWidth = (fontFlags & 1) ? ((fontFlags & 8) ? 2.0f : 1.0f) : 0.0f;
+
+        float outlineParams[4] = { outlineWidth, 0.47f, 0.0f, 0.0f };
+        float outlineColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+
+        GxShaderConstantsSet(GxSh_Pixel, 1, outlineParams, 1);
+        GxShaderConstantsSet(GxSh_Pixel, 2, outlineColor, 1);
+    }
+
     CGxBuf* buf = GxBufStream(GxPoolTarget_Vertex, sizeof(CGxVertexPCT), 2048);
     CGxVertexPCT* verts = reinterpret_cast<CGxVertexPCT*>(GxBufLock(buf));
     int32_t space = 2048;
@@ -350,6 +412,8 @@ void BATCHEDRENDERFONTDESC::RenderBatch() {
             space = 2048;
         }
     }
+
+    g_theGxDevicePtr->RsPop();
 
     GxBufUnlock(buf, 0);
 }

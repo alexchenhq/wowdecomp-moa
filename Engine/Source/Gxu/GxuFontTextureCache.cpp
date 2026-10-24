@@ -6,16 +6,23 @@
 #include "Engine/Source/Gx/Gx.h"
 #include "Engine/Source/Gxu/GxuFontFont.h"
 #include "Engine/Source/Gxu/GxuFontMiscClasses.h"
+#include "Engine/Source/Gxu/GxuFontSDF.h"
 #include "Engine/Source/Gxu/GxuFontUtil.h"
 #include "Engine/Source/Services/Texture.h"
 #include "Engine/Source/Storm/H/storm.h"
 
+// MODIFIED: atlas widened from ARGB4444 to ARGB8888 so the distance field has
+// 8 bits of precision instead of 4.
 // STATIC: 0x00C7D328
-static uint16_t s_textureData[256 * 256];
+static uint32_t s_textureData[256 * 256];
+
+// Scratch cell image used to build a distance field from the outlined/mono
+// coverage paths, which do not hand us a grayscale bitmap.
+static uint8_t s_cellImage[256 * 36];
 
 // VERIFY: 7a9fdc75 manual
 // OFFSET: 0x006C8E70
-void TEXTURECACHE::PasteGlyphOutlinedMonochrome(const GLYPHBITMAPDATA& data, uint16_t* dest) {
+void TEXTURECACHE::PasteGlyphOutlinedMonochrome(const GLYPHBITMAPDATA& data, uint32_t* dest) {
     const uint8_t* source = static_cast<const uint8_t*>(data.m_data);
     uint32_t thick = this->m_theFace->m_fontFlags & 8;
 
@@ -102,60 +109,79 @@ void TEXTURECACHE::PasteGlyphOutlinedMonochrome(const GLYPHBITMAPDATA& data, uin
         }
     }
 
+    // MODIFIED: body and outline rim both become ink in the cell image, then the
+    // cell goes through the distance field path.
     uint16_t* bufferRow = buffer;
 
-    for (uint32_t y = 0; y < this->m_theFace->m_cellHeight; y++) {
-        for (uint32_t x = 0; x < data.m_glyphCellWidth; x++) {
+    if (cellWidth > 256 || cellHeight > 36) {
+        GxuFontSdf::ClearCell(cellWidth, cellHeight, dest, 256);
+        return;
+    }
+
+    memset(s_cellImage, 0, sizeof(s_cellImage));
+
+    for (uint32_t y = 0; y < cellHeight; y++) {
+        uint8_t* line = s_cellImage + y * 256;
+
+        for (uint32_t x = 0; x < cellWidth; x++) {
             uint16_t value = bufferRow[x];
 
-            if (value == 1) {
-                dest[x] = 0xFFFF;
-            } else if (value == 2) {
-                dest[x] = 0x7000;
-            } else {
-                dest[x] = value != 4 ? 0 : 0xF000;
+            // MODIFIED: only the glyph body is ink. The outline rim used to be
+            // baked in here, which merged it into the body and made outlined
+            // text look bold and clumped. The shader expands the rim instead.
+            if (value == 1 || value == 4) {
+                line[x] = 255;
             }
         }
 
         bufferRow += 256;
-        dest += 256;
     }
+
+    GxuFontSdf::BuildCell(s_cellImage, cellWidth, cellHeight, 256, cellWidth, cellHeight, 0, dest, 256);
 }
 
 // VERIFY: 891087d8 manual
 // OFFSET: 0x006C9330
-void TEXTURECACHE::PasteGlyphNonOutlinedMonochrome(const GLYPHBITMAPDATA& data, uint16_t* dest) {
+void TEXTURECACHE::PasteGlyphNonOutlinedMonochrome(const GLYPHBITMAPDATA& data, uint32_t* dest) {
+    // MODIFIED: monochrome glyphs are expanded into the cell image and go
+    // through the same distance field path as antialiased ones, so the shader
+    // sees a uniform encoding for every glyph.
     const uint8_t* source = static_cast<const uint8_t*>(data.m_data);
     uint32_t pitch = data.m_glyphPitch;
-    size_t size = 2 * data.m_glyphCellWidth;
+    uint32_t cellW = data.m_glyphCellWidth;
+    uint32_t cellH = this->m_theFace->m_cellHeight;
 
-    for (uint32_t y = 0; y < data.m_yStart; y++) {
-        memset(dest, 0, size);
-        dest += 256;
+    if (cellW > 256 || cellH > 36) {
+        GxuFontSdf::ClearCell(cellW, cellH, dest, 256);
+        return;
     }
 
+    memset(s_cellImage, 0, sizeof(s_cellImage));
+
     for (uint32_t y = 0; y < data.m_glyphHeight; y++) {
-        for (uint32_t x = 0; x < data.m_glyphWidth; x++) {
-            dest[x] = -(((source[x >> 3] >> (7 - (x & 7))) & 1) != 0);
+        uint32_t row = data.m_yStart + y;
+
+        if (row >= cellH) {
+            break;
+        }
+
+        uint8_t* line = s_cellImage + row * 256;
+
+        for (uint32_t x = 0; x < data.m_glyphWidth && x < cellW; x++) {
+            if ((source[x >> 3] >> (7 - (x & 7))) & 1) {
+                line[x] = 255;
+            }
         }
 
         source += pitch;
-        dest += 256;
     }
 
-    int32_t remaining = this->m_theFace->m_cellHeight - data.m_yStart - data.m_glyphHeight;
-
-    if (remaining > 0) {
-        for (uint32_t y = 0; y < static_cast<uint32_t>(remaining); y++) {
-            memset(dest, 0, size);
-            dest += 256;
-        }
-    }
+    GxuFontSdf::BuildCell(s_cellImage, cellW, cellH, 256, cellW, cellH, 0, dest, 256);
 }
 
 // VERIFY: c5efdcbb manual
 // OFFSET: 0x006C9420
-void TEXTURECACHE::PasteGlyphOutlinedAA(const GLYPHBITMAPDATA& data, uint16_t* dest) {
+void TEXTURECACHE::PasteGlyphOutlinedAA(const GLYPHBITMAPDATA& data, uint32_t* dest) {
     static const uint8_t s_outlineAlpha[] = { 0, 1, 1, 3, 5, 7, 9, 11, 13, 15 };
 
     const uint8_t* source = static_cast<const uint8_t*>(data.m_data);
@@ -281,57 +307,47 @@ void TEXTURECACHE::PasteGlyphOutlinedAA(const GLYPHBITMAPDATA& data, uint16_t* d
         }
     }
 
+    // MODIFIED: the outline rim and the glyph body are unioned into one cell
+    // image and pushed through the distance field builder.
+    if (data.m_glyphCellWidth > 256 || this->m_theFace->m_cellHeight > 36) {
+        GxuFontSdf::ClearCell(data.m_glyphCellWidth, this->m_theFace->m_cellHeight, dest, 256);
+        return;
+    }
+
+    memset(s_cellImage, 0, sizeof(s_cellImage));
+
     uint32_t offset = 0;
 
     for (uint32_t y = 0; y < this->m_theFace->m_cellHeight; y++) {
-        uint32_t index = offset;
+        uint8_t* line = s_cellImage + y * 256;
 
         for (uint32_t x = 0; x < data.m_glyphCellWidth; x++) {
-            if (!state[index]) {
-                dest[index] = 0;
-            } else if (!coverage[index]) {
-                dest[index] = alpha[index] << 12;
-            } else {
-                uint8_t gray = (255 * static_cast<uint8_t>(coverage[index])) >> 12;
-                dest[index] = ((((alpha[index] << 4) | gray) << 4 | gray) << 4) | gray;
-            }
+            // MODIFIED: use the body coverage only. The rim lives in state[] but
+            // not in coverage[]; baking it into the distance field made outlined
+            // glyphs visibly heavier, so the shader draws the rim analytically.
+            const uint16_t cov = coverage[offset + x];
 
-            index++;
+            if (cov) {
+                line[x] = static_cast<uint8_t>(cov > 255 ? 255 : cov);
+            }
         }
 
         offset += 256;
     }
+
+    GxuFontSdf::BuildCell(s_cellImage, data.m_glyphCellWidth, this->m_theFace->m_cellHeight,
+        256, data.m_glyphCellWidth, this->m_theFace->m_cellHeight, 0, dest, 256);
 }
 
 // VERIFY: 45fd06c3 manual
 // OFFSET: 0x006C9C70
-void TEXTURECACHE::PasteGlyphNonOutlinedAA(const GLYPHBITMAPDATA& data, uint16_t* dest) {
-    const uint8_t* source = static_cast<const uint8_t*>(data.m_data);
-    uint32_t pitch = data.m_glyphPitch;
-    size_t size = 2 * data.m_glyphCellWidth;
-
-    for (uint32_t y = 0; y < data.m_yStart; y++) {
-        memset(dest, 0, size);
-        dest += 256;
-    }
-
-    for (uint32_t y = 0; y < data.m_glyphHeight; y++) {
-        for (uint32_t x = 0; x < data.m_glyphWidth; x++) {
-            dest[x] = (source[x] << 8) | 0xFFF;
-        }
-
-        source += pitch;
-        dest += 256;
-    }
-
-    int32_t remaining = this->m_theFace->m_cellHeight - data.m_yStart - data.m_glyphHeight;
-
-    if (remaining > 0) {
-        for (uint32_t y = 0; y < static_cast<uint32_t>(remaining); y++) {
-            memset(dest, 0, size);
-            dest += 256;
-        }
-    }
+void TEXTURECACHE::PasteGlyphNonOutlinedAA(const GLYPHBITMAPDATA& data, uint32_t* dest) {
+    // MODIFIED: instead of pasting raw 4-bit coverage, build an 8-bit signed
+    // distance field for this cell. The shader turns it back into a crisp edge.
+    GxuFontSdf::BuildCell(static_cast<const uint8_t*>(data.m_data),
+        data.m_glyphWidth, data.m_glyphHeight, data.m_glyphPitch,
+        data.m_glyphCellWidth, this->m_theFace->m_cellHeight, data.m_yStart,
+        dest, 256);
 }
 
 // VERIFY: d9c18e4c auto
@@ -378,7 +394,7 @@ void TEXTURECACHE::TextureCallback(EGxTexCommand command, uint32_t width, uint32
             }
 
             CGxFont* font = cache->m_theFace;
-            uint16_t* dest = &s_textureData[glyph->m_glyphStartPixel + ((glyph->m_rowNumber * font->m_cellHeight) << 8)];
+            uint32_t* dest = &s_textureData[glyph->m_glyphStartPixel + ((glyph->m_rowNumber * font->m_cellHeight) << 8)];
 
             if (font->m_fontFlags & 1) {
                 if (font->m_fontFlags & 2) {
@@ -394,15 +410,23 @@ void TEXTURECACHE::TextureCallback(EGxTexCommand command, uint32_t width, uint32
         }
     }
 
-    texelStrideInBytes = 512;
+    // MODIFIED: 256 texels of ARGB8888 per row.
+    texelStrideInBytes = 1024;
     texels = s_textureData;
 }
 
 // VERIFY: 0f656a97 auto
 // OFFSET: 0x006CA050
 void TEXTURECACHE::CreateTexture(int32_t filter) {
-    CGxTexFlags flags(static_cast<EGxTexFilter>(filter != 0), 0, 0, 0, 0, 0, 1, 0, 0, 0);
-    this->m_texture = TextureCreate(256, 256, GxTex_Argb4444, GxTex_Argb4444, flags, this, TEXTURECACHE::TextureCallback, "GxuFont", 0);
+    // MODIFIED: ARGB8888 instead of ARGB4444. 4 bits of alpha cannot carry a
+    // distance field (16 levels), 8 bits is the minimum usable precision.
+    //
+    // MODIFIED: the filter is forced to linear. The original client used
+    // nearest filtering (fontFlags & 4 was usually 0) because a coverage bitmap
+    // sampled 1:1 does not care. A distance field does: nearest sampling of it
+    // aliases badly the moment the UI is scaled, which is the normal case here.
+    CGxTexFlags flags(GxTex_Linear, 0, 0, 0, 0, 0, 1, 0, 0, 0);
+    this->m_texture = TextureCreate(256, 256, GxTex_Argb8888, GxTex_Argb8888, flags, this, TEXTURECACHE::TextureCallback, "GxuFont", 0);
 }
 
 // VERIFY: ba005b39 manual
