@@ -37,12 +37,42 @@ constexpr float kSpread = 4.0f;
 // Writes 0xAARRGGBB texels. The distance lives in the alpha byte; RGB is set to
 // the same value so the texture still displays correctly if sampled by a
 // fixed-function path.
+//
+// NOTE: this variant derives the distance from a rasterized bitmap, which
+// quantizes curves. BuildFromPolygons is the accurate path; this one is only
+// kept as a fallback for glyphs whose outline cannot be decomposed.
 void BuildCell(const uint8_t* gray, uint32_t gw, uint32_t gh, uint32_t pitch,
                uint32_t cellW, uint32_t cellH, uint32_t yStart,
                uint32_t* dest, uint32_t destStride);
 
+// Builds the SDF directly from the glyph outline, which is what the vector
+// shape actually is. No rasterization, no thresholding, so curves stay curved.
+//
+// pts          : flattened outline points, interleaved (x, y), in glyph pixel
+//                space with y pointing UP
+// pointCount   : number of points in pts
+// contourStart : index into pts where each contour begins
+// contourCount : number of contours
+// originX      : glyph-space x of the bitmap's left edge
+// originY      : glyph-space y of the bitmap's TOP edge
+// gw, gh       : bitmap size the caller will display (grid to sample on)
+// out          : gw * gh bytes, one distance per pixel, row stride = gw
+//
+// Returns false if the outline is empty or degenerate.
+bool BuildFromPolygons(const float* pts, int pointCount,
+                       const int* contourStart, int contourCount,
+                       float originX, float originY,
+                       uint32_t gw, uint32_t gh, uint8_t* out);
+
 // Clears one cell (used for empty glyphs and for glyphs we skip).
 void ClearCell(uint32_t cellW, uint32_t cellH, uint32_t* dest, uint32_t destStride);
+
+// Copies a prepared one-byte-per-pixel distance field into an atlas cell,
+// converting it to the 0xAARRGGBB form the texture expects. The cell is cleared
+// first, so callers do not have to blank the area themselves.
+void BlitDistance(const uint8_t* sdf, uint32_t sdfWidth, uint32_t sdfHeight,
+                  uint32_t cellW, uint32_t cellH, uint32_t yStart,
+                  uint32_t* dest, uint32_t destStride);
 
 } // namespace GxuFontSdf
 

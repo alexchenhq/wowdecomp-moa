@@ -23,6 +23,28 @@
 
 改动量：**新增约 250 行，修改 123 行 / 删除 72 行**。
 
+## 2026-10-25 07:27 修正（第三版反馈：5/8/6 圆弧不自然、数字不平直）
+
+**先纠正一个方向性判断：这不是 MSDF 能解决的问题。**
+
+根因有两条，都在"距离场的来源"上：
+
+1. **原版用了 `FT_LOAD_NO_HINTING`**（`IGxuFontGlyph.cpp:13`）。没有 hinting 的字形不吸附像素网格，12~14px 下竖笔落在小数像素上，宽度一粗一细 —— 这是"不平直"的直接原因。
+2. **第一版的距离场是从二值化位图算的**（阈值 128 → EDT）。位图已经把矢量轮廓量化成像素了，再算距离等于把量化误差放大，圆弧被切成不规则多边形 —— 这是 5/8/6 不自然的原因。
+
+MSDF 解决的是**尖角方向**（A 顶点、4 的转折），圆弧对不对它管不了。所以走 MSDF 只会改善 4 和 A，5/8/6 依旧。
+
+**改法：距离场直接从矢量轮廓算。**
+
+- `IGxuFontGlyph.cpp`：把 `FREETYPE_RenderGlyph` 拆成 load / render 两步，在 `FT_Render_Glyph` **之前**用 `FT_Outline_Decompose` 取出轮廓（渲染会把 glyph slot 换成位图，轮廓就没了）
+- 二次贝塞尔细分 8 段、三次细分 12 段，拍平成折线
+- `GxuFontSDF::BuildFromPolygons`：逐像素求到所有线段的**精确距离**，用 even-odd 射线法定内外符号
+- 结果按同一像素网格存进 `GLYPHBITMAPDATA::m_sdfData`，缓存直接 blit
+
+**对已有成果零影响**：图集格式（ARGB8888）、过滤（线性）、着色器（ps_3_0 + ddx/ddy）、描边解析式扩张，全部没动。位图路径完整保留，`m_sdfData` 为空时自动回退。
+
+注意 FreeType 2.0 的坑：常量叫 `ft_glyph_format_outline`（不是 `FT_GLYPH_FORMAT_OUTLINE`），且 `FT_Outline_Decompose` 要显式 `#include <freetype/ftoutln.h>`。
+
 ## 2026-10-25 06:21 修正（第二版反馈：描边字体太粗、堆积）
 
 第二版实机确认「清楚了非常多」，但带 OUTLINE 的文字过粗。

@@ -1,24 +1,176 @@
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
+#include <vector>
+#include <freetype/ftoutln.h>
 #include "Engine/Source/Gxu/IGxuFontGlyph.h"
 #include "Engine/Source/Gxu/GxuFontMiscClasses.h"
+#include "Engine/Source/Gxu/GxuFontSDF.h"
 #include "Engine/Source/Storm/H/storm.h"
 
-// VERIFY: fff26b99 manual
-// OFFSET: 0x006C8C10
-static int32_t FREETYPE_RenderGlyph(FT_Face face, uint32_t code, bool monochrome) {
-    FT_UInt index = FT_Get_Char_Index(face, code);
+namespace {
 
-    if (!index || FT_Load_Glyph(face, index, monochrome ? FT_LOAD_LINEAR_DESIGN | FT_LOAD_PEDANTIC | FT_LOAD_CROP_BITMAP | FT_LOAD_NO_HINTING : FT_LOAD_LINEAR_DESIGN | FT_LOAD_PEDANTIC | FT_LOAD_NO_BITMAP | FT_LOAD_NO_HINTING)) {
+// MODIFIED: the outline is flattened into polylines before FT_Render_Glyph,
+// because rendering replaces the glyph slot with a bitmap and the vector shape
+// is lost. The distance field is then built from those polylines, which keeps
+// curves round instead of quantizing them to the rasterizer's pixel grid.
+// Values arrive in 26.6 fixed point and are converted to pixels on the way in.
+struct OutlinePoly {
+    std::vector<float> m_points;     // interleaved x, y in pixels, y pointing up
+    std::vector<int> m_contourStart;
+
+    void PushScaled(int32_t x, int32_t y) {
+        m_points.push_back(static_cast<float>(x) * (1.0f / 64.0f));
+        m_points.push_back(static_cast<float>(y) * (1.0f / 64.0f));
+    }
+
+    void Push(float x, float y) {
+        m_points.push_back(x);
+        m_points.push_back(y);
+    }
+
+    float LastX() const { return m_points[m_points.size() - 2]; }
+    float LastY() const { return m_points[m_points.size() - 1]; }
+    bool Usable() const { return m_points.size() >= 6 && !m_contourStart.empty(); }
+};
+
+int OutlineMoveTo(FT_Vector* to, void* user) {
+    OutlinePoly* poly = static_cast<OutlinePoly*>(user);
+
+    if (!poly) {
         return 0;
     }
 
+    poly->m_contourStart.push_back(static_cast<int>(poly->m_points.size() / 2));
+    poly->PushScaled(to->x, to->y);
+
+    return 0;
+}
+
+int OutlineLineTo(FT_Vector* to, void* user) {
+    OutlinePoly* poly = static_cast<OutlinePoly*>(user);
+
+    if (poly) {
+        poly->PushScaled(to->x, to->y);
+    }
+
+    return 0;
+}
+
+int OutlineConicTo(FT_Vector* control, FT_Vector* to, void* user) {
+    OutlinePoly* poly = static_cast<OutlinePoly*>(user);
+
+    if (!poly || poly->m_points.size() < 2) {
+        return 0;
+    }
+
+    const float x0 = poly->LastX();
+    const float y0 = poly->LastY();
+    const float x1 = static_cast<float>(control->x) * (1.0f / 64.0f);
+    const float y1 = static_cast<float>(control->y) * (1.0f / 64.0f);
+    const float x2 = static_cast<float>(to->x) * (1.0f / 64.0f);
+    const float y2 = static_cast<float>(to->y) * (1.0f / 64.0f);
+
+    const int steps = 8;
+
+    for (int i = 1; i <= steps; i++) {
+        const float t = static_cast<float>(i) / static_cast<float>(steps);
+        const float mt = 1.0f - t;
+
+        poly->Push(mt * mt * x0 + 2.0f * mt * t * x1 + t * t * x2,
+                   mt * mt * y0 + 2.0f * mt * t * y1 + t * t * y2);
+    }
+
+    return 0;
+}
+
+int OutlineCubicTo(FT_Vector* control1, FT_Vector* control2, FT_Vector* to, void* user) {
+    OutlinePoly* poly = static_cast<OutlinePoly*>(user);
+
+    if (!poly || poly->m_points.size() < 2) {
+        return 0;
+    }
+
+    const float x0 = poly->LastX();
+    const float y0 = poly->LastY();
+    const float x1 = static_cast<float>(control1->x) * (1.0f / 64.0f);
+    const float y1 = static_cast<float>(control1->y) * (1.0f / 64.0f);
+    const float x2 = static_cast<float>(control2->x) * (1.0f / 64.0f);
+    const float y2 = static_cast<float>(control2->y) * (1.0f / 64.0f);
+    const float x3 = static_cast<float>(to->x) * (1.0f / 64.0f);
+    const float y3 = static_cast<float>(to->y) * (1.0f / 64.0f);
+
+    const int steps = 12;
+
+    for (int i = 1; i <= steps; i++) {
+        const float t = static_cast<float>(i) / static_cast<float>(steps);
+        const float mt = 1.0f - t;
+
+        const float a = mt * mt * mt;
+        const float b = 3.0f * mt * mt * t;
+        const float c = 3.0f * mt * t * t;
+        const float d = t * t * t;
+
+        poly->Push(a * x0 + b * x1 + c * x2 + d * x3,
+                   a * y0 + b * y1 + c * y2 + d * y3);
+    }
+
+    return 0;
+}
+
+// MODIFIED: split from the original single FREETYPE_RenderGlyph so the caller
+// can inspect the outline between loading and rasterizing.
+int32_t FREETYPE_LoadGlyph(FT_Face face, uint32_t code, bool monochrome) {
+    FT_UInt index = FT_Get_Char_Index(face, code);
+
+    if (!index) {
+        return 0;
+    }
+
+    FT_Int32 flags = FT_LOAD_LINEAR_DESIGN | FT_LOAD_PEDANTIC | FT_LOAD_NO_HINTING;
+
+    if (monochrome) {
+        flags |= FT_LOAD_CROP_BITMAP;
+    } else {
+        flags |= FT_LOAD_NO_BITMAP;
+    }
+
+    return FT_Load_Glyph(face, index, flags) == 0;
+}
+
+int32_t FREETYPE_RenderLoadedGlyph(FT_Face face, bool monochrome) {
     return FT_Render_Glyph(face->glyph, static_cast<FT_Render_Mode>(monochrome)) == FT_Err_Ok;
 }
 
-// VERIFY: d81e8b25 manual
-// OFFSET: 0x006C8C60
+bool FlattenOutline(FT_Face face, OutlinePoly* poly) {
+    if (!face || !poly || !face->glyph || face->glyph->format != ft_glyph_format_outline) {
+        return false;
+    }
+
+    if (!face->glyph->outline.n_contours || face->glyph->outline.n_points <= 0) {
+        return false;
+    }
+
+    FT_Outline_Funcs functions;
+    memset(&functions, 0, sizeof(functions));
+
+    functions.move_to = OutlineMoveTo;
+    functions.line_to = OutlineLineTo;
+    functions.conic_to = OutlineConicTo;
+    functions.cubic_to = OutlineCubicTo;
+    functions.shift = 0;
+    functions.delta = 0;
+
+    if (FT_Outline_Decompose(&face->glyph->outline, &functions, poly) != 0) {
+        return false;
+    }
+
+    return poly->Usable();
+}
+
+} // namespace
+
 static void CalculateYOffset(uint32_t pixelSize, int32_t baseline, FT_Face face, uint32_t glyphHeight, int32_t* yOffset, uint32_t* yStart) {
     int32_t offset = 0;
     int32_t start;
@@ -49,8 +201,6 @@ static void CalculateYOffset(uint32_t pixelSize, int32_t baseline, FT_Face face,
     }
 }
 
-// VERIFY: 86715750 manual
-// OFFSET: 0x006C8CC0
 bool IGxuFontGlyphRenderGlyph(FT_Face face, uint32_t pixelSize, uint32_t code, uint32_t baseline, GLYPHBITMAPDATA* dataPtr, int32_t monochrome, uint32_t padding) {
     if (!face || !pixelSize || !dataPtr) {
         SErrSetLastError(STORM_ERROR_INVALID_PARAMETER);
@@ -61,7 +211,19 @@ bool IGxuFontGlyphRenderGlyph(FT_Face face, uint32_t pixelSize, uint32_t code, u
         return false;
     }
 
-    if (!FREETYPE_RenderGlyph(face, code, monochrome != 0)) {
+    if (!FREETYPE_LoadGlyph(face, code, monochrome != 0)) {
+        return false;
+    }
+
+    // MODIFIED: sample the vector outline while it is still present.
+    OutlinePoly poly;
+    bool haveOutline = false;
+
+    if (!monochrome) {
+        haveOutline = FlattenOutline(face, &poly);
+    }
+
+    if (!FREETYPE_RenderLoadedGlyph(face, monochrome != 0)) {
         return false;
     }
 
@@ -114,6 +276,30 @@ bool IGxuFontGlyphRenderGlyph(FT_Face face, uint32_t pixelSize, uint32_t code, u
 
     if (width && data && !placeholder) {
         CalculateYOffset(pixelSize, baseline, face, height, &dataPtr->m_yOffset, &dataPtr->m_yStart);
+    }
+
+    // MODIFIED: build the distance field on the same pixel grid as the bitmap, so
+    // the texture cache can blit it straight into a cell without knowing where
+    // the outline came from.
+    if (haveOutline && width && height && !placeholder) {
+        const size_t sdfSize = static_cast<size_t>(width) * height;
+        uint8_t* sdf = static_cast<uint8_t*>(SMemAlloc(sdfSize, __FILE__, __LINE__, 0));
+
+        if (sdf) {
+            const bool built = GxuFontSdf::BuildFromPolygons(poly.m_points.data(),
+                static_cast<int>(poly.m_points.size() / 2),
+                poly.m_contourStart.data(),
+                static_cast<int>(poly.m_contourStart.size()),
+                static_cast<float>(face->glyph->bitmap_left),
+                static_cast<float>(face->glyph->bitmap_top),
+                width, height, sdf);
+
+            if (built) {
+                dataPtr->m_sdfData = sdf;
+            } else {
+                SMemFree(sdf, __FILE__, __LINE__, 0);
+            }
+        }
     }
 
     return true;

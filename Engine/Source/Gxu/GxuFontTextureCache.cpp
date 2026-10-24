@@ -182,6 +182,14 @@ void TEXTURECACHE::PasteGlyphNonOutlinedMonochrome(const GLYPHBITMAPDATA& data, 
 // VERIFY: c5efdcbb manual
 // OFFSET: 0x006C9420
 void TEXTURECACHE::PasteGlyphOutlinedAA(const GLYPHBITMAPDATA& data, uint32_t* dest) {
+    // MODIFIED: when the outline-derived field exists, use it directly. It holds
+    // the body only, which is exactly what the shader needs; the rim is expanded
+    // there. This also skips the whole wall-following pass below.
+    if (data.m_sdfData) {
+        GxuFontSdf::BlitDistance(data.m_sdfData, data.m_glyphWidth, data.m_glyphHeight,
+            data.m_glyphCellWidth, this->m_theFace->m_cellHeight, data.m_yStart, dest, 256);
+        return;
+    }
     static const uint8_t s_outlineAlpha[] = { 0, 1, 1, 3, 5, 7, 9, 11, 13, 15 };
 
     const uint8_t* source = static_cast<const uint8_t*>(data.m_data);
@@ -342,8 +350,14 @@ void TEXTURECACHE::PasteGlyphOutlinedAA(const GLYPHBITMAPDATA& data, uint32_t* d
 // VERIFY: 45fd06c3 manual
 // OFFSET: 0x006C9C70
 void TEXTURECACHE::PasteGlyphNonOutlinedAA(const GLYPHBITMAPDATA& data, uint32_t* dest) {
-    // MODIFIED: instead of pasting raw 4-bit coverage, build an 8-bit signed
-    // distance field for this cell. The shader turns it back into a crisp edge.
+    // MODIFIED: prefer the field built from the outline; fall back to deriving it
+    // from the raster when the outline was not available.
+    if (data.m_sdfData) {
+        GxuFontSdf::BlitDistance(data.m_sdfData, data.m_glyphWidth, data.m_glyphHeight,
+            data.m_glyphCellWidth, this->m_theFace->m_cellHeight, data.m_yStart, dest, 256);
+        return;
+    }
+
     GxuFontSdf::BuildCell(static_cast<const uint8_t*>(data.m_data),
         data.m_glyphWidth, data.m_glyphHeight, data.m_glyphPitch,
         data.m_glyphCellWidth, this->m_theFace->m_cellHeight, data.m_yStart,
