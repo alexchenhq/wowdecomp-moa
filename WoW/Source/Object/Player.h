@@ -98,7 +98,10 @@ class CGPlayerLocalData : public CGPlayerData {
     /* 0FF8 */ uint32_t m_playerFieldCoinage;
     /* 0FFC */ uint32_t m_playerFieldModDamageDonePos [7];
     /* 1018 */ uint32_t m_playerFieldModDamageDoneNeg [7];
-    /* 1034 */ uint32_t m_playerFieldModDamageDonePct [7];
+    // MODIFIED: the server writes this array with SetFloatValue (IEEE bits), so it
+    // has to be read back as float. Declared as uint32_t it returned the raw bit
+    // pattern, which is what produced "x106703091200%" in the paperdoll tooltip.
+    /* 1034 */ float m_playerFieldModDamageDonePct [7];
     /* 1050 */ uint32_t m_playerFieldModHealingDonePos;
     /* 1054 */ float m_playerFieldModHealingPct;
     /* 1058 */ float m_playerFieldModHealingDonePct;
