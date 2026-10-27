@@ -289,37 +289,44 @@ bool IGxuFontGlyphRenderGlyph(FT_Face face, uint32_t pixelSize, uint32_t code, u
         CalculateYOffset(pixelSize, baseline, face, height, &dataPtr->m_yOffset, &dataPtr->m_yStart);
     }
 
-    // MODIFIED: build the distance field on the same pixel grid as the bitmap, so
-    // the texture cache can blit it straight into a cell without knowing where
-    // the outline came from.
-    if (haveOutline && width && height && !placeholder) {
-        // MODIFIED: three channels instead of one. The shader takes the median,
-        // which keeps corners sharp; a single channel rounds them off.
-        // Single channel is the default: at UI sizes the median of three 8-bit
-        // channels is noisier than one, and the outline is already exact. Flip
-        // kUseMsdf to compare the three-channel path.
-        const bool useMsdf = false;
-        const uint32_t channels = useMsdf ? 3 : 1;
-        const size_t sdfSize = static_cast<size_t>(width) * height * channels;
-        uint8_t* sdf = static_cast<uint8_t*>(SMemAlloc(sdfSize, __FILE__, __LINE__, 0));
+    // MODIFIED: sample the whole atlas cell, not just the ink rectangle. The
+    // outline is analytic, so texels outside the glyph still get a real distance
+    // and the field keeps decaying past the edge instead of stopping dead at the
+    // last ink column. That dead stop is what looked like a cut line on the right
+    // of 8 and 6, and like a chipped tip on the apex of M.
+    if (haveOutline && width && height && !placeholder && dataPtr->m_glyphCellWidth && pixelSize) {
+        const uint32_t fieldW = dataPtr->m_glyphCellWidth;
+        const uint32_t fieldH = pixelSize;
 
-        if (sdf) {
-            const float originX = static_cast<float>(face->glyph->bitmap_left);
-            const float originY = static_cast<float>(face->glyph->bitmap_top);
-            const int pointCount = static_cast<int>(poly.m_points.size() / 2);
-            const int contourCount = static_cast<int>(poly.m_contourStart.size());
+        if (fieldW <= 256 && fieldH <= 64) {
+            const bool useMsdf = false;
+            const uint32_t channels = useMsdf ? 3 : 1;
+            const size_t sdfSize = static_cast<size_t>(fieldW) * fieldH * channels;
+            uint8_t* sdf = static_cast<uint8_t*>(SMemAlloc(sdfSize, __FILE__, __LINE__, 0));
 
-            const bool built = useMsdf
-                ? GxuFontSdf::BuildMSDFFromPolygons(poly.m_points.data(), pointCount,
-                    poly.m_contourStart.data(), contourCount, originX, originY, width, height, sdf)
-                : GxuFontSdf::BuildFromPolygons(poly.m_points.data(), pointCount,
-                    poly.m_contourStart.data(), contourCount, originX, originY, width, height, sdf);
+            if (sdf) {
+                // Cell row 0 sits yStart rows above the bitmap's top edge.
+                const float originX = static_cast<float>(face->glyph->bitmap_left);
+                const float originY = static_cast<float>(face->glyph->bitmap_top)
+                                    + static_cast<float>(dataPtr->m_yStart);
 
-            if (built) {
-                dataPtr->m_sdfData = sdf;
-                dataPtr->m_sdfChannels = channels;
-            } else {
-                SMemFree(sdf, __FILE__, __LINE__, 0);
+                const int pointCount = static_cast<int>(poly.m_points.size() / 2);
+                const int contourCount = static_cast<int>(poly.m_contourStart.size());
+
+                const bool built = useMsdf
+                    ? GxuFontSdf::BuildMSDFFromPolygons(poly.m_points.data(), pointCount,
+                        poly.m_contourStart.data(), contourCount, originX, originY, fieldW, fieldH, sdf)
+                    : GxuFontSdf::BuildFromPolygons(poly.m_points.data(), pointCount,
+                        poly.m_contourStart.data(), contourCount, originX, originY, fieldW, fieldH, sdf);
+
+                if (built) {
+                    dataPtr->m_sdfData = sdf;
+                    dataPtr->m_sdfChannels = channels;
+                    dataPtr->m_sdfWidth = fieldW;
+                    dataPtr->m_sdfHeight = fieldH;
+                } else {
+                    SMemFree(sdf, __FILE__, __LINE__, 0);
+                }
             }
         }
     }

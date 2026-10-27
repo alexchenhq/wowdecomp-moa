@@ -186,9 +186,11 @@ void TEXTURECACHE::PasteGlyphOutlinedAA(const GLYPHBITMAPDATA& data, uint32_t* d
     // the body only, which is exactly what the shader needs; the rim is expanded
     // there. This also skips the whole wall-following pass below.
     if (data.m_sdfData) {
-        GxuFontSdf::BlitDistance(data.m_sdfData, data.m_glyphWidth, data.m_glyphHeight,
+        // The field already covers the full cell, so it lands at row 0 with no
+        // yStart offset.
+        GxuFontSdf::BlitDistance(data.m_sdfData, data.m_sdfWidth, data.m_sdfHeight,
             data.m_sdfChannels ? data.m_sdfChannels : 1,
-            data.m_glyphCellWidth, this->m_theFace->m_cellHeight, data.m_yStart, dest, 256);
+            data.m_glyphCellWidth, this->m_theFace->m_cellHeight, 0, dest, 256);
         return;
     }
     static const uint8_t s_outlineAlpha[] = { 0, 1, 1, 3, 5, 7, 9, 11, 13, 15 };
@@ -354,9 +356,11 @@ void TEXTURECACHE::PasteGlyphNonOutlinedAA(const GLYPHBITMAPDATA& data, uint32_t
     // MODIFIED: prefer the field built from the outline; fall back to deriving it
     // from the raster when the outline was not available.
     if (data.m_sdfData) {
-        GxuFontSdf::BlitDistance(data.m_sdfData, data.m_glyphWidth, data.m_glyphHeight,
+        // The field already covers the full cell, so it lands at row 0 with no
+        // yStart offset.
+        GxuFontSdf::BlitDistance(data.m_sdfData, data.m_sdfWidth, data.m_sdfHeight,
             data.m_sdfChannels ? data.m_sdfChannels : 1,
-            data.m_glyphCellWidth, this->m_theFace->m_cellHeight, data.m_yStart, dest, 256);
+            data.m_glyphCellWidth, this->m_theFace->m_cellHeight, 0, dest, 256);
         return;
     }
 

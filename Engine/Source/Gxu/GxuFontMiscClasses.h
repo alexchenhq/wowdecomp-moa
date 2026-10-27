@@ -35,6 +35,11 @@ struct GLYPHBITMAPDATA {
     // decomposed, in which case the bitmap path is used instead.
     /* NEW */ uint8_t* m_sdfData;
     /* NEW */ uint32_t m_sdfChannels;   // 1 = grayscale field, 3 = MSDF
+    // MODIFIED: the field covers the whole atlas cell, not just the ink, so the
+    // distance keeps falling off past the glyph edge. Without the margin the
+    // shader hit a hard step at the last ink texel and edges looked cut off.
+    /* NEW */ uint32_t m_sdfWidth;
+    /* NEW */ uint32_t m_sdfHeight;
 
     GLYPHBITMAPDATA();
     ~GLYPHBITMAPDATA();
