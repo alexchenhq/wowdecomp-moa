@@ -282,11 +282,13 @@ bool IGxuFontGlyphRenderGlyph(FT_Face face, uint32_t pixelSize, uint32_t code, u
     // the texture cache can blit it straight into a cell without knowing where
     // the outline came from.
     if (haveOutline && width && height && !placeholder) {
-        const size_t sdfSize = static_cast<size_t>(width) * height;
+        // MODIFIED: three channels instead of one. The shader takes the median,
+        // which keeps corners sharp; a single channel rounds them off.
+        const size_t sdfSize = static_cast<size_t>(width) * height * 3;
         uint8_t* sdf = static_cast<uint8_t*>(SMemAlloc(sdfSize, __FILE__, __LINE__, 0));
 
         if (sdf) {
-            const bool built = GxuFontSdf::BuildFromPolygons(poly.m_points.data(),
+            const bool built = GxuFontSdf::BuildMSDFFromPolygons(poly.m_points.data(),
                 static_cast<int>(poly.m_points.size() / 2),
                 poly.m_contourStart.data(),
                 static_cast<int>(poly.m_contourStart.size()),
@@ -296,6 +298,7 @@ bool IGxuFontGlyphRenderGlyph(FT_Face face, uint32_t pixelSize, uint32_t code, u
 
             if (built) {
                 dataPtr->m_sdfData = sdf;
+                dataPtr->m_sdfChannels = 3;
             } else {
                 SMemFree(sdf, __FILE__, __LINE__, 0);
             }

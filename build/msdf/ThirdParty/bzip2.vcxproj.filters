@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\bzip2\blocksort.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\bzip2\bzlib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\bzip2\compress.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\bzip2\crctable.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\bzip2\decompress.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\bzip2\huffman.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\bzip2\randtable.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{75F5BD57-742E-3DF4-BBF2-91C0E3275CE8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
