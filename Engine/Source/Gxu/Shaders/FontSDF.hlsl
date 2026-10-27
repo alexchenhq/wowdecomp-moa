@@ -39,7 +39,7 @@ float4 main(float2 uv : TEXCOORD0, float4 color : COLOR0) : COLOR0 {
     // Edge sharpness comes from FontSDF.cfg so it can be tuned without a
     // rebuild. Above 1.0 the ramp is narrower than a pixel (crisper, can alias);
     // below 1.0 it is softer.
-    float sharpness = OutlineParams.w > 0.0 ? OutlineParams.w : 1.35;
+    float sharpness = OutlineParams.w > 0.0 ? OutlineParams.w : 1.6;
 
     float body = saturate(sd / px * sharpness + 0.5);
 
