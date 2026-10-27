@@ -302,7 +302,7 @@ bool BuildFromPolygons(const float* pts, int pointCount,                       c
 }
 
 void BlitDistance(const uint8_t* sdf, uint32_t sdfWidth, uint32_t sdfHeight,
-                  uint32_t cellW, uint32_t cellH, uint32_t yStart,
+                  uint32_t channels, uint32_t cellW, uint32_t cellH, uint32_t yStart,
                   uint32_t* dest, uint32_t destStride) {
     ClearCell(cellW, cellH, dest, destStride);
 
@@ -317,13 +317,196 @@ void BlitDistance(const uint8_t* sdf, uint32_t sdfWidth, uint32_t sdfHeight,
             break;
         }
 
-        const uint8_t* src = sdf + static_cast<size_t>(y) * sdfWidth;
+        const uint8_t* src = sdf + static_cast<size_t>(y) * sdfWidth * channels;
         uint32_t* row = dest + static_cast<size_t>(cellRow) * destStride;
 
         for (uint32_t x = 0; x < sdfWidth && x < cellW; x++) {
-            row[x] = PackGray(src[x]);
+            if (channels == 3) {
+                const uint8_t r = src[x * 3 + 0];
+                const uint8_t g = src[x * 3 + 1];
+                const uint8_t b = src[x * 3 + 2];
+
+                // Median of the three channels goes into alpha so a fixed-function
+                // path still shows recognisable text.
+                const uint32_t lo = r < g ? r : g;
+                const uint32_t hi = r < g ? g : r;
+                const uint32_t mid = hi < b ? hi : (lo > b ? lo : b);
+
+                row[x] = (mid << 24) | (static_cast<uint32_t>(r) << 16)
+                       | (static_cast<uint32_t>(g) << 8) | static_cast<uint32_t>(b);
+            } else {
+                row[x] = PackGray(src[x]);
+            }
         }
     }
+}
+
+namespace {
+
+struct MsdfSegment {
+    int m_from;
+    int m_to;
+    uint8_t m_color;
+};
+
+inline float Median3(float a, float b, float c) {
+    const float lo = a < b ? a : b;
+    const float hi = a < b ? b : a;
+    return hi < c ? hi : (lo > c ? lo : c);
+}
+
+} // namespace
+
+bool BuildMSDFFromPolygons(const float* pts, int pointCount,
+                           const int* contourStart, int contourCount,
+                           float originX, float originY,
+                           uint32_t gw, uint32_t gh, uint8_t* out) {
+    if (!pts || pointCount < 2 || !contourStart || contourCount < 1 || !out || !gw || !gh) {
+        return false;
+    }
+
+    // Edge colouring. Runs of edges get one of three colours; a run breaks at a
+    // sharp turn so the corner is where two colours meet, which is what lets the
+    // shader keep it sharp. Each contour starts one colour further along so that
+    // simple glyphs end up using all three channels.
+    std::vector<MsdfSegment> segments;
+    segments.reserve(static_cast<size_t>(pointCount) * 2);
+
+    for (int c = 0; c < contourCount; c++) {
+        const int s = contourStart[c];
+        const int e = (c + 1 < contourCount) ? contourStart[c + 1] : pointCount;
+
+        if (s < 0 || e > pointCount || e - s < 2) {
+            continue;
+        }
+
+        const int count = e - s;
+        int color = c % 3;
+
+        float prevDx = 0.0f;
+        float prevDy = 0.0f;
+        bool havePrev = false;
+
+        for (int k = 0; k < count; k++) {
+            const int i = s + k;
+            const int j = (k + 1 < count) ? (i + 1) : s;
+
+            float dx = pts[2 * j] - pts[2 * i];
+            float dy = pts[2 * j + 1] - pts[2 * i + 1];
+
+            const float len = std::sqrt(dx * dx + dy * dy);
+
+            if (len > 1e-6f) {
+                dx /= len;
+                dy /= len;
+            }
+
+            if (havePrev) {
+                const float dot = dx * prevDx + dy * prevDy;
+
+                // Roughly a 26 degree turn or sharper starts a new colour run.
+                if (dot < 0.9f) {
+                    color = (color + 1) % 3;
+                }
+            }
+
+            segments.push_back({ i, j, static_cast<uint8_t>(color) });
+
+            prevDx = dx;
+            prevDy = dy;
+            havePrev = true;
+        }
+    }
+
+    if (segments.empty()) {
+        return false;
+    }
+
+    const float invScale = 1.0f / (2.0f * kSpread);
+    const float kMissing = 1.0e30f;
+
+    for (uint32_t y = 0; y < gh; y++) {
+        const float py = originY - (static_cast<float>(y) + 0.5f);
+
+        for (uint32_t x = 0; x < gw; x++) {
+            const float px = originX + (static_cast<float>(x) + 0.5f);
+
+            float bestSq[3] = { kMissing, kMissing, kMissing };
+            int crossings = 0;
+
+            for (const MsdfSegment& seg : segments) {
+                const float ax = pts[2 * seg.m_from];
+                const float ay = pts[2 * seg.m_from + 1];
+                const float bx = pts[2 * seg.m_to];
+                const float by = pts[2 * seg.m_to + 1];
+
+                const float d2 = DistanceSqToSegment(px, py, ax, ay, bx, by);
+
+                if (d2 < bestSq[seg.m_color]) {
+                    bestSq[seg.m_color] = d2;
+                }
+
+                if ((ay <= py) != (by <= py)) {
+                    const float t = (py - ay) / (by - ay);
+
+                    if (ax + t * (bx - ax) > px) {
+                        crossings++;
+                    }
+                }
+            }
+
+            float dist[3];
+            int present = 0;
+            float sum = 0.0f;
+
+            for (int i = 0; i < 3; i++) {
+                if (bestSq[i] < kMissing * 0.5f) {
+                    dist[i] = std::sqrt(bestSq[i]);
+                    sum += dist[i];
+                    present++;
+                } else {
+                    dist[i] = -1.0f;
+                }
+            }
+
+            if (!present) {
+                out[(static_cast<size_t>(y) * gw + x) * 3 + 0] = 128;
+                out[(static_cast<size_t>(y) * gw + x) * 3 + 1] = 128;
+                out[(static_cast<size_t>(y) * gw + x) * 3 + 2] = 128;
+                continue;
+            }
+
+            // Fill unused channels so the median stays meaningful.
+            const float fallback = present == 3 ? 0.0f : (sum / static_cast<float>(present));
+
+            for (int i = 0; i < 3; i++) {
+                if (dist[i] < 0.0f) {
+                    dist[i] = fallback;
+                }
+            }
+
+            const float signedDistance = (crossings & 1) ? 1.0f : -1.0f;
+            const float median = Median3(dist[0], dist[1], dist[2]);
+            uint8_t* pixel = out + (static_cast<size_t>(y) * gw + x) * 3;
+
+            for (int i = 0; i < 3; i++) {
+                float encoded = 0.5f + signedDistance * dist[i] * invScale;
+                encoded = std::min(1.0f, std::max(0.0f, encoded));
+                pixel[i] = static_cast<uint8_t>(encoded * 255.0f + 0.5f);
+            }
+
+            // Keep the median in the unused slots so linear filtering stays sane.
+            for (int i = 0; i < 3; i++) {
+                if (dist[i] == fallback && present != 3) {
+                    float encoded = 0.5f + signedDistance * median * invScale;
+                    encoded = std::min(1.0f, std::max(0.0f, encoded));
+                    pixel[i] = static_cast<uint8_t>(encoded * 255.0f + 0.5f);
+                }
+            }
+        }
+    }
+
+    return true;
 }
 
 } // namespace GxuFontSdf

@@ -1,0 +1,585 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{4A44A765-E487-31A7-85BB-206FA161271A}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
+    <Platform>x64</Platform>
+    <ProjectName>Wow</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\bin\Win\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Wow.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Wow64</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\bin\Win\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Wow.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Wow64</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\bin\Win\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Wow.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Wow64</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\bin\Win\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Wow.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Wow64</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</GenerateManifest>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\generated;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\zlib\contrib\blast;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\lzma;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\zlib;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\DivxDecoder;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\freetype\include;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\Engine\Source\lua-5.1\src;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\expat\lib;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\Engine\Source\SoundEngine\fmodex\src;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\bzip2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SupportJustMyCode></SupportJustMyCode>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;WOWDECOMP_ARCH_64=1;NOMINMAX;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;_STATIC;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;WOWDECOMP_ARCH_64=1;NOMINMAX;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;_STATIC;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\generated;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\zlib\contrib\blast;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\lzma;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\zlib;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\DivxDecoder;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\freetype\include;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\Engine\Source\lua-5.1\src;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\expat\lib;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\Engine\Source\SoundEngine\fmodex\src;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\bzip2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\generated;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\zlib\contrib\blast;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\lzma;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\zlib;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\DivxDecoder;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\freetype\include;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\Engine\Source\lua-5.1\src;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\expat\lib;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\Engine\Source\SoundEngine\fmodex\src;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\bzip2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>..\..\lib\Debug\BLPFile.lib;..\..\lib\Debug\Base.lib;..\..\lib\Debug\BlizzardCore.lib;..\..\lib\Debug\ComSat.lib;..\..\lib\Debug\ConsoleBase.lib;..\..\lib\Debug\Event.lib;..\..\lib\Debug\FFX.lib;..\..\lib\Debug\Frame.lib;..\..\lib\Debug\FrameScript.lib;..\..\lib\Debug\lua.lib;..\..\lib\Debug\FrameXML.lib;..\..\lib\Debug\Gx.lib;..\..\lib\Debug\Gxu.lib;..\..\lib\Debug\Images.lib;..\..\lib\Debug\Model2.lib;..\..\lib\Debug\Os.lib;..\..\lib\Debug\Scrn.lib;..\..\lib\Debug\Services.lib;..\..\lib\Debug\ShaderEffect.lib;..\..\lib\Debug\Tempest.lib;..\..\lib\Debug\SoundEngine.lib;..\..\lib\Debug\SteelseriesMouse.lib;..\..\lib\Debug\Storm.lib;..\..\lib\Debug\WoWCommon.lib;..\..\lib\Debug\Battlenet.lib;..\..\lib\Debug\Console.lib;..\..\lib\Debug\ConsoleDevice.lib;..\..\lib\Debug\DB.lib;..\..\lib\Debug\Game.lib;..\..\lib\Debug\Glue.lib;..\..\lib\Debug\LiquidSystem.lib;..\..\lib\Debug\Magic.lib;..\..\lib\Debug\Minigame.lib;..\..\lib\Debug\Net.lib;..\..\lib\Debug\Object.lib;..\..\lib\Debug\ObjectAlloc.lib;..\..\lib\Debug\ObjectMgrClient.lib;..\..\lib\Debug\SoundInterface.lib;..\..\lib\Debug\UIUtil.lib;..\..\lib\Debug\Ui.lib;..\..\lib\Debug\WorldClient.lib;..\..\lib\Debug\WowServices.lib;..\..\lib\Debug\WowSvcs.lib;..\..\lib\Debug\lzma.lib;..\..\lib\Debug\XvidDecoder.lib;..\..\lib\Debug\expat.lib;d3d9.lib;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\nvapi\amd64\nvapi64.lib;opengl32.lib;..\..\lib\Debug\jpeg.lib;imm32.lib;wininet.lib;dinput8.lib;dxguid.lib;version.lib;..\..\lib\Debug\fmodex.lib;winmm.lib;msacm32.lib;hid.lib;setupapi.lib;..\..\lib\Debug\blast.lib;..\..\lib\Debug\zlib.lib;..\..\lib\Debug\bzip2.lib;..\..\lib\Debug\freetype.lib;..\..\lib\Debug\pcreposix.lib;..\..\lib\Debug\pcre.lib;ws2_32.lib;wsock32.lib;..\..\lib\Debug\lgLcd.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <EntryPointSymbol>start</EntryPointSymbol>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateMapFile>true</GenerateMapFile>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/Users/alexc/WorkBuddy/2026-10-24-22-17-35/wowdecomp-src/build/msdf/lib/Debug/Wow64.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Users/alexc/WorkBuddy/2026-10-24-22-17-35/wowdecomp-src/bin/Win/Wow64.pdb</ProgramDataBaseFile>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\generated;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\zlib\contrib\blast;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\lzma;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\zlib;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\DivxDecoder;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\freetype\include;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\Engine\Source\lua-5.1\src;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\expat\lib;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\Engine\Source\SoundEngine\fmodex\src;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\bzip2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SupportJustMyCode></SupportJustMyCode>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;WOWDECOMP_ARCH_64=1;NOMINMAX;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;_STATIC;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;WOWDECOMP_ARCH_64=1;NOMINMAX;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;_STATIC;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\generated;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\zlib\contrib\blast;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\lzma;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\zlib;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\DivxDecoder;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\freetype\include;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\Engine\Source\lua-5.1\src;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\expat\lib;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\Engine\Source\SoundEngine\fmodex\src;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\bzip2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\generated;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\zlib\contrib\blast;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\lzma;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\zlib;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\DivxDecoder;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\freetype\include;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\Engine\Source\lua-5.1\src;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\expat\lib;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\Engine\Source\SoundEngine\fmodex\src;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\bzip2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>..\..\lib\Release\BLPFile.lib;..\..\lib\Release\Base.lib;..\..\lib\Release\BlizzardCore.lib;..\..\lib\Release\ComSat.lib;..\..\lib\Release\ConsoleBase.lib;..\..\lib\Release\Event.lib;..\..\lib\Release\FFX.lib;..\..\lib\Release\Frame.lib;..\..\lib\Release\FrameScript.lib;..\..\lib\Release\lua.lib;..\..\lib\Release\FrameXML.lib;..\..\lib\Release\Gx.lib;..\..\lib\Release\Gxu.lib;..\..\lib\Release\Images.lib;..\..\lib\Release\Model2.lib;..\..\lib\Release\Os.lib;..\..\lib\Release\Scrn.lib;..\..\lib\Release\Services.lib;..\..\lib\Release\ShaderEffect.lib;..\..\lib\Release\Tempest.lib;..\..\lib\Release\SoundEngine.lib;..\..\lib\Release\SteelseriesMouse.lib;..\..\lib\Release\Storm.lib;..\..\lib\Release\WoWCommon.lib;..\..\lib\Release\Battlenet.lib;..\..\lib\Release\Console.lib;..\..\lib\Release\ConsoleDevice.lib;..\..\lib\Release\DB.lib;..\..\lib\Release\Game.lib;..\..\lib\Release\Glue.lib;..\..\lib\Release\LiquidSystem.lib;..\..\lib\Release\Magic.lib;..\..\lib\Release\Minigame.lib;..\..\lib\Release\Net.lib;..\..\lib\Release\Object.lib;..\..\lib\Release\ObjectAlloc.lib;..\..\lib\Release\ObjectMgrClient.lib;..\..\lib\Release\SoundInterface.lib;..\..\lib\Release\UIUtil.lib;..\..\lib\Release\Ui.lib;..\..\lib\Release\WorldClient.lib;..\..\lib\Release\WowServices.lib;..\..\lib\Release\WowSvcs.lib;..\..\lib\Release\lzma.lib;..\..\lib\Release\XvidDecoder.lib;..\..\lib\Release\expat.lib;d3d9.lib;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\nvapi\amd64\nvapi64.lib;opengl32.lib;..\..\lib\Release\jpeg.lib;imm32.lib;wininet.lib;dinput8.lib;dxguid.lib;version.lib;..\..\lib\Release\fmodex.lib;winmm.lib;msacm32.lib;hid.lib;setupapi.lib;..\..\lib\Release\blast.lib;..\..\lib\Release\zlib.lib;..\..\lib\Release\bzip2.lib;..\..\lib\Release\freetype.lib;..\..\lib\Release\pcreposix.lib;..\..\lib\Release\pcre.lib;ws2_32.lib;wsock32.lib;..\..\lib\Release\lgLcd.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <EntryPointSymbol>start</EntryPointSymbol>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <GenerateMapFile>true</GenerateMapFile>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/Users/alexc/WorkBuddy/2026-10-24-22-17-35/wowdecomp-src/build/msdf/lib/Release/Wow64.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Users/alexc/WorkBuddy/2026-10-24-22-17-35/wowdecomp-src/bin/Win/Wow64.pdb</ProgramDataBaseFile>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\generated;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\zlib\contrib\blast;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\lzma;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\zlib;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\DivxDecoder;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\freetype\include;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\Engine\Source\lua-5.1\src;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\expat\lib;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\Engine\Source\SoundEngine\fmodex\src;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\bzip2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SupportJustMyCode></SupportJustMyCode>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;WOWDECOMP_ARCH_64=1;NOMINMAX;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;_STATIC;CMAKE_INTDIR="MinSizeRel"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;WOWDECOMP_ARCH_64=1;NOMINMAX;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;_STATIC;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\generated;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\zlib\contrib\blast;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\lzma;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\zlib;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\DivxDecoder;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\freetype\include;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\Engine\Source\lua-5.1\src;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\expat\lib;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\Engine\Source\SoundEngine\fmodex\src;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\bzip2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\generated;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\zlib\contrib\blast;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\lzma;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\zlib;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\DivxDecoder;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\freetype\include;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\Engine\Source\lua-5.1\src;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\expat\lib;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\Engine\Source\SoundEngine\fmodex\src;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\bzip2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>..\..\lib\MinSizeRel\BLPFile.lib;..\..\lib\MinSizeRel\Base.lib;..\..\lib\MinSizeRel\BlizzardCore.lib;..\..\lib\MinSizeRel\ComSat.lib;..\..\lib\MinSizeRel\ConsoleBase.lib;..\..\lib\MinSizeRel\Event.lib;..\..\lib\MinSizeRel\FFX.lib;..\..\lib\MinSizeRel\Frame.lib;..\..\lib\MinSizeRel\FrameScript.lib;..\..\lib\MinSizeRel\lua.lib;..\..\lib\MinSizeRel\FrameXML.lib;..\..\lib\MinSizeRel\Gx.lib;..\..\lib\MinSizeRel\Gxu.lib;..\..\lib\MinSizeRel\Images.lib;..\..\lib\MinSizeRel\Model2.lib;..\..\lib\MinSizeRel\Os.lib;..\..\lib\MinSizeRel\Scrn.lib;..\..\lib\MinSizeRel\Services.lib;..\..\lib\MinSizeRel\ShaderEffect.lib;..\..\lib\MinSizeRel\Tempest.lib;..\..\lib\MinSizeRel\SoundEngine.lib;..\..\lib\MinSizeRel\SteelseriesMouse.lib;..\..\lib\MinSizeRel\Storm.lib;..\..\lib\MinSizeRel\WoWCommon.lib;..\..\lib\MinSizeRel\Battlenet.lib;..\..\lib\MinSizeRel\Console.lib;..\..\lib\MinSizeRel\ConsoleDevice.lib;..\..\lib\MinSizeRel\DB.lib;..\..\lib\MinSizeRel\Game.lib;..\..\lib\MinSizeRel\Glue.lib;..\..\lib\MinSizeRel\LiquidSystem.lib;..\..\lib\MinSizeRel\Magic.lib;..\..\lib\MinSizeRel\Minigame.lib;..\..\lib\MinSizeRel\Net.lib;..\..\lib\MinSizeRel\Object.lib;..\..\lib\MinSizeRel\ObjectAlloc.lib;..\..\lib\MinSizeRel\ObjectMgrClient.lib;..\..\lib\MinSizeRel\SoundInterface.lib;..\..\lib\MinSizeRel\UIUtil.lib;..\..\lib\MinSizeRel\Ui.lib;..\..\lib\MinSizeRel\WorldClient.lib;..\..\lib\MinSizeRel\WowServices.lib;..\..\lib\MinSizeRel\WowSvcs.lib;..\..\lib\MinSizeRel\lzma.lib;..\..\lib\MinSizeRel\XvidDecoder.lib;..\..\lib\MinSizeRel\expat.lib;d3d9.lib;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\nvapi\amd64\nvapi64.lib;opengl32.lib;..\..\lib\MinSizeRel\jpeg.lib;imm32.lib;wininet.lib;dinput8.lib;dxguid.lib;version.lib;..\..\lib\MinSizeRel\fmodex.lib;winmm.lib;msacm32.lib;hid.lib;setupapi.lib;..\..\lib\MinSizeRel\blast.lib;..\..\lib\MinSizeRel\zlib.lib;..\..\lib\MinSizeRel\bzip2.lib;..\..\lib\MinSizeRel\freetype.lib;..\..\lib\MinSizeRel\pcreposix.lib;..\..\lib\MinSizeRel\pcre.lib;ws2_32.lib;wsock32.lib;..\..\lib\MinSizeRel\lgLcd.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <EntryPointSymbol>start</EntryPointSymbol>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <GenerateMapFile>true</GenerateMapFile>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/Users/alexc/WorkBuddy/2026-10-24-22-17-35/wowdecomp-src/build/msdf/lib/MinSizeRel/Wow64.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Users/alexc/WorkBuddy/2026-10-24-22-17-35/wowdecomp-src/bin/Win/Wow64.pdb</ProgramDataBaseFile>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\generated;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\zlib\contrib\blast;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\lzma;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\zlib;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\DivxDecoder;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\freetype\include;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\Engine\Source\lua-5.1\src;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\expat\lib;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\Engine\Source\SoundEngine\fmodex\src;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\bzip2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SupportJustMyCode></SupportJustMyCode>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;WOWDECOMP_ARCH_64=1;NOMINMAX;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;_STATIC;CMAKE_INTDIR="RelWithDebInfo"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;WOWDECOMP_ARCH_64=1;NOMINMAX;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;_STATIC;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\generated;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\zlib\contrib\blast;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\lzma;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\zlib;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\DivxDecoder;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\freetype\include;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\Engine\Source\lua-5.1\src;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\expat\lib;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\Engine\Source\SoundEngine\fmodex\src;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\bzip2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\generated;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\zlib\contrib\blast;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\lzma;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\zlib;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\DivxDecoder;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\freetype\include;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\Engine\Source\lua-5.1\src;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\expat\lib;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\Engine\Source\SoundEngine\fmodex\src;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\bzip2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>..\..\lib\RelWithDebInfo\BLPFile.lib;..\..\lib\RelWithDebInfo\Base.lib;..\..\lib\RelWithDebInfo\BlizzardCore.lib;..\..\lib\RelWithDebInfo\ComSat.lib;..\..\lib\RelWithDebInfo\ConsoleBase.lib;..\..\lib\RelWithDebInfo\Event.lib;..\..\lib\RelWithDebInfo\FFX.lib;..\..\lib\RelWithDebInfo\Frame.lib;..\..\lib\RelWithDebInfo\FrameScript.lib;..\..\lib\RelWithDebInfo\lua.lib;..\..\lib\RelWithDebInfo\FrameXML.lib;..\..\lib\RelWithDebInfo\Gx.lib;..\..\lib\RelWithDebInfo\Gxu.lib;..\..\lib\RelWithDebInfo\Images.lib;..\..\lib\RelWithDebInfo\Model2.lib;..\..\lib\RelWithDebInfo\Os.lib;..\..\lib\RelWithDebInfo\Scrn.lib;..\..\lib\RelWithDebInfo\Services.lib;..\..\lib\RelWithDebInfo\ShaderEffect.lib;..\..\lib\RelWithDebInfo\Tempest.lib;..\..\lib\RelWithDebInfo\SoundEngine.lib;..\..\lib\RelWithDebInfo\SteelseriesMouse.lib;..\..\lib\RelWithDebInfo\Storm.lib;..\..\lib\RelWithDebInfo\WoWCommon.lib;..\..\lib\RelWithDebInfo\Battlenet.lib;..\..\lib\RelWithDebInfo\Console.lib;..\..\lib\RelWithDebInfo\ConsoleDevice.lib;..\..\lib\RelWithDebInfo\DB.lib;..\..\lib\RelWithDebInfo\Game.lib;..\..\lib\RelWithDebInfo\Glue.lib;..\..\lib\RelWithDebInfo\LiquidSystem.lib;..\..\lib\RelWithDebInfo\Magic.lib;..\..\lib\RelWithDebInfo\Minigame.lib;..\..\lib\RelWithDebInfo\Net.lib;..\..\lib\RelWithDebInfo\Object.lib;..\..\lib\RelWithDebInfo\ObjectAlloc.lib;..\..\lib\RelWithDebInfo\ObjectMgrClient.lib;..\..\lib\RelWithDebInfo\SoundInterface.lib;..\..\lib\RelWithDebInfo\UIUtil.lib;..\..\lib\RelWithDebInfo\Ui.lib;..\..\lib\RelWithDebInfo\WorldClient.lib;..\..\lib\RelWithDebInfo\WowServices.lib;..\..\lib\RelWithDebInfo\WowSvcs.lib;..\..\lib\RelWithDebInfo\lzma.lib;..\..\lib\RelWithDebInfo\XvidDecoder.lib;..\..\lib\RelWithDebInfo\expat.lib;d3d9.lib;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\ThirdParty\nvapi\amd64\nvapi64.lib;opengl32.lib;..\..\lib\RelWithDebInfo\jpeg.lib;imm32.lib;wininet.lib;dinput8.lib;dxguid.lib;version.lib;..\..\lib\RelWithDebInfo\fmodex.lib;winmm.lib;msacm32.lib;hid.lib;setupapi.lib;..\..\lib\RelWithDebInfo\blast.lib;..\..\lib\RelWithDebInfo\zlib.lib;..\..\lib\RelWithDebInfo\bzip2.lib;..\..\lib\RelWithDebInfo\freetype.lib;..\..\lib\RelWithDebInfo\pcreposix.lib;..\..\lib\RelWithDebInfo\pcre.lib;ws2_32.lib;wsock32.lib;..\..\lib\RelWithDebInfo\lgLcd.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <EntryPointSymbol>start</EntryPointSymbol>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateMapFile>true</GenerateMapFile>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/Users/alexc/WorkBuddy/2026-10-24-22-17-35/wowdecomp-src/build/msdf/lib/RelWithDebInfo/Wow64.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Users/alexc/WorkBuddy/2026-10-24-22-17-35/wowdecomp-src/bin/Win/Wow64.pdb</ProgramDataBaseFile>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\WoW\Source\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/alexc/WorkBuddy/2026-10-24-22-17-35/wowdecomp-src/WoW/Source/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/alexc/WorkBuddy/2026-10-24-22-17-35/wowdecomp-src -BC:/Users/alexc/WorkBuddy/2026-10-24-22-17-35/wowdecomp-src/build/msdf --check-stamp-file C:/Users/alexc/WorkBuddy/2026-10-24-22-17-35/wowdecomp-src/build/msdf/WoW/Source/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Users/alexc/WorkBuddy/2026-10-24-22-17-35/wowdecomp-src/WoW/Source/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/alexc/WorkBuddy/2026-10-24-22-17-35/wowdecomp-src -BC:/Users/alexc/WorkBuddy/2026-10-24-22-17-35/wowdecomp-src/build/msdf --check-stamp-file C:/Users/alexc/WorkBuddy/2026-10-24-22-17-35/wowdecomp-src/build/msdf/WoW/Source/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule C:/Users/alexc/WorkBuddy/2026-10-24-22-17-35/wowdecomp-src/WoW/Source/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/alexc/WorkBuddy/2026-10-24-22-17-35/wowdecomp-src -BC:/Users/alexc/WorkBuddy/2026-10-24-22-17-35/wowdecomp-src/build/msdf --check-stamp-file C:/Users/alexc/WorkBuddy/2026-10-24-22-17-35/wowdecomp-src/build/msdf/WoW/Source/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule C:/Users/alexc/WorkBuddy/2026-10-24-22-17-35/wowdecomp-src/WoW/Source/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/alexc/WorkBuddy/2026-10-24-22-17-35/wowdecomp-src -BC:/Users/alexc/WorkBuddy/2026-10-24-22-17-35/wowdecomp-src/build/msdf --check-stamp-file C:/Users/alexc/WorkBuddy/2026-10-24-22-17-35/wowdecomp-src/build/msdf/WoW/Source/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\WoW\Source\Client.cpp" />
+    <ClCompile Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\WoW\Source\Client_CVar.cpp" />
+    <ClCompile Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\WoW\Source\Client_Console.cpp" />
+    <ClCompile Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\WoW\Source\Hardware.cpp" />
+    <ClCompile Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\WoW\Source\LoadingScreen.cpp" />
+    <ClCompile Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\WoW\Source\WowSysMessageOutput.cpp" />
+    <ClCompile Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\WoW\Source\Win64\BotCheck.cpp" />
+    <ClCompile Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\WoW\Source\Win64\WinMain.cpp" />
+    <ResourceCompile Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\waystone.rc" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\ZERO_CHECK.vcxproj">
+      <Project>{21BA5D67-242D-3BAC-AF1B-A7CC446A21FD}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\BLPFile\BLPFile.vcxproj">
+      <Project>{A4937030-AD6E-35D5-9614-8259AD108E04}</Project>
+      <Name>BLPFile</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\Base\Base.vcxproj">
+      <Project>{17F419ED-EEF6-3AAA-84AA-95C9DA9ABC01}</Project>
+      <Name>Base</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\Battlenet\Battlenet.vcxproj">
+      <Project>{2163BD8B-C448-31C7-A87B-C5E30D33034E}</Project>
+      <Name>Battlenet</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\BlizzardCore\BlizzardCore.vcxproj">
+      <Project>{6167DEA8-7186-37DD-A2E7-B00E19A05172}</Project>
+      <Name>BlizzardCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\ComSat\ComSat.vcxproj">
+      <Project>{CD45B3DE-D124-30C2-9B59-E5B348B53DFB}</Project>
+      <Name>ComSat</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\Console\Console.vcxproj">
+      <Project>{50FB92AF-07B2-376E-99AD-0F155D4EE276}</Project>
+      <Name>Console</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\ConsoleBase\ConsoleBase.vcxproj">
+      <Project>{9FA8FBAD-FF22-3A4B-B463-E1C108A47F61}</Project>
+      <Name>ConsoleBase</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\ConsoleDevice\ConsoleDevice.vcxproj">
+      <Project>{22838550-CB43-3F7E-97D1-E07604D3769A}</Project>
+      <Name>ConsoleDevice</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\DB\DB.vcxproj">
+      <Project>{9695B4BA-2644-37D3-86CE-991547B2BF93}</Project>
+      <Name>DB</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\Event\Event.vcxproj">
+      <Project>{E3595701-E53E-370B-A07E-FE553986DC40}</Project>
+      <Name>Event</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\FFX\FFX.vcxproj">
+      <Project>{B86AD818-69B1-3CE8-9603-A7EFD6252F41}</Project>
+      <Name>FFX</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\Frame\Frame.vcxproj">
+      <Project>{AD71A770-6730-3B9A-89AF-D0681EAC9D76}</Project>
+      <Name>Frame</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\FrameScript\FrameScript.vcxproj">
+      <Project>{C9D6DF97-1C30-3183-8B6E-DECC5D591627}</Project>
+      <Name>FrameScript</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\FrameXML\FrameXML.vcxproj">
+      <Project>{69DF3384-84A0-30A7-B267-16FA6EB1AB5B}</Project>
+      <Name>FrameXML</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\Game\Game.vcxproj">
+      <Project>{FD7ED7EB-4A55-34E5-9724-92D5145F3CD6}</Project>
+      <Name>Game</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\Glue\Glue.vcxproj">
+      <Project>{7275B533-AA85-3128-ACAF-9FB767FFF710}</Project>
+      <Name>Glue</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\Gx\Gx.vcxproj">
+      <Project>{C90AAD2B-DDA8-3DAD-83FD-FD3FE4504158}</Project>
+      <Name>Gx</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\Gxu\Gxu.vcxproj">
+      <Project>{ABFCFDCE-B173-35FC-BF21-4E6BC24317F7}</Project>
+      <Name>Gxu</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\Images\Images.vcxproj">
+      <Project>{CB2D0357-13F7-3D37-8652-E27C30761871}</Project>
+      <Name>Images</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\LiquidSystem\LiquidSystem.vcxproj">
+      <Project>{921B48D2-B3F1-36AC-BF10-54C949306685}</Project>
+      <Name>LiquidSystem</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\Magic\Magic.vcxproj">
+      <Project>{32066CFB-9557-31AA-B1A3-D0B96E0A6297}</Project>
+      <Name>Magic</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\Minigame\Minigame.vcxproj">
+      <Project>{9514A8E8-F508-3F5F-B1EF-906CED9AC9B4}</Project>
+      <Name>Minigame</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\Model2\Model2.vcxproj">
+      <Project>{0772654C-9209-32E8-86F5-341C10012E67}</Project>
+      <Name>Model2</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\Net\Net.vcxproj">
+      <Project>{89236928-EB80-37F3-9C3A-F245747E3C8F}</Project>
+      <Name>Net</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\Object\Object.vcxproj">
+      <Project>{E7BCBAD7-5B96-3139-917C-CD235B8A6181}</Project>
+      <Name>Object</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\ObjectAlloc\ObjectAlloc.vcxproj">
+      <Project>{86B0978E-C0C4-3CEA-BF63-C83EDDD2CAD9}</Project>
+      <Name>ObjectAlloc</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\ObjectMgrClient\ObjectMgrClient.vcxproj">
+      <Project>{99BD7A30-1030-362F-935E-77866A8ABDB8}</Project>
+      <Name>ObjectMgrClient</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\Os\Os.vcxproj">
+      <Project>{3D7B71FB-0BB7-3106-A600-7C71E87F8303}</Project>
+      <Name>Os</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\Scrn\Scrn.vcxproj">
+      <Project>{BEFA47EB-CC30-32E3-B3DC-301089940714}</Project>
+      <Name>Scrn</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\Services\Services.vcxproj">
+      <Project>{55BC7BB0-6B3B-3C9A-A84A-856781AA3205}</Project>
+      <Name>Services</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\ShaderEffect\ShaderEffect.vcxproj">
+      <Project>{8DF3A318-F2C6-3375-B755-3E037D035C57}</Project>
+      <Name>ShaderEffect</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\SoundEngine\SoundEngine.vcxproj">
+      <Project>{240A8321-2ADF-3614-B44C-82EDEACD3265}</Project>
+      <Name>SoundEngine</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\SoundInterface\SoundInterface.vcxproj">
+      <Project>{5E3B6533-45F8-3FDB-BB88-2751D5F760B9}</Project>
+      <Name>SoundInterface</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\SteelseriesMouse\SteelseriesMouse.vcxproj">
+      <Project>{99B23D49-A3A8-3C82-A3A0-A6F02AEA4663}</Project>
+      <Name>SteelseriesMouse</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\Storm\Storm.vcxproj">
+      <Project>{83233294-65E9-3821-88F8-6F7F7CBC2C98}</Project>
+      <Name>Storm</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\Tempest\Tempest.vcxproj">
+      <Project>{2C786702-F684-39C5-B394-C70B60B25B72}</Project>
+      <Name>Tempest</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\UIUtil\UIUtil.vcxproj">
+      <Project>{CC8F7D67-232C-3D50-85AC-0BC0A4E19F57}</Project>
+      <Name>UIUtil</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\Ui\Ui.vcxproj">
+      <Project>{5CA0D025-9150-3A36-ACF4-2F36D0A78641}</Project>
+      <Name>Ui</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Common\WoWCommon.vcxproj">
+      <Project>{B383885E-2F96-3C9F-AE5E-85E08D28D7FF}</Project>
+      <Name>WoWCommon</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\WorldClient\WorldClient.vcxproj">
+      <Project>{57542701-FCF6-3B68-A2F7-70886D26BAAD}</Project>
+      <Name>WorldClient</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\WowServices\WowServices.vcxproj">
+      <Project>{A57A6CB5-1CD3-3D9F-BA6C-57EC0D85B12B}</Project>
+      <Name>WowServices</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\WowSvcs\WowSvcs.vcxproj">
+      <Project>{DFB50FF7-84CD-38E0-9836-206AEA8CDA8A}</Project>
+      <Name>WowSvcs</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Tools\XvidDecoder\XvidDecoder.vcxproj">
+      <Project>{698E40B5-868B-3599-9018-405A43EA4523}</Project>
+      <Name>XvidDecoder</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\ThirdParty\blast.vcxproj">
+      <Project>{1B41C429-E268-31FA-8F00-EB673F7A3E86}</Project>
+      <Name>blast</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\ThirdParty\bzip2.vcxproj">
+      <Project>{09A4E2DB-3050-33D6-A74C-A46E2E9BDEDB}</Project>
+      <Name>bzip2</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\ThirdParty\expat.vcxproj">
+      <Project>{572E2BA7-AA6F-3BA4-BF4C-0A4EB31ED89D}</Project>
+      <Name>expat</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\SoundEngine\fmodex.vcxproj">
+      <Project>{F1EF310C-DE89-38D6-BEC6-92ACE6E9E6B0}</Project>
+      <Name>fmodex</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\ThirdParty\freetype.vcxproj">
+      <Project>{B9AFECD7-A1EA-3CC6-A7D2-9286CD836085}</Project>
+      <Name>freetype</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\jpeg\jpeg.vcxproj">
+      <Project>{01CF02E0-087A-3CD9-A24F-B9CAA0ABAF3E}</Project>
+      <Name>jpeg</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\ThirdParty\lgLcd.vcxproj">
+      <Project>{8CB18E87-9428-3E35-84B0-E477A120ABEE}</Project>
+      <Name>lgLcd</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\lua-5.1\lua.vcxproj">
+      <Project>{00714D34-177A-3BB3-B883-74B6CE912C36}</Project>
+      <Name>lua</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\ThirdParty\lzma.vcxproj">
+      <Project>{0C6F9666-A9DE-3F3A-A0A5-D8168D7B4441}</Project>
+      <Name>lzma</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\ThirdParty\pcre.vcxproj">
+      <Project>{C1C54778-22BE-3191-95E4-FC556BD97445}</Project>
+      <Name>pcre</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\pcre\pcreposix.vcxproj">
+      <Project>{BCC77CB2-9674-3693-9681-81E0551DA381}</Project>
+      <Name>pcreposix</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\ThirdParty\zlib.vcxproj">
+      <Project>{20FDAA03-2257-31DA-8799-C902C6748EBE}</Project>
+      <Name>zlib</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -1,0 +1,409 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ResolveNugetPackages>false</ResolveNugetPackages>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{0976079E-7F9B-3278-9488-715A925F4E95}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
+    <Platform>x64</Platform>
+    <ProjectName>ALL_BUILD</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\generated;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\generated;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\generated;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\generated;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/alexc/WorkBuddy/2026-10-24-22-17-35/wowdecomp-src/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/alexc/WorkBuddy/2026-10-24-22-17-35/wowdecomp-src -BC:/Users/alexc/WorkBuddy/2026-10-24-22-17-35/wowdecomp-src/build/msdf --check-stamp-file C:/Users/alexc/WorkBuddy/2026-10-24-22-17-35/wowdecomp-src/build/msdf/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeCCompiler.cmake.in;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeCCompilerABI.c;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeCInformation.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeCXXCompiler.cmake.in;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeCXXCompilerABI.cpp;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeCompilerIdDetection.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeDetermineCCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeDetermineCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeDetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeDetermineCompilerABI.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeDetermineCompilerId.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeDetermineCompilerSupport.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeDetermineRCCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeDetermineSystem.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeFindBinUtils.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeParseImplicitIncludeInfo.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeParseImplicitLinkInfo.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeParseLibraryArchitecture.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeRCCompiler.cmake.in;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeSystem.cmake.in;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeTestCCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeTestCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeTestCompilerCommon.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeTestRCCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\ADSP-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\ARMCC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\ARMClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\AppleClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Borland-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Bruce-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Clang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Compaq-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Compaq-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Cray-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\CrayClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Embarcadero-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Fujitsu-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\FujitsuClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\GHS-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\GNU-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\GNU-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\HP-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\HP-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\IAR-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\IBMCPP-C-DetermineVersionInternal.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\IBMClang-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\IBMClang-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Intel-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\IntelLLVM-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\LCC-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\LCC-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\MSVC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\NVHPC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\NVIDIA-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\OrangeC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\PGI-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\PathScale-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\SCO-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\SDCC-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\SunPro-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\SunPro-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\TI-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\TIClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Tasking-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\TinyCC-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\VisualAge-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\VisualAge-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Watcom-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\XL-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\XL-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\XLClang-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\XLClang-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\zOS-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\zOS-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CompilerId\VS-10.vcxproj.in;C:\Program Files\CMake\share\cmake-4.0\Modules\Internal\CMakeCLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Internal\CMakeCXXLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Internal\CMakeCommonLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Internal\CMakeDetermineLinkerId.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Internal\CMakeInspectCLinker.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Internal\CMakeInspectCXXLinker.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Internal\FeatureTesting.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Linker\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Linker\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Linker\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Platform\Linker\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Platform\Linker\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Platform\Linker\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Platform\Windows-Determine-CXX.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Platform\Windows-Initialize.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Platform\WindowsPaths.cmake;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\CMakeFiles\4.0.2\CMakeCCompiler.cmake;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\CMakeFiles\4.0.2\CMakeCXXCompiler.cmake;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\CMakeFiles\4.0.2\CMakeRCCompiler.cmake;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\CMakeFiles\4.0.2\CMakeSystem.cmake;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Users/alexc/WorkBuddy/2026-10-24-22-17-35/wowdecomp-src/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/alexc/WorkBuddy/2026-10-24-22-17-35/wowdecomp-src -BC:/Users/alexc/WorkBuddy/2026-10-24-22-17-35/wowdecomp-src/build/msdf --check-stamp-file C:/Users/alexc/WorkBuddy/2026-10-24-22-17-35/wowdecomp-src/build/msdf/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeCCompiler.cmake.in;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeCCompilerABI.c;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeCInformation.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeCXXCompiler.cmake.in;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeCXXCompilerABI.cpp;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeCompilerIdDetection.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeDetermineCCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeDetermineCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeDetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeDetermineCompilerABI.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeDetermineCompilerId.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeDetermineCompilerSupport.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeDetermineRCCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeDetermineSystem.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeFindBinUtils.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeParseImplicitIncludeInfo.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeParseImplicitLinkInfo.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeParseLibraryArchitecture.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeRCCompiler.cmake.in;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeSystem.cmake.in;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeTestCCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeTestCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeTestCompilerCommon.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeTestRCCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\ADSP-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\ARMCC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\ARMClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\AppleClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Borland-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Bruce-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Clang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Compaq-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Compaq-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Cray-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\CrayClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Embarcadero-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Fujitsu-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\FujitsuClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\GHS-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\GNU-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\GNU-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\HP-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\HP-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\IAR-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\IBMCPP-C-DetermineVersionInternal.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\IBMClang-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\IBMClang-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Intel-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\IntelLLVM-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\LCC-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\LCC-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\MSVC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\NVHPC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\NVIDIA-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\OrangeC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\PGI-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\PathScale-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\SCO-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\SDCC-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\SunPro-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\SunPro-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\TI-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\TIClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Tasking-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\TinyCC-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\VisualAge-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\VisualAge-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Watcom-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\XL-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\XL-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\XLClang-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\XLClang-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\zOS-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\zOS-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CompilerId\VS-10.vcxproj.in;C:\Program Files\CMake\share\cmake-4.0\Modules\Internal\CMakeCLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Internal\CMakeCXXLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Internal\CMakeCommonLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Internal\CMakeDetermineLinkerId.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Internal\CMakeInspectCLinker.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Internal\CMakeInspectCXXLinker.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Internal\FeatureTesting.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Linker\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Linker\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Linker\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Platform\Linker\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Platform\Linker\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Platform\Linker\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Platform\Windows-Determine-CXX.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Platform\Windows-Initialize.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Platform\WindowsPaths.cmake;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\CMakeFiles\4.0.2\CMakeCCompiler.cmake;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\CMakeFiles\4.0.2\CMakeCXXCompiler.cmake;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\CMakeFiles\4.0.2\CMakeRCCompiler.cmake;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\CMakeFiles\4.0.2\CMakeSystem.cmake;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule C:/Users/alexc/WorkBuddy/2026-10-24-22-17-35/wowdecomp-src/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/alexc/WorkBuddy/2026-10-24-22-17-35/wowdecomp-src -BC:/Users/alexc/WorkBuddy/2026-10-24-22-17-35/wowdecomp-src/build/msdf --check-stamp-file C:/Users/alexc/WorkBuddy/2026-10-24-22-17-35/wowdecomp-src/build/msdf/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeCCompiler.cmake.in;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeCCompilerABI.c;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeCInformation.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeCXXCompiler.cmake.in;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeCXXCompilerABI.cpp;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeCompilerIdDetection.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeDetermineCCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeDetermineCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeDetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeDetermineCompilerABI.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeDetermineCompilerId.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeDetermineCompilerSupport.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeDetermineRCCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeDetermineSystem.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeFindBinUtils.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeParseImplicitIncludeInfo.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeParseImplicitLinkInfo.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeParseLibraryArchitecture.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeRCCompiler.cmake.in;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeSystem.cmake.in;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeTestCCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeTestCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeTestCompilerCommon.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeTestRCCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\ADSP-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\ARMCC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\ARMClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\AppleClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Borland-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Bruce-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Clang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Compaq-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Compaq-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Cray-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\CrayClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Embarcadero-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Fujitsu-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\FujitsuClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\GHS-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\GNU-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\GNU-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\HP-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\HP-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\IAR-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\IBMCPP-C-DetermineVersionInternal.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\IBMClang-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\IBMClang-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Intel-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\IntelLLVM-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\LCC-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\LCC-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\MSVC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\NVHPC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\NVIDIA-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\OrangeC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\PGI-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\PathScale-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\SCO-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\SDCC-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\SunPro-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\SunPro-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\TI-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\TIClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Tasking-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\TinyCC-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\VisualAge-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\VisualAge-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Watcom-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\XL-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\XL-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\XLClang-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\XLClang-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\zOS-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\zOS-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CompilerId\VS-10.vcxproj.in;C:\Program Files\CMake\share\cmake-4.0\Modules\Internal\CMakeCLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Internal\CMakeCXXLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Internal\CMakeCommonLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Internal\CMakeDetermineLinkerId.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Internal\CMakeInspectCLinker.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Internal\CMakeInspectCXXLinker.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Internal\FeatureTesting.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Linker\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Linker\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Linker\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Platform\Linker\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Platform\Linker\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Platform\Linker\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Platform\Windows-Determine-CXX.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Platform\Windows-Initialize.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Platform\WindowsPaths.cmake;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\CMakeFiles\4.0.2\CMakeCCompiler.cmake;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\CMakeFiles\4.0.2\CMakeCXXCompiler.cmake;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\CMakeFiles\4.0.2\CMakeRCCompiler.cmake;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\CMakeFiles\4.0.2\CMakeSystem.cmake;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule C:/Users/alexc/WorkBuddy/2026-10-24-22-17-35/wowdecomp-src/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/alexc/WorkBuddy/2026-10-24-22-17-35/wowdecomp-src -BC:/Users/alexc/WorkBuddy/2026-10-24-22-17-35/wowdecomp-src/build/msdf --check-stamp-file C:/Users/alexc/WorkBuddy/2026-10-24-22-17-35/wowdecomp-src/build/msdf/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeCCompiler.cmake.in;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeCCompilerABI.c;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeCInformation.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeCXXCompiler.cmake.in;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeCXXCompilerABI.cpp;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeCompilerIdDetection.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeDetermineCCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeDetermineCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeDetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeDetermineCompilerABI.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeDetermineCompilerId.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeDetermineCompilerSupport.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeDetermineRCCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeDetermineSystem.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeFindBinUtils.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeParseImplicitIncludeInfo.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeParseImplicitLinkInfo.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeParseLibraryArchitecture.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeRCCompiler.cmake.in;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeSystem.cmake.in;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeTestCCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeTestCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeTestCompilerCommon.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CMakeTestRCCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\ADSP-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\ARMCC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\ARMClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\AppleClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Borland-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Bruce-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Clang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Compaq-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Compaq-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Cray-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\CrayClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Embarcadero-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Fujitsu-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\FujitsuClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\GHS-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\GNU-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\GNU-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\HP-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\HP-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\IAR-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\IBMCPP-C-DetermineVersionInternal.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\IBMClang-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\IBMClang-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Intel-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\IntelLLVM-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\LCC-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\LCC-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\MSVC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\NVHPC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\NVIDIA-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\OrangeC-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\PGI-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\PathScale-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\SCO-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\SDCC-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\SunPro-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\SunPro-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\TI-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\TIClang-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Tasking-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\TinyCC-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\VisualAge-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\VisualAge-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\Watcom-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\XL-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\XL-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\XLClang-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\XLClang-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\zOS-C-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Compiler\zOS-CXX-DetermineCompiler.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\CompilerId\VS-10.vcxproj.in;C:\Program Files\CMake\share\cmake-4.0\Modules\Internal\CMakeCLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Internal\CMakeCXXLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Internal\CMakeCommonLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Internal\CMakeDetermineLinkerId.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Internal\CMakeInspectCLinker.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Internal\CMakeInspectCXXLinker.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Internal\FeatureTesting.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Linker\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Linker\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Linker\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Platform\Linker\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Platform\Linker\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Platform\Linker\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Platform\Windows-Determine-CXX.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Platform\Windows-Initialize.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-4.0\Modules\Platform\WindowsPaths.cmake;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\CMakeFiles\4.0.2\CMakeCCompiler.cmake;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\CMakeFiles\4.0.2\CMakeCXXCompiler.cmake;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\CMakeFiles\4.0.2\CMakeRCCompiler.cmake;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\CMakeFiles\4.0.2\CMakeSystem.cmake;C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\ZERO_CHECK.vcxproj">
+      <Project>{21BA5D67-242D-3BAC-AF1B-A7CC446A21FD}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\BLPFile\BLPFile.vcxproj">
+      <Project>{A4937030-AD6E-35D5-9614-8259AD108E04}</Project>
+      <Name>BLPFile</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\Base\Base.vcxproj">
+      <Project>{17F419ED-EEF6-3AAA-84AA-95C9DA9ABC01}</Project>
+      <Name>Base</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\Battlenet\Battlenet.vcxproj">
+      <Project>{2163BD8B-C448-31C7-A87B-C5E30D33034E}</Project>
+      <Name>Battlenet</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\BlizzardCore\BlizzardCore.vcxproj">
+      <Project>{6167DEA8-7186-37DD-A2E7-B00E19A05172}</Project>
+      <Name>BlizzardCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\ComSat\ComSat.vcxproj">
+      <Project>{CD45B3DE-D124-30C2-9B59-E5B348B53DFB}</Project>
+      <Name>ComSat</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\Console\Console.vcxproj">
+      <Project>{50FB92AF-07B2-376E-99AD-0F155D4EE276}</Project>
+      <Name>Console</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\ConsoleBase\ConsoleBase.vcxproj">
+      <Project>{9FA8FBAD-FF22-3A4B-B463-E1C108A47F61}</Project>
+      <Name>ConsoleBase</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\ConsoleDevice\ConsoleDevice.vcxproj">
+      <Project>{22838550-CB43-3F7E-97D1-E07604D3769A}</Project>
+      <Name>ConsoleDevice</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\DB\DB.vcxproj">
+      <Project>{9695B4BA-2644-37D3-86CE-991547B2BF93}</Project>
+      <Name>DB</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\Event\Event.vcxproj">
+      <Project>{E3595701-E53E-370B-A07E-FE553986DC40}</Project>
+      <Name>Event</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\FFX\FFX.vcxproj">
+      <Project>{B86AD818-69B1-3CE8-9603-A7EFD6252F41}</Project>
+      <Name>FFX</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\Frame\Frame.vcxproj">
+      <Project>{AD71A770-6730-3B9A-89AF-D0681EAC9D76}</Project>
+      <Name>Frame</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\FrameScript\FrameScript.vcxproj">
+      <Project>{C9D6DF97-1C30-3183-8B6E-DECC5D591627}</Project>
+      <Name>FrameScript</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\FrameXML\FrameXML.vcxproj">
+      <Project>{69DF3384-84A0-30A7-B267-16FA6EB1AB5B}</Project>
+      <Name>FrameXML</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\Game\Game.vcxproj">
+      <Project>{FD7ED7EB-4A55-34E5-9724-92D5145F3CD6}</Project>
+      <Name>Game</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\Glue\Glue.vcxproj">
+      <Project>{7275B533-AA85-3128-ACAF-9FB767FFF710}</Project>
+      <Name>Glue</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\Gx\Gx.vcxproj">
+      <Project>{C90AAD2B-DDA8-3DAD-83FD-FD3FE4504158}</Project>
+      <Name>Gx</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\Gxu\Gxu.vcxproj">
+      <Project>{ABFCFDCE-B173-35FC-BF21-4E6BC24317F7}</Project>
+      <Name>Gxu</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\Images\Images.vcxproj">
+      <Project>{CB2D0357-13F7-3D37-8652-E27C30761871}</Project>
+      <Name>Images</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\LiquidSystem\LiquidSystem.vcxproj">
+      <Project>{921B48D2-B3F1-36AC-BF10-54C949306685}</Project>
+      <Name>LiquidSystem</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\Magic\Magic.vcxproj">
+      <Project>{32066CFB-9557-31AA-B1A3-D0B96E0A6297}</Project>
+      <Name>Magic</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\Minigame\Minigame.vcxproj">
+      <Project>{9514A8E8-F508-3F5F-B1EF-906CED9AC9B4}</Project>
+      <Name>Minigame</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\Model2\Model2.vcxproj">
+      <Project>{0772654C-9209-32E8-86F5-341C10012E67}</Project>
+      <Name>Model2</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\Net\Net.vcxproj">
+      <Project>{89236928-EB80-37F3-9C3A-F245747E3C8F}</Project>
+      <Name>Net</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\Object\Object.vcxproj">
+      <Project>{E7BCBAD7-5B96-3139-917C-CD235B8A6181}</Project>
+      <Name>Object</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\ObjectAlloc\ObjectAlloc.vcxproj">
+      <Project>{86B0978E-C0C4-3CEA-BF63-C83EDDD2CAD9}</Project>
+      <Name>ObjectAlloc</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\ObjectMgrClient\ObjectMgrClient.vcxproj">
+      <Project>{99BD7A30-1030-362F-935E-77866A8ABDB8}</Project>
+      <Name>ObjectMgrClient</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\Os\Os.vcxproj">
+      <Project>{3D7B71FB-0BB7-3106-A600-7C71E87F8303}</Project>
+      <Name>Os</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\Scrn\Scrn.vcxproj">
+      <Project>{BEFA47EB-CC30-32E3-B3DC-301089940714}</Project>
+      <Name>Scrn</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\Services\Services.vcxproj">
+      <Project>{55BC7BB0-6B3B-3C9A-A84A-856781AA3205}</Project>
+      <Name>Services</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\ShaderEffect\ShaderEffect.vcxproj">
+      <Project>{8DF3A318-F2C6-3375-B755-3E037D035C57}</Project>
+      <Name>ShaderEffect</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\SoundEngine\SoundEngine.vcxproj">
+      <Project>{240A8321-2ADF-3614-B44C-82EDEACD3265}</Project>
+      <Name>SoundEngine</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\SoundInterface\SoundInterface.vcxproj">
+      <Project>{5E3B6533-45F8-3FDB-BB88-2751D5F760B9}</Project>
+      <Name>SoundInterface</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\SteelseriesMouse\SteelseriesMouse.vcxproj">
+      <Project>{99B23D49-A3A8-3C82-A3A0-A6F02AEA4663}</Project>
+      <Name>SteelseriesMouse</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\Storm\Storm.vcxproj">
+      <Project>{83233294-65E9-3821-88F8-6F7F7CBC2C98}</Project>
+      <Name>Storm</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\Tempest\Tempest.vcxproj">
+      <Project>{2C786702-F684-39C5-B394-C70B60B25B72}</Project>
+      <Name>Tempest</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\UIUtil\UIUtil.vcxproj">
+      <Project>{CC8F7D67-232C-3D50-85AC-0BC0A4E19F57}</Project>
+      <Name>UIUtil</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\Ui\Ui.vcxproj">
+      <Project>{5CA0D025-9150-3A36-ACF4-2F36D0A78641}</Project>
+      <Name>Ui</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Common\WoWCommon.vcxproj">
+      <Project>{B383885E-2F96-3C9F-AE5E-85E08D28D7FF}</Project>
+      <Name>WoWCommon</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\WorldClient\WorldClient.vcxproj">
+      <Project>{57542701-FCF6-3B68-A2F7-70886D26BAAD}</Project>
+      <Name>WorldClient</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\Wow.vcxproj">
+      <Project>{4A44A765-E487-31A7-85BB-206FA161271A}</Project>
+      <Name>Wow</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Tools\WowClient\WowClient.vcxproj">
+      <Project>{861C9020-EFA1-3AB3-9E09-58F0DA1A8DFF}</Project>
+      <Name>WowClient</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\WowServices\WowServices.vcxproj">
+      <Project>{A57A6CB5-1CD3-3D9F-BA6C-57EC0D85B12B}</Project>
+      <Name>WowServices</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\WoW\Source\WowSvcs\WowSvcs.vcxproj">
+      <Project>{DFB50FF7-84CD-38E0-9836-206AEA8CDA8A}</Project>
+      <Name>WowSvcs</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Tools\XvidDecoder\XvidDecoder.vcxproj">
+      <Project>{698E40B5-868B-3599-9018-405A43EA4523}</Project>
+      <Name>XvidDecoder</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\ThirdParty\blast.vcxproj">
+      <Project>{1B41C429-E268-31FA-8F00-EB673F7A3E86}</Project>
+      <Name>blast</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\ThirdParty\bzip2.vcxproj">
+      <Project>{09A4E2DB-3050-33D6-A74C-A46E2E9BDEDB}</Project>
+      <Name>bzip2</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\ThirdParty\expat.vcxproj">
+      <Project>{572E2BA7-AA6F-3BA4-BF4C-0A4EB31ED89D}</Project>
+      <Name>expat</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\SoundEngine\fmodex.vcxproj">
+      <Project>{F1EF310C-DE89-38D6-BEC6-92ACE6E9E6B0}</Project>
+      <Name>fmodex</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\ThirdParty\freetype.vcxproj">
+      <Project>{B9AFECD7-A1EA-3CC6-A7D2-9286CD836085}</Project>
+      <Name>freetype</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\jpeg\jpeg.vcxproj">
+      <Project>{01CF02E0-087A-3CD9-A24F-B9CAA0ABAF3E}</Project>
+      <Name>jpeg</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\ThirdParty\lgLcd.vcxproj">
+      <Project>{8CB18E87-9428-3E35-84B0-E477A120ABEE}</Project>
+      <Name>lgLcd</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\lua-5.1\lua.vcxproj">
+      <Project>{00714D34-177A-3BB3-B883-74B6CE912C36}</Project>
+      <Name>lua</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\ThirdParty\lzma.vcxproj">
+      <Project>{0C6F9666-A9DE-3F3A-A0A5-D8168D7B4441}</Project>
+      <Name>lzma</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\ThirdParty\pcre.vcxproj">
+      <Project>{C1C54778-22BE-3191-95E4-FC556BD97445}</Project>
+      <Name>pcre</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\Engine\Source\pcre\pcreposix.vcxproj">
+      <Project>{BCC77CB2-9674-3693-9681-81E0551DA381}</Project>
+      <Name>pcreposix</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\build\msdf\ThirdParty\zlib.vcxproj">
+      <Project>{20FDAA03-2257-31DA-8799-C902C6748EBE}</Project>
+      <Name>zlib</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

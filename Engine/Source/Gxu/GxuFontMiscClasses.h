@@ -34,6 +34,7 @@ struct GLYPHBITMAPDATA {
     // with a row stride of m_glyphWidth. Null when the outline could not be
     // decomposed, in which case the bitmap path is used instead.
     /* NEW */ uint8_t* m_sdfData;
+    /* NEW */ uint32_t m_sdfChannels;   // 1 = grayscale field, 3 = MSDF
 
     GLYPHBITMAPDATA();
     ~GLYPHBITMAPDATA();

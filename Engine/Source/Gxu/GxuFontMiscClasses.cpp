@@ -89,6 +89,7 @@ void GLYPHBITMAPDATA::CopyFrom(GLYPHBITMAPDATA* source) {
 
     this->m_data = nullptr;
     this->m_sdfData = nullptr;
+    this->m_sdfChannels = 0;
     *this = *source;
     source->m_data = nullptr;
     source->m_sdfData = nullptr;
@@ -99,6 +100,7 @@ void GLYPHBITMAPDATA::CopyFrom(GLYPHBITMAPDATA* source) {
 GLYPHBITMAPDATA::GLYPHBITMAPDATA() {
     this->m_data = nullptr;
     this->m_sdfData = nullptr;
+    this->m_sdfChannels = 0;
     this->m_dataSize = 0;
     this->m_textureCoords.minY = 0.0f;
     this->m_textureCoords.minX = 0.0f;

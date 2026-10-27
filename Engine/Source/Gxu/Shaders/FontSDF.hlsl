@@ -1,9 +1,10 @@
-// Signed distance field font pixel shader (ps_3_0).
+// Multi-channel signed distance field font pixel shader (ps_3_0).
 //
-// The atlas stores a distance field of the GLYPH BODY ONLY. The outline is no
-// longer baked into the texture as a solid rim; it is expanded analytically
-// here, so a stroke keeps its intended width instead of merging into the body.
+// The atlas stores a three-channel MSDF in RGB: each channel holds the distance
+// to one colour class of contour edges. Taking the median of the three keeps
+// corners sharp, which a single-channel field cannot do.
 //
+// The outline is not baked into the texture; it is expanded analytically below.
 // The screen-space footprint of one texel is measured with ddx/ddy so the
 // reconstruction stays correct at any uiScale.
 
@@ -19,7 +20,12 @@ float4 OutlineParams : register(c1);
 float4 OutlineColor : register(c2);
 
 float4 main(float2 uv : TEXCOORD0, float4 color : COLOR0) : COLOR0 {
-    float dist = tex2D(FontAtlas, uv).a;
+    float3 msd = tex2D(FontAtlas, uv).rgb;
+
+    // Median of three: max(min(r,g), min(max(r,g), b)).
+    float lo = min(msd.r, msd.g);
+    float hi = max(msd.r, msd.g);
+    float mid = max(lo, min(hi, msd.b));
 
     // Texels covered by one screen pixel.
     float2 ddxTexel = ddx(uv / AtlasSize.xy);
@@ -27,7 +33,7 @@ float4 main(float2 uv : TEXCOORD0, float4 color : COLOR0) : COLOR0 {
     float texelsPerPixel = max(length(ddxTexel), length(ddyTexel));
 
     // kSpread is 4.0 texels, so the encoded range spans 8 texels.
-    float sd = (dist - 0.5) * 8.0;
+    float sd = (mid - 0.5) * 8.0;
     float px = max(texelsPerPixel, 1e-5);
 
     float body = saturate(sd / px + 0.5);

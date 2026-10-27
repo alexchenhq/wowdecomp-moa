@@ -64,14 +64,28 @@ bool BuildFromPolygons(const float* pts, int pointCount,
                        float originX, float originY,
                        uint32_t gw, uint32_t gh, uint8_t* out);
 
+// Multi-channel variant (MSDF). Each contour edge is assigned one of three
+// colours, and the field stores the distance to the red, green and blue edges in
+// separate channels. The shader takes the median of the three, which keeps
+// corners sharp instead of rounding them off the way a single channel does.
+//
+// out: gw * gh * 3 bytes, interleaved R, G, B.
+bool BuildMSDFFromPolygons(const float* pts, int pointCount,
+                           const int* contourStart, int contourCount,
+                           float originX, float originY,
+                           uint32_t gw, uint32_t gh, uint8_t* out);
+
 // Clears one cell (used for empty glyphs and for glyphs we skip).
 void ClearCell(uint32_t cellW, uint32_t cellH, uint32_t* dest, uint32_t destStride);
 
 // Copies a prepared one-byte-per-pixel distance field into an atlas cell,
 // converting it to the 0xAARRGGBB form the texture expects. The cell is cleared
 // first, so callers do not have to blank the area themselves.
+// channels: 1 for a grayscale field, 3 for an MSDF. With three channels the
+// R/G/B texel channels carry the per-colour distances and alpha receives their
+// median, so a fixed-function fallback still shows readable text.
 void BlitDistance(const uint8_t* sdf, uint32_t sdfWidth, uint32_t sdfHeight,
-                  uint32_t cellW, uint32_t cellH, uint32_t yStart,
+                  uint32_t channels, uint32_t cellW, uint32_t cellH, uint32_t yStart,
                   uint32_t* dest, uint32_t destStride);
 
 } // namespace GxuFontSdf

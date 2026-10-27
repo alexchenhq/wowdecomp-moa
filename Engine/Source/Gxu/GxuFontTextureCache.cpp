@@ -187,6 +187,7 @@ void TEXTURECACHE::PasteGlyphOutlinedAA(const GLYPHBITMAPDATA& data, uint32_t* d
     // there. This also skips the whole wall-following pass below.
     if (data.m_sdfData) {
         GxuFontSdf::BlitDistance(data.m_sdfData, data.m_glyphWidth, data.m_glyphHeight,
+            data.m_sdfChannels ? data.m_sdfChannels : 1,
             data.m_glyphCellWidth, this->m_theFace->m_cellHeight, data.m_yStart, dest, 256);
         return;
     }
@@ -354,6 +355,7 @@ void TEXTURECACHE::PasteGlyphNonOutlinedAA(const GLYPHBITMAPDATA& data, uint32_t
     // from the raster when the outline was not available.
     if (data.m_sdfData) {
         GxuFontSdf::BlitDistance(data.m_sdfData, data.m_glyphWidth, data.m_glyphHeight,
+            data.m_sdfChannels ? data.m_sdfChannels : 1,
             data.m_glyphCellWidth, this->m_theFace->m_cellHeight, data.m_yStart, dest, 256);
         return;
     }

@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\WoW\Source\Battlenet\BSN\Adapter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\WoW\Source\Battlenet\BSN\BSNCpp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\WoW\Source\Battlenet\BSN\BSNEncodeInterface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\WoW\Source\Battlenet\BSN\Encoder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\WoW\Source\Battlenet\BSN\Protocol.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\WoW\Source\Battlenet\BSN\ProtocolMeta.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\WoW\Source\Battlenet\BSN\ProtocolType.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\WoW\Source\Battlenet\Battlenet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\WoW\Source\Battlenet\BattlenetMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\WoW\Source\Battlenet\BattlenetProtocol.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\WoW\Source\Battlenet\BattlenetProtocolData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\WoW\Source\Battlenet\BattlenetProtocolTypes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\WoW\Source\Battlenet\GeneralFunction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\WoW\Source\Battlenet\Tumor\CreepTendril.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\WoW\Source\Battlenet\Tumor\Tendril.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\WoW\Source\Battlenet\Tumor\Tumor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\WoW\Source\Battlenet\Tumor\TumorManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\WoW\Source\Battlenet\Win64\Battlenet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\alexc\WorkBuddy\2026-10-24-22-17-35\wowdecomp-src\WoW\Source\Battlenet\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{75F5BD57-742E-3DF4-BBF2-91C0E3275CE8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
