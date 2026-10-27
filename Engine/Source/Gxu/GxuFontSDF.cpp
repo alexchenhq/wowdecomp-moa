@@ -365,12 +365,19 @@ bool BuildMSDFFromPolygons(const float* pts, int pointCount,
         return false;
     }
 
-    // Edge colouring. Runs of edges get one of three colours; a run breaks at a
-    // sharp turn so the corner is where two colours meet, which is what lets the
-    // shader keep it sharp. Each contour starts one colour further along so that
-    // simple glyphs end up using all three channels.
+    // Edge colouring, following the rule msdfgen uses for "simple" colouring:
+    // find the real corners first (by the cross product of adjacent edge
+    // directions), then walk the contour and advance the colour with an
+    // alternating +1 / +2 step at every corner. A plain +1 cycle puts the same
+    // colour on both sides of a thin stem, and then the median picks a far edge
+    // and the stroke breaks into pieces.
     std::vector<MsdfSegment> segments;
     segments.reserve(static_cast<size_t>(pointCount) * 2);
+
+    const float kCornerCross = 0.5f; // sin(~30 degrees); flattened curves stay below
+
+    std::vector<int> cornerIndex;
+    std::vector<uint8_t> edgeColor;
 
     for (int c = 0; c < contourCount; c++) {
         const int s = contourStart[c];
@@ -381,40 +388,61 @@ bool BuildMSDFFromPolygons(const float* pts, int pointCount,
         }
 
         const int count = e - s;
-        int color = c % 3;
 
-        float prevDx = 0.0f;
-        float prevDy = 0.0f;
-        bool havePrev = false;
+        cornerIndex.clear();
+        edgeColor.assign(static_cast<size_t>(count), 0);
+
+        for (int k = 0; k < count; k++) {
+            const int prev = s + ((k + count - 1) % count);
+            const int cur = s + k;
+            const int nextCur = (k + 1 < count) ? (cur + 1) : s;
+
+            float ax = pts[2 * nextCur] - pts[2 * cur];
+            float ay = pts[2 * nextCur + 1] - pts[2 * cur + 1];
+            const float la = std::sqrt(ax * ax + ay * ay);
+            if (la > 1e-6f) { ax /= la; ay /= la; }
+
+            const int prevEnd = (prev + 1 <= e - 1) ? (prev + 1) : s;
+            float bx = pts[2 * cur] - pts[2 * prevEnd];
+            float by = pts[2 * cur + 1] - pts[2 * prevEnd + 1];
+            const float lb = std::sqrt(bx * bx + by * by);
+            if (lb > 1e-6f) { bx /= lb; by /= lb; }
+
+            const float cross = bx * ay - by * ax;
+
+            if (std::fabs(cross) > kCornerCross) {
+                cornerIndex.push_back(k);
+            }
+        }
+
+        const uint8_t seed = static_cast<uint8_t>(c % 3);
+
+        if (cornerIndex.empty()) {
+            // Smooth contour: a single colour is correct.
+            for (int k = 0; k < count; k++) {
+                edgeColor[k] = seed;
+            }
+        } else {
+            const int startK = cornerIndex[0];
+            uint8_t color = seed;
+            size_t spline = 0;
+
+            for (int i = 0; i < count; i++) {
+                const int idx = (startK + i) % count;
+
+                if (spline + 1 < cornerIndex.size() && cornerIndex[spline + 1] == idx) {
+                    ++spline;
+                    color = static_cast<uint8_t>((color + 1 + (spline % 2)) % 3);
+                }
+
+                edgeColor[idx] = color;
+            }
+        }
 
         for (int k = 0; k < count; k++) {
             const int i = s + k;
             const int j = (k + 1 < count) ? (i + 1) : s;
-
-            float dx = pts[2 * j] - pts[2 * i];
-            float dy = pts[2 * j + 1] - pts[2 * i + 1];
-
-            const float len = std::sqrt(dx * dx + dy * dy);
-
-            if (len > 1e-6f) {
-                dx /= len;
-                dy /= len;
-            }
-
-            if (havePrev) {
-                const float dot = dx * prevDx + dy * prevDy;
-
-                // Roughly a 26 degree turn or sharper starts a new colour run.
-                if (dot < 0.9f) {
-                    color = (color + 1) % 3;
-                }
-            }
-
-            segments.push_back({ i, j, static_cast<uint8_t>(color) });
-
-            prevDx = dx;
-            prevDy = dy;
-            havePrev = true;
+            segments.push_back({ i, j, edgeColor[k] });
         }
     }
 
@@ -476,32 +504,21 @@ bool BuildMSDFFromPolygons(const float* pts, int pointCount,
                 continue;
             }
 
-            // Fill unused channels so the median stays meaningful.
-            const float fallback = present == 3 ? 0.0f : (sum / static_cast<float>(present));
-
+            // Unused channels get a far distance so they clamp to fully inside or
+            // fully outside according to the sign, which is what msdfgen does.
             for (int i = 0; i < 3; i++) {
                 if (dist[i] < 0.0f) {
-                    dist[i] = fallback;
+                    dist[i] = kMissing;
                 }
             }
 
             const float signedDistance = (crossings & 1) ? 1.0f : -1.0f;
-            const float median = Median3(dist[0], dist[1], dist[2]);
             uint8_t* pixel = out + (static_cast<size_t>(y) * gw + x) * 3;
 
             for (int i = 0; i < 3; i++) {
                 float encoded = 0.5f + signedDistance * dist[i] * invScale;
                 encoded = std::min(1.0f, std::max(0.0f, encoded));
                 pixel[i] = static_cast<uint8_t>(encoded * 255.0f + 0.5f);
-            }
-
-            // Keep the median in the unused slots so linear filtering stays sane.
-            for (int i = 0; i < 3; i++) {
-                if (dist[i] == fallback && present != 3) {
-                    float encoded = 0.5f + signedDistance * median * invScale;
-                    encoded = std::min(1.0f, std::max(0.0f, encoded));
-                    pixel[i] = static_cast<uint8_t>(encoded * 255.0f + 0.5f);
-                }
             }
         }
     }
