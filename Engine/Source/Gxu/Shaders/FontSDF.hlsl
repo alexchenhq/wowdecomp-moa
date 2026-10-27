@@ -13,7 +13,7 @@ sampler2D FontAtlas : register(s0);
 // (1/atlasWidth, 1/atlasHeight, atlasWidth, atlasHeight)
 float4 AtlasSize : register(c0);
 
-// (outlineWidthInTexels, outlineAlpha, 0, 0)
+// (outlineWidthInTexels, outlineAlpha, 0, edgeSharpness)
 float4 OutlineParams : register(c1);
 
 // outline colour
@@ -36,16 +36,19 @@ float4 main(float2 uv : TEXCOORD0, float4 color : COLOR0) : COLOR0 {
     float sd = (mid - 0.5) * 8.0;
     float px = max(texelsPerPixel, 1e-5);
 
-    // Slightly narrower than one pixel: a full-pixel ramp reads as smeared on
-    // larger text, where the atlas is minified by the UI scale.
-    float body = saturate(sd / px * 1.35 + 0.5);
+    // Edge sharpness comes from FontSDF.cfg so it can be tuned without a
+    // rebuild. Above 1.0 the ramp is narrower than a pixel (crisper, can alias);
+    // below 1.0 it is softer.
+    float sharpness = OutlineParams.w > 0.0 ? OutlineParams.w : 1.35;
+
+    float body = saturate(sd / px * sharpness + 0.5);
 
     if (OutlineParams.x <= 0.0) {
         return float4(color.rgb, color.a * body);
     }
 
     // Expand the shape outward by the outline width.
-    float rim = saturate((sd + OutlineParams.x) / px * 1.35 + 0.5);
+    float rim = saturate((sd + OutlineParams.x) / px * sharpness + 0.5);
 
     float3 rgb = lerp(OutlineColor.rgb, color.rgb, body);
     float alpha = max(body * color.a, rim * OutlineParams.y);
