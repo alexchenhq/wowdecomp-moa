@@ -36,14 +36,16 @@ float4 main(float2 uv : TEXCOORD0, float4 color : COLOR0) : COLOR0 {
     float sd = (mid - 0.5) * 8.0;
     float px = max(texelsPerPixel, 1e-5);
 
-    float body = saturate(sd / px + 0.5);
+    // Slightly narrower than one pixel: a full-pixel ramp reads as smeared on
+    // larger text, where the atlas is minified by the UI scale.
+    float body = saturate(sd / px * 1.35 + 0.5);
 
     if (OutlineParams.x <= 0.0) {
         return float4(color.rgb, color.a * body);
     }
 
     // Expand the shape outward by the outline width.
-    float rim = saturate((sd + OutlineParams.x) / px + 0.5);
+    float rim = saturate((sd + OutlineParams.x) / px * 1.35 + 0.5);
 
     float3 rgb = lerp(OutlineColor.rgb, color.rgb, body);
     float alpha = max(body * color.a, rim * OutlineParams.y);
