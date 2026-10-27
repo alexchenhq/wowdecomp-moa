@@ -121,14 +121,25 @@ int OutlineCubicTo(FT_Vector* control1, FT_Vector* control2, FT_Vector* to, void
 
 // MODIFIED: split from the original single FREETYPE_RenderGlyph so the caller
 // can inspect the outline between loading and rasterizing.
-int32_t FREETYPE_LoadGlyph(FT_Face face, uint32_t code, bool monochrome) {
+int32_t FREETYPE_LoadGlyph(FT_Face face, uint32_t code, bool monochrome, uint32_t pixelSize) {
     FT_UInt index = FT_Get_Char_Index(face, code);
 
     if (!index) {
         return 0;
     }
 
-    FT_Int32 flags = FT_LOAD_LINEAR_DESIGN | FT_LOAD_PEDANTIC | FT_LOAD_NO_HINTING;
+    // MODIFIED: grid-fit small glyphs. Without hinting a stem lands on a
+    // fractional column (3.37, 4.12, ...), so the same stroke comes out a
+    // different width from glyph to glyph and the line looks wavy. Hinting snaps
+    // the outline to whole pixels first, and the distance field is then built
+    // from that snapped outline. Large text is left unhinted so it stays true.
+    const bool gridFit = pixelSize <= 20;
+
+    FT_Int32 flags = FT_LOAD_LINEAR_DESIGN | FT_LOAD_PEDANTIC;
+
+    if (!gridFit) {
+        flags |= FT_LOAD_NO_HINTING;
+    }
 
     if (monochrome) {
         flags |= FT_LOAD_CROP_BITMAP;
@@ -211,7 +222,7 @@ bool IGxuFontGlyphRenderGlyph(FT_Face face, uint32_t pixelSize, uint32_t code, u
         return false;
     }
 
-    if (!FREETYPE_LoadGlyph(face, code, monochrome != 0)) {
+    if (!FREETYPE_LoadGlyph(face, code, monochrome != 0, pixelSize)) {
         return false;
     }
 
@@ -284,21 +295,29 @@ bool IGxuFontGlyphRenderGlyph(FT_Face face, uint32_t pixelSize, uint32_t code, u
     if (haveOutline && width && height && !placeholder) {
         // MODIFIED: three channels instead of one. The shader takes the median,
         // which keeps corners sharp; a single channel rounds them off.
-        const size_t sdfSize = static_cast<size_t>(width) * height * 3;
+        // Single channel is the default: at UI sizes the median of three 8-bit
+        // channels is noisier than one, and the outline is already exact. Flip
+        // kUseMsdf to compare the three-channel path.
+        const bool useMsdf = false;
+        const uint32_t channels = useMsdf ? 3 : 1;
+        const size_t sdfSize = static_cast<size_t>(width) * height * channels;
         uint8_t* sdf = static_cast<uint8_t*>(SMemAlloc(sdfSize, __FILE__, __LINE__, 0));
 
         if (sdf) {
-            const bool built = GxuFontSdf::BuildMSDFFromPolygons(poly.m_points.data(),
-                static_cast<int>(poly.m_points.size() / 2),
-                poly.m_contourStart.data(),
-                static_cast<int>(poly.m_contourStart.size()),
-                static_cast<float>(face->glyph->bitmap_left),
-                static_cast<float>(face->glyph->bitmap_top),
-                width, height, sdf);
+            const float originX = static_cast<float>(face->glyph->bitmap_left);
+            const float originY = static_cast<float>(face->glyph->bitmap_top);
+            const int pointCount = static_cast<int>(poly.m_points.size() / 2);
+            const int contourCount = static_cast<int>(poly.m_contourStart.size());
+
+            const bool built = useMsdf
+                ? GxuFontSdf::BuildMSDFFromPolygons(poly.m_points.data(), pointCount,
+                    poly.m_contourStart.data(), contourCount, originX, originY, width, height, sdf)
+                : GxuFontSdf::BuildFromPolygons(poly.m_points.data(), pointCount,
+                    poly.m_contourStart.data(), contourCount, originX, originY, width, height, sdf);
 
             if (built) {
                 dataPtr->m_sdfData = sdf;
-                dataPtr->m_sdfChannels = 3;
+                dataPtr->m_sdfChannels = channels;
             } else {
                 SMemFree(sdf, __FILE__, __LINE__, 0);
             }
