@@ -33,7 +33,7 @@ static float s_fontSdfSharpnessLarge = 1.50f;
 static float s_fontSdfSharpnessSplit = 20.0f;
 static float s_fontSdfRasterScale = 1.0f;
 static float s_fontSdfMaxRasterSize = 64.0f;
-static float s_fontSdfRasterScaleAbove = 20.0f;
+static float s_fontSdfRasterScaleAbove = 32.0f;
 static bool s_fontSdfConfigLoaded = false;
 
 static void LoadFontSdfConfig() {
