@@ -28,6 +28,9 @@ static CGxShader* s_gxuFontSdfShader = nullptr;
 // to the executable instead of being compiled in.
 //    sharpness = 1.35     >1 crisper (can alias), <1 softer
 static float s_fontSdfSharpness = 1.35f;
+static float s_fontSdfSharpnessSmall = 1.20f;
+static float s_fontSdfSharpnessLarge = 1.50f;
+static float s_fontSdfSharpnessSplit = 20.0f;
 static float s_fontSdfRasterScale = 1.0f;
 static float s_fontSdfMaxRasterSize = 64.0f;
 static float s_fontSdfRasterScaleAbove = 20.0f;
@@ -57,8 +60,20 @@ static void LoadFontSdfConfig() {
 
         const float value = static_cast<float>(atof(equals + 1));
 
-        if (strstr(line, "sharpness") && value >= 0.25f && value <= 8.0f) {
+        // Specific keys first: "sharpnessSmall" also matches "sharpness".
+        if (strstr(line, "sharpnessSmall") && value >= 0.25f && value <= 8.0f) {
+            s_fontSdfSharpnessSmall = value;
+            printf("[FontSDF] sharpnessSmall = %.2f\n", value);
+        } else if (strstr(line, "sharpnessLarge") && value >= 0.25f && value <= 8.0f) {
+            s_fontSdfSharpnessLarge = value;
+            printf("[FontSDF] sharpnessLarge = %.2f\n", value);
+        } else if (strstr(line, "sharpnessSplit") && value >= 0.0f && value <= 128.0f) {
+            s_fontSdfSharpnessSplit = value;
+            printf("[FontSDF] sharpnessSplit = %.0f\n", value);
+        } else if (strstr(line, "sharpness") && value >= 0.25f && value <= 8.0f) {
             s_fontSdfSharpness = value;
+            s_fontSdfSharpnessSmall = value;
+            s_fontSdfSharpnessLarge = value;
             printf("[FontSDF] sharpness = %.2f\n", value);
         } else if (strstr(line, "rasterScale") && value >= 0.25f && value <= 2.0f) {
             s_fontSdfRasterScale = value;
@@ -78,6 +93,21 @@ static void LoadFontSdfConfig() {
 float GxuFontSdfSharpness() {
     LoadFontSdfConfig();
     return s_fontSdfSharpness;
+}
+
+float GxuFontSdfSharpnessSmall() {
+    LoadFontSdfConfig();
+    return s_fontSdfSharpnessSmall;
+}
+
+float GxuFontSdfSharpnessLarge() {
+    LoadFontSdfConfig();
+    return s_fontSdfSharpnessLarge;
+}
+
+float GxuFontSdfSharpnessSplit() {
+    LoadFontSdfConfig();
+    return s_fontSdfSharpnessSplit;
 }
 
 float GxuFontSdfRasterScale() {
@@ -448,7 +478,15 @@ void BATCHEDRENDERFONTDESC::RenderBatch() {
         const uint32_t fontFlags = this->m_face->m_fontFlags;
         const float outlineWidth = (fontFlags & 1) ? ((fontFlags & 8) ? 2.0f : 1.0f) : 0.0f;
 
-        float outlineParams[4] = { outlineWidth, 0.47f, 0.0f, GxuFontSdfSharpness() };
+        // Small text needs a wider ramp to hide the quantised edge on diagonals;
+        // large text reads as soft with the same ramp, so it gets a tighter one.
+        // Each font face has its own raster size, so this is decided per batch.
+        const uint32_t facePixels = this->m_face->GetPixelSize();
+        const float sharpness = (facePixels <= static_cast<uint32_t>(GxuFontSdfSharpnessSplit()))
+            ? GxuFontSdfSharpnessSmall()
+            : GxuFontSdfSharpnessLarge();
+
+        float outlineParams[4] = { outlineWidth, 0.47f, 0.0f, sharpness };
         float outlineColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
         GxShaderConstantsSet(GxSh_Pixel, 1, outlineParams, 1);
