@@ -116,6 +116,9 @@ struct TEXTURECACHEROW {
 //   rasterScale    rasterise at this fraction of the requested size (1.0 = off)
 //   maxRasterSize  upper bound on the rasterised pixel size
 float GxuFontSdfSharpness();
+float GxuFontSdfSharpnessSmall();
+float GxuFontSdfSharpnessLarge();
+float GxuFontSdfSharpnessSplit();
 float GxuFontSdfRasterScale();
 float GxuFontSdfMaxRasterSize();
 float GxuFontSdfRasterScaleAbove();
