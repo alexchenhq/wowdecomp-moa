@@ -224,7 +224,9 @@ float GxuFontGetOneToOneHeight(CGxFont* face) {
         return 0.0f;
     }
 
-    return static_cast<float>(face->GetPixelSize()) / static_cast<float>(g_heightPixels);
+    // MODIFIED: must be the logical size. This value is used as a font height, so
+    // returning the (possibly shrunk) raster size would shrink every string.
+    return static_cast<float>(face->GetLogicalPixelSize()) / static_cast<float>(g_heightPixels);
 }
 
 // VERIFY: 1ebc6f2b auto

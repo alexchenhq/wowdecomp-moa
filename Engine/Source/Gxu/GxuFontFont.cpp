@@ -37,6 +37,11 @@ uint32_t CGxFont::GetPixelSize() {
     return this->m_pixelSize;
 }
 
+// MODIFIED: the size the caller asked for, before rasterScale shrank the raster.
+uint32_t CGxFont::GetLogicalPixelSize() {
+    return this->m_logicalPixelSize ? this->m_logicalPixelSize : this->m_pixelSize;
+}
+
 // VERIFY: 3c5dbf73 manual
 // OFFSET: 0x006C2280
 float CGxFont::FindNearestFixedSize(FT_Face face, float height) {
@@ -76,6 +81,9 @@ int32_t CGxFont::UpdateDimensions() {
     if (pixelSize > maxRaster) {
         pixelSize = maxRaster;
     }
+
+    // Remember what the caller asked for before the raster is shaved down.
+    this->m_logicalPixelSize = pixelSize;
 
     // MODIFIED: rasterise at the size the glyph is actually shown at. The whole
     // UI is drawn at uiScale, so a face built for the nominal size gets minified,
@@ -221,7 +229,7 @@ void CGxFont::HandleScreenSizeChange() {
 
 // VERIFY: 4ab2e948 manual
 // OFFSET: 0x006C39A0
-CGxFont::CGxFont() : m_cellHeight(0), m_pixelsPerUnit(0.0f) {
+CGxFont::CGxFont() : m_cellHeight(0), m_pixelsPerUnit(0.0f), m_logicalPixelSize(0) {
 }
 
 // VERIFY: b72018df manual
