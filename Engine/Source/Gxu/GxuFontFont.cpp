@@ -68,9 +68,27 @@ int32_t CGxFont::UpdateDimensions() {
 
     uint32_t pixelSize = static_cast<uint32_t>(ScreenToPixelHeight(0, height));
 
-    if (pixelSize > 32) {
-        pixelSize = 32;
-    } else if (pixelSize == 0) {
+    // MODIFIED: the original client clamped rasterisation at 32 pixels, so any
+    // larger text was a magnified 32px atlas. That is the ceiling behind the
+    // smeared look on big numbers; the bound is now configurable.
+    const uint32_t maxRaster = static_cast<uint32_t>(GxuFontSdfMaxRasterSize());
+
+    if (pixelSize > maxRaster) {
+        pixelSize = maxRaster;
+    }
+
+    // MODIFIED: rasterise at the size the glyph is actually shown at. The whole
+    // UI is drawn at uiScale, so a face built for the nominal size gets minified,
+    // and minifying a distance field is exactly where it loses detail. Geometry
+    // compensates on its own because every placement divides by GetPixelSize().
+    const float rasterScale = GxuFontSdfRasterScale();
+
+    if (rasterScale < 0.999f) {
+        const uint32_t scaled = static_cast<uint32_t>(pixelSize * rasterScale + 0.5f);
+        pixelSize = scaled < 6 ? 6 : scaled;
+    }
+
+    if (pixelSize == 0) {
         DebugLog("Error, font %s being created with height %g at screen res of %dx%d which is %d pixels!", this->m_fontName, height, g_widthPixels, g_heightPixels, pixelSize);
     }
 
