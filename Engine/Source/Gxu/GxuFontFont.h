@@ -37,6 +37,11 @@ struct CGxFont : public TSLinkedNode<CGxFont> {
     /* 018C */ TEXTURECACHE m_textureCache[8];
     /* 024C */ uint32_t m_pixelSize;
 
+    // MODIFIED: m_pixelSize is the rasterised size, which rasterScale shrinks.
+    // Callers that turn a face back into a font height must use the logical size,
+    // otherwise shrinking the raster silently shrinks every string built from it.
+    /* NEW */ uint32_t m_logicalPixelSize;
+
     CGxFont();
     ~CGxFont();
     int32_t CheckStringGlyphs(const char* string);
@@ -49,6 +54,7 @@ struct CGxFont : public TSLinkedNode<CGxFont> {
     bool GetGlyphData(GLYPHBITMAPDATA* data, uint32_t code);
     const char* GetName();
     uint32_t GetPixelSize();
+    uint32_t GetLogicalPixelSize();
     void HandleScreenSizeChange();
     int32_t Initialize(const char* name, uint32_t fontFlags, float fontHeight);
     CHARCODEDESC* NewCodeDesc(uint32_t code);
