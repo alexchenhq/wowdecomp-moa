@@ -28,6 +28,8 @@ static CGxShader* s_gxuFontSdfShader = nullptr;
 // to the executable instead of being compiled in.
 //    sharpness = 1.60     >1 crisper (can alias), <1 softer
 static float s_fontSdfSharpness = 1.60f;
+static float s_fontSdfRasterScale = 1.0f;
+static float s_fontSdfMaxRasterSize = 64.0f;
 static bool s_fontSdfConfigLoaded = false;
 
 static void LoadFontSdfConfig() {
@@ -46,13 +48,7 @@ static void LoadFontSdfConfig() {
     char line[256];
 
     while (fgets(line, sizeof(line), file)) {
-        char* key = strstr(line, "sharpness");
-
-        if (!key) {
-            continue;
-        }
-
-        char* equals = strchr(key, '=');
+        char* equals = strchr(line, '=');
 
         if (!equals) {
             continue;
@@ -60,13 +56,34 @@ static void LoadFontSdfConfig() {
 
         const float value = static_cast<float>(atof(equals + 1));
 
-        if (value >= 0.25f && value <= 8.0f) {
+        if (strstr(line, "sharpness") && value >= 0.25f && value <= 8.0f) {
             s_fontSdfSharpness = value;
             printf("[FontSDF] sharpness = %.2f\n", value);
+        } else if (strstr(line, "rasterScale") && value >= 0.25f && value <= 2.0f) {
+            s_fontSdfRasterScale = value;
+            printf("[FontSDF] rasterScale = %.2f\n", value);
+        } else if (strstr(line, "maxRasterSize") && value >= 8.0f && value <= 256.0f) {
+            s_fontSdfMaxRasterSize = value;
+            printf("[FontSDF] maxRasterSize = %.0f\n", value);
         }
     }
 
     fclose(file);
+}
+
+float GxuFontSdfSharpness() {
+    LoadFontSdfConfig();
+    return s_fontSdfSharpness;
+}
+
+float GxuFontSdfRasterScale() {
+    LoadFontSdfConfig();
+    return s_fontSdfRasterScale;
+}
+
+float GxuFontSdfMaxRasterSize() {
+    LoadFontSdfConfig();
+    return s_fontSdfMaxRasterSize;
 }
 
 static CGxShader* GxuGetFontSdfShader() {
@@ -422,7 +439,7 @@ void BATCHEDRENDERFONTDESC::RenderBatch() {
         const uint32_t fontFlags = this->m_face->m_fontFlags;
         const float outlineWidth = (fontFlags & 1) ? ((fontFlags & 8) ? 2.0f : 1.0f) : 0.0f;
 
-        float outlineParams[4] = { outlineWidth, 0.47f, 0.0f, s_fontSdfSharpness };
+        float outlineParams[4] = { outlineWidth, 0.47f, 0.0f, GxuFontSdfSharpness() };
         float outlineColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
         GxShaderConstantsSet(GxSh_Pixel, 1, outlineParams, 1);

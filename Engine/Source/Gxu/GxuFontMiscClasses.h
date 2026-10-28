@@ -111,6 +111,14 @@ struct TEXTURECACHEROW {
     void EvictGlyph(CHARCODEDESC* desc);
 };
 
+// MODIFIED: font rasterisation settings, read from FontSDF.cfg at first use.
+//   sharpness      edge ramp width used by the SDF shader
+//   rasterScale    rasterise at this fraction of the requested size (1.0 = off)
+//   maxRasterSize  upper bound on the rasterised pixel size
+float GxuFontSdfSharpness();
+float GxuFontSdfRasterScale();
+float GxuFontSdfMaxRasterSize();
+
 struct TEXTURECACHE {
     static void TextureCallback(EGxTexCommand command, uint32_t width, uint32_t height, uint32_t face, uint32_t level, void* userArg, uint32_t& texelStrideInBytes, const void*& texels);
 
