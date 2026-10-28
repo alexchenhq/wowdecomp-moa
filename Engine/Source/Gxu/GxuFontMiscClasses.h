@@ -118,6 +118,7 @@ struct TEXTURECACHEROW {
 float GxuFontSdfSharpness();
 float GxuFontSdfRasterScale();
 float GxuFontSdfMaxRasterSize();
+float GxuFontSdfRasterScaleAbove();
 
 struct TEXTURECACHE {
     static void TextureCallback(EGxTexCommand command, uint32_t width, uint32_t height, uint32_t face, uint32_t level, void* userArg, uint32_t& texelStrideInBytes, const void*& texels);

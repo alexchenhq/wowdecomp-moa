@@ -81,9 +81,14 @@ int32_t CGxFont::UpdateDimensions() {
     // UI is drawn at uiScale, so a face built for the nominal size gets minified,
     // and minifying a distance field is exactly where it loses detail. Geometry
     // compensates on its own because every placement divides by GetPixelSize().
+    // Only shave the raster size for large text. Below the threshold the glyph is
+    // already small, and rasterising at ~8px gives a W almost no samples on its
+    // diagonals; hinting then grid-fits them into steps and the field faithfully
+    // records the steps, which reads as jaggies.
     const float rasterScale = GxuFontSdfRasterScale();
+    const uint32_t rasterScaleAbove = static_cast<uint32_t>(GxuFontSdfRasterScaleAbove());
 
-    if (rasterScale < 0.999f) {
+    if (rasterScale < 0.999f && pixelSize > rasterScaleAbove) {
         const uint32_t scaled = static_cast<uint32_t>(pixelSize * rasterScale + 0.5f);
         pixelSize = scaled < 6 ? 6 : scaled;
     }
