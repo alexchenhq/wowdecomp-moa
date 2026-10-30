@@ -548,7 +548,12 @@ bool GxuFontSlugBindRim(float widthPixels) {
     GxShaderConstantsSet(GxSh_Pixel, 0, params, 1);
 
     float rimParams[4] = { widthPixels, 0.0f, 0.0f, 0.0f };
-    float rimColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+
+    // The distance field path draws its rim at 0.47 alpha (OutlineParams.y in
+    // FontSDF.hlsl), not opaque. At full alpha the same width reads as a solid
+    // black band that closes narrow counters; at 0.47 the background still shows
+    // through, which is why the two paths now match.
+    float rimColor[4] = { 0.0f, 0.0f, 0.0f, 0.47f };
 
     GxShaderConstantsSet(GxSh_Pixel, 1, rimParams, 1);
     GxShaderConstantsSet(GxSh_Pixel, 2, rimColor, 1);
