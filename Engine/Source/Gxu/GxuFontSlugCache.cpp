@@ -347,6 +347,15 @@ bool GxuFontSlugFaceEnabled(const CGxFont* face) {
         return false;
     }
 
+    // Outlined faces stay on the distance field on purpose. A rim needs distances
+    // of one to two pixels, but coverage only carries distance inside half a
+    // pixel: past that it saturates and the gradient dies, so anything rebuilt
+    // from it is a hard threshold, which is exactly the stair step measured at
+    // every size. The field grows a rim properly, so let it.
+    if (face->m_fontFlags & 1) {
+        return false;
+    }
+
     // GetName is a plain accessor that predates this work; it is not const only
     // because the decompiled class never needed it to be.
     const char* name = const_cast<CGxFont*>(face)->GetName();
