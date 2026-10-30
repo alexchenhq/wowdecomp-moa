@@ -524,20 +524,51 @@ void BATCHEDRENDERFONTDESC::RenderBatch() {
     CGxFontVertex* verts = reinterpret_cast<CGxFontVertex*>(GxBufLock(buf));
     int32_t space = 2048;
 
-    for (int32_t texturePage = 0; texturePage < 8; texturePage++) {
-        CTexture* texture = this->m_face->m_textureCache[texturePage].m_texture;
+#if GXU_FONT_SLUG_TEXT
+    const bool rimFace = slugFace && GxuFontSlugRimEnabled(this->m_face);
+    const uint32_t faceFlags = this->m_face->m_fontFlags;
+    const float slugOutlineWidth = (faceFlags & 1) ? ((faceFlags & 8) ? 2.0f : 1.0f) : 0.0f;
+#endif
+
+    // Which lines this batch draws and in what order. The rim has to land before
+    // the body: it fills the grown shape, the body covers all but the outside.
+    int32_t pages[8];
+    int32_t pageCount = 0;
+
+#if GXU_FONT_SLUG_TEXT
+    if (slugFace) {
+        if (rimFace) {
+            pages[pageCount++] = static_cast<int32_t>(GxuFontSlugRimPage());
+        }
+
+        pages[pageCount++] = 0;
+    } else
+#endif
+    {
+        for (int32_t i = 0; i < 8; i++) {
+            pages[pageCount++] = i;
+        }
+    }
+
+    for (int32_t p = 0; p < pageCount; p++) {
+        const int32_t texturePage = pages[p];
 
 #if GXU_FONT_SLUG_TEXT
         if (slugFace) {
-            // Slug geometry reads the curve page that the batch setup already
-            // bound, not the atlas, and every slug glyph sits on line 0 because
-            // there is no page to spread them over.
-            if (texturePage) {
-                break;
+            if (texturePage != 0) {
+                // Without its shader the rim geometry would be shaded as a slightly
+                // larger body, which is worse than no rim at all.
+                if (!GxuFontSlugBindRim(slugOutlineWidth)) {
+                    continue;
+                }
+            } else {
+                GxuFontSlugBindBody();
             }
         } else
 #endif
         {
+            CTexture* texture = this->m_face->m_textureCache[texturePage].m_texture;
+
             if (!texture) {
                 continue;
             }
