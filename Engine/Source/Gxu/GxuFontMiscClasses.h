@@ -73,7 +73,7 @@ struct TEXTLINETEXTURE : public TSLinkedNode<TEXTLINETEXTURE> {
 
     TEXTLINETEXTURE();
     ~TEXTLINETEXTURE();
-    void WriteGeometry(CGxVertexPCT* buf, const CImVector& fontColor, const C2Vector& shadowOffset, const CImVector& shadowColor, const C3Vector& viewTranslation, bool hasShadow, bool hasGradient, int32_t vertIndex, int32_t numVerts) const;
+    void WriteGeometry(CGxFontVertex* buf, const CImVector& fontColor, const C2Vector& shadowOffset, const CImVector& shadowColor, const C3Vector& viewTranslation, bool hasShadow, bool hasGradient, int32_t vertIndex, int32_t numVerts) const;
 };
 
 struct BATCHEDRENDERFONTDESC : public TSHashObject<BATCHEDRENDERFONTDESC, HASHKEY_PTR> {
@@ -84,7 +84,7 @@ struct BATCHEDRENDERFONTDESC : public TSHashObject<BATCHEDRENDERFONTDESC, HASHKE
     static void Initialize();
     static void InitializeIndexBuff();
     static void Shutdown();
-    static CGxVertexPCT* UnlockVertexPtrAndRender(CGxBuf*& buf, int32_t count);
+    static CGxFontVertex* UnlockVertexPtrAndRender(CGxBuf*& buf, int32_t count);
 
     /* 0018 */ CGxFont* m_face;
     /* 001C */ TSExplicitList<CGxString, offsetof(CGxString, m_batchedStringLink)> m_strings;

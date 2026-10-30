@@ -274,7 +274,7 @@ uint32_t CHARCODEDESC::GapToPrevious() {
 
 // VERIFY: 6fcf1d8c manual
 // OFFSET: 0x006C4440
-void TEXTLINETEXTURE::WriteGeometry(CGxVertexPCT* buf, const CImVector& fontColor, const C2Vector& shadowOffset, const CImVector& shadowColor, const C3Vector& viewTranslation, bool hasShadow, bool hasGradient, int32_t vertIndex, int32_t numVerts) const {
+void TEXTLINETEXTURE::WriteGeometry(CGxFontVertex* buf, const CImVector& fontColor, const C2Vector& shadowOffset, const CImVector& shadowColor, const C3Vector& viewTranslation, bool hasShadow, bool hasGradient, int32_t vertIndex, int32_t numVerts) const {
     if (!numVerts) {
         return;
     }
@@ -314,6 +314,9 @@ void TEXTLINETEXTURE::WriteGeometry(CGxVertexPCT* buf, const CImVector& fontColo
             for (int32_t i = 0; i < count; i++) {
                 buf->p = vert->m_vc + offset;
                 buf->tc = vert->m_tc;
+#if GXU_FONT_SLUG_TEXT
+                buf->tc2 = vert->m_tc2;
+#endif
 
                 CImVector vertColor = shadowColor;
 
@@ -373,6 +376,9 @@ void TEXTLINETEXTURE::WriteGeometry(CGxVertexPCT* buf, const CImVector& fontColo
         }
 
         buf->tc = vert->m_tc;
+#if GXU_FONT_SLUG_TEXT
+        buf->tc2 = vert->m_tc2;
+#endif
 
         CImVector vertColor = *color;
         color += colorStride;
@@ -428,15 +434,15 @@ void BATCHEDRENDERFONTDESC::Shutdown() {
 
 // VERIFY: 36c33614 manual
 // OFFSET: 0x006C48D0
-CGxVertexPCT* BATCHEDRENDERFONTDESC::UnlockVertexPtrAndRender(CGxBuf*& buf, int32_t count) {
-    GxBufUnlock(buf, sizeof(CGxVertexPCT) * count);
+CGxFontVertex* BATCHEDRENDERFONTDESC::UnlockVertexPtrAndRender(CGxBuf*& buf, int32_t count) {
+    GxBufUnlock(buf, sizeof(CGxFontVertex) * count);
 
     if (!BATCHEDRENDERFONTDESC::s_indexBuf->m_hasData || !BATCHEDRENDERFONTDESC::s_indexBuf->m_valid) {
         BATCHEDRENDERFONTDESC::InitializeIndexBuff();
     }
 
     if (BATCHEDRENDERFONTDESC::s_indexBuf->m_hasData && BATCHEDRENDERFONTDESC::s_indexBuf->m_valid) {
-        GxPrimVertexPtr(buf, GxVBF_PCT);
+        GxPrimVertexPtr(buf, GXU_FONT_VERTEX_FORMAT);
         g_theGxDevicePtr->PrimIndexPtr(BATCHEDRENDERFONTDESC::s_indexBuf);
 
         CGxBatch batch;
@@ -449,7 +455,7 @@ CGxVertexPCT* BATCHEDRENDERFONTDESC::UnlockVertexPtrAndRender(CGxBuf*& buf, int3
         GxDraw(&batch, 1);
     }
 
-    return reinterpret_cast<CGxVertexPCT*>(GxBufLock(buf));
+    return reinterpret_cast<CGxFontVertex*>(GxBufLock(buf));
 }
 
 // VERIFY: 7e6d9f88 manual
@@ -472,9 +478,18 @@ void BATCHEDRENDERFONTDESC::RenderBatch() {
     // shader for the duration of this batch and restore the previous state.
     g_theGxDevicePtr->RsPush();
 
+#if GXU_FONT_SLUG_TEXT
+    // One face at a time goes through Slug; every other face keeps the distance
+    // field in the same build. The two need different shaders, so the choice is
+    // made here, once per batch.
+    const bool slugFace = GxuFontSlugFaceEnabled(this->m_face) && GxuFontSlugBeginBatch();
+#else
+    const bool slugFace = false;
+#endif
+
     CGxShader* sdfShader = GxuGetFontSdfShader();
 
-    if (sdfShader) {
+    if (!slugFace && sdfShader) {
         GxRsSet(GxRs_PixelShader, sdfShader);
 
         // c0 = (1 / atlasWidth, 1 / atlasHeight). The shader multiplies by this
@@ -505,24 +520,36 @@ void BATCHEDRENDERFONTDESC::RenderBatch() {
         GxShaderConstantsSet(GxSh_Pixel, 2, outlineColor, 1);
     }
 
-    CGxBuf* buf = GxBufStream(GxPoolTarget_Vertex, sizeof(CGxVertexPCT), 2048);
-    CGxVertexPCT* verts = reinterpret_cast<CGxVertexPCT*>(GxBufLock(buf));
+    CGxBuf* buf = GxBufStream(GxPoolTarget_Vertex, sizeof(CGxFontVertex), 2048);
+    CGxFontVertex* verts = reinterpret_cast<CGxFontVertex*>(GxBufLock(buf));
     int32_t space = 2048;
 
     for (int32_t texturePage = 0; texturePage < 8; texturePage++) {
         CTexture* texture = this->m_face->m_textureCache[texturePage].m_texture;
 
-        if (!texture) {
-            continue;
+#if GXU_FONT_SLUG_TEXT
+        if (slugFace) {
+            // Slug geometry reads the curve page that the batch setup already
+            // bound, not the atlas, and every slug glyph sits on line 0 because
+            // there is no page to spread them over.
+            if (texturePage) {
+                break;
+            }
+        } else
+#endif
+        {
+            if (!texture) {
+                continue;
+            }
+
+            CGxTex* gxTex = TextureGetGxTex(texture, 1, nullptr);
+
+            if (!gxTex) {
+                continue;
+            }
+
+            g_theGxDevicePtr->RsSet(GxRs_Texture0, gxTex);
         }
-
-        CGxTex* gxTex = TextureGetGxTex(texture, 1, nullptr);
-
-        if (!gxTex) {
-            continue;
-        }
-
-        g_theGxDevicePtr->RsSet(GxRs_Texture0, gxTex);
 
         for (CGxString* string = this->m_strings.Head(); string; string = this->m_strings.Next(string)) {
             if (!string->m_textLines[texturePage]) {

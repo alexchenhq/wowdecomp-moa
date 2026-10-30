@@ -14,14 +14,17 @@
 #include "Engine/Source/Gx/CGxBuf.h"
 #include "Engine/Source/Gx/CGxDevice/CGxDevice.h"
 #include "Engine/Source/Gx/CGxDevice/CGxShader.h"
-#include "Engine/Source/Gx/CGxVertexPCT.h"
+#include "Engine/Source/Gx/CGxVertexPCT2.h"
 #include "Engine/Source/Services/Texture.h"
 #include "Engine/Source/Storm/H/storm.h"
 
 namespace {
 
-const uint32_t kPageWidth = 256;
-const uint32_t kPageHeight = 256;
+// 512 x 512 texels: a full latin face at one entry per character fits with room to
+// spare, and a page flush (which invalidates the base texels already baked into
+// cached string geometry) stays out of reach in normal play.
+const uint32_t kPageWidth = 512;
+const uint32_t kPageHeight = 512;
 const uint32_t kTexelBytes = 4;          // Gr1616F, two halves per texel
 const uint32_t kTotalTexels = kPageWidth * kPageHeight;
 const uint32_t kTexelsPerCurve = 4;
@@ -47,6 +50,7 @@ uint16_t s_pageData[kPageWidth * kPageHeight * 2];
 CTexture* s_texture = nullptr;
 CGxTex* s_deviceTexture = nullptr;
 CGxShader* s_shader = nullptr;
+CGxShader* s_vertexShader = nullptr;
 
 struct CacheEntry {
     FT_Face m_face;
@@ -56,6 +60,7 @@ struct CacheEntry {
 
 std::vector<CacheEntry> s_entries;
 uint32_t s_cursorTexel = 0;
+bool s_pageDirty = false;
 
 void PageCallback(EGxTexCommand command, uint32_t width, uint32_t height,
                   uint32_t face, uint32_t level, void* userArg,
@@ -98,6 +103,15 @@ void UploadPage() {
     }
 }
 
+// One page upload per frame instead of one per new glyph: a first frame that
+// caches a whole alphabet would otherwise push a megabyte per character.
+void FlushPageIfDirty() {
+    if (s_pageDirty) {
+        s_pageDirty = false;
+        UploadPage();
+    }
+}
+
 CGxShader* GetShader() {
     if (s_shader) {
         return s_shader;
@@ -116,8 +130,35 @@ CGxShader* GetShader() {
         return nullptr;
     }
 
-    SlugLog("[Slug] pixel shader active (ps_3_0)");
+    SlugLog("[Slug] pixel shader active (ps_3_0, texcoord1 for the glyph base)");
     s_shader = shader;
+
+    return shader;
+}
+
+// The game data's UI vertex shader was not written for this path and there is no
+// way to know whether it forwards a second texture coordinate, so the batch
+// carries its own. It only has to reproject and pass the interpolators through.
+CGxShader* GetVertexShader() {
+    if (s_vertexShader) {
+        return s_vertexShader;
+    }
+
+    CGxShader* shader = new CGxShader;
+
+    shader->m_target = GxSh_Vertex;
+    shader->m_code.SetCount(g_gxuFontSlugVertexShaderSize);
+    memcpy(shader->m_code.m_data, g_gxuFontSlugVertexShader, g_gxuFontSlugVertexShaderSize);
+    shader->m_loaded = 0;
+
+    if (!shader->Valid()) {
+        SlugLog("[Slug] vertex shader failed to create");
+        delete shader;
+        return nullptr;
+    }
+
+    SlugLog("[Slug] vertex shader active (vs_3_0)");
+    s_vertexShader = shader;
 
     return shader;
 }
@@ -159,8 +200,8 @@ void DrawGlyphQuad(const SLUGGLYPHINFO& glyph, float x0, float y0, float width, 
     const float x1 = x0 + width;
     const float y1 = y0 + height;
 
-    CGxBuf* buf = GxBufStream(GxPoolTarget_Vertex, sizeof(CGxVertexPCT), 4);
-    CGxVertexPCT* verts = reinterpret_cast<CGxVertexPCT*>(GxBufLock(buf));
+    CGxBuf* buf = GxBufStream(GxPoolTarget_Vertex, sizeof(CGxVertexPCT2), 4);
+    CGxVertexPCT2* verts = reinterpret_cast<CGxVertexPCT2*>(GxBufLock(buf));
 
     if (!verts) {
         return;
@@ -181,9 +222,11 @@ void DrawGlyphQuad(const SLUGGLYPHINFO& glyph, float x0, float y0, float width, 
         verts[i].c = color;
         verts[i].tc.x = coords[i][0];
         verts[i].tc.y = coords[i][1];
+        verts[i].tc2.x = static_cast<float>(glyph.m_baseTexel);
+        verts[i].tc2.y = static_cast<float>(glyph.m_curveCount);
     }
 
-    GxBufUnlock(buf, sizeof(CGxVertexPCT) * 4);
+    GxBufUnlock(buf, sizeof(CGxVertexPCT2) * 4);
 
     CGxBuf* indexBuf = GetIndexBuffer();
 
@@ -191,11 +234,7 @@ void DrawGlyphQuad(const SLUGGLYPHINFO& glyph, float x0, float y0, float width, 
         return;
     }
 
-    float params[4];
-    GxuFontSlugShaderParams(glyph, params);
-    GxShaderConstantsSet(GxSh_Pixel, 0, params, 1);
-
-    GxPrimVertexPtr(buf, GxVBF_PCT);
+    GxPrimVertexPtr(buf, GxVBF_PCT2);
     g_theGxDevicePtr->PrimIndexPtr(indexBuf);
 
     CGxBatch batch;
@@ -237,7 +276,8 @@ bool GxuFontSlugGetGlyph(FT_Face face, uint32_t code, uint32_t pixelSize, SLUGGL
     // Flush rather than fragment. A real allocator belongs with the text path; a
     // reset keeps the layout trivially correct for now.
     if (s_cursorTexel + needed > kTotalTexels) {
-        SlugLog("[Slug] page full, flushing %u entries", static_cast<uint32_t>(s_entries.size()));
+        SlugLog("[Slug] page full, flushing %u entries (cached geometry goes stale)",
+            static_cast<uint32_t>(s_entries.size()));
         s_entries.clear();
         s_cursorTexel = 0;
         memset(s_pageData, 0, sizeof(s_pageData));
@@ -267,7 +307,8 @@ bool GxuFontSlugGetGlyph(FT_Face face, uint32_t code, uint32_t pixelSize, SLUGGL
     s_entries.push_back(entry);
     s_cursorTexel += needed;
 
-    UploadPage();
+    // Uploaded on the next batch, see FlushPageIfDirty.
+    s_pageDirty = true;
 
     SlugLog("[Slug] cached %c base=%u curves=%u used=%u/%u",
         static_cast<char>(code), entry.m_info.m_baseTexel, entry.m_info.m_curveCount,
@@ -286,15 +327,76 @@ CGxTex* GxuFontSlugDeviceTexture() {
     return s_deviceTexture;
 }
 
-void GxuFontSlugShaderParams(const SLUGGLYPHINFO& glyph, float* out) {
+void GxuFontSlugPageConstants(float* out) {
     if (!out) {
         return;
     }
 
-    out[0] = static_cast<float>(glyph.m_baseTexel);
-    out[1] = static_cast<float>(glyph.m_curveCount);
-    out[2] = 1.0f / static_cast<float>(kPageWidth);
-    out[3] = 1.0f / static_cast<float>(kPageHeight);
+    out[0] = 1.0f / static_cast<float>(kPageWidth);
+    out[1] = 1.0f / static_cast<float>(kPageHeight);
+    out[2] = 0.0f;
+    out[3] = 0.0f;
+}
+
+bool GxuFontSlugFaceEnabled(const CGxFont* face) {
+#if !GXU_FONT_SLUG_TEXT
+    (void)face;
+    return false;
+#else
+    if (!face) {
+        return false;
+    }
+
+    // GetName is a plain accessor that predates this work; it is not const only
+    // because the decompiled class never needed it to be.
+    const char* name = const_cast<CGxFont*>(face)->GetName();
+    const char* wanted = GXU_FONT_SLUG_FACE;
+
+    if (!name) {
+        return false;
+    }
+
+    // Font names are stored as the file path and the case varies between the
+    // client's own tables and the data files, so compare folded.
+    for (; *name && *wanted; name++, wanted++) {
+        char a = *name;
+        char b = *wanted;
+
+        if (a >= 'A' && a <= 'Z') a = static_cast<char>(a - 'A' + 'a');
+        if (b >= 'A' && b <= 'Z') b = static_cast<char>(b - 'A' + 'a');
+
+        if (a != b) {
+            return false;
+        }
+    }
+
+    return *name == 0 && *wanted == 0;
+#endif
+}
+
+bool GxuFontSlugBeginBatch() {
+#if !GXU_FONT_SLUG_TEXT
+    return false;
+#else
+    CGxShader* vertexShader = GetVertexShader();
+    CGxShader* shader = GetShader();
+
+    if (!vertexShader || !shader || !s_deviceTexture) {
+        return false;
+    }
+
+    FlushPageIfDirty();
+
+    GxRsSet(GxRs_VertexShader, vertexShader);
+    GxRsSet(GxRs_PixelShader, shader);
+    GxRsSet(GxRs_Texture0, s_deviceTexture);
+
+    float params[4];
+    GxuFontSlugPageConstants(params);
+    GxShaderConstantsSet(GxSh_Pixel, 0, params, 1);
+
+    return true;
+#endif
 }
 
 void GxuFontSlugDebugDraw(FT_Face face, uint32_t pixelSize) {
@@ -321,15 +423,18 @@ void GxuFontSlugDebugDraw(FT_Face face, uint32_t pixelSize) {
 
     const bool haveSecond = GxuFontSlugGetGlyph(face, '8', pixelSize, &second);
 
-    CGxShader* shader = GetShader();
+    g_theGxDevicePtr->RsPush();
 
-    if (!shader || !s_deviceTexture) {
+    if (!GxuFontSlugBeginBatch()) {
+        g_theGxDevicePtr->RsPop();
         return;
     }
 
-    g_theGxDevicePtr->RsPush();
-    GxRsSet(GxRs_PixelShader, shader);
-    GxRsSet(GxRs_Texture0, s_deviceTexture);
+    // The probe runs outside the string batch, so it cannot assume the transform
+    // is still bound; take it from the same source the batch uses.
+    C44Matrix viewProj;
+    GxXformViewProjNativeTranspose(viewProj);
+    GxShaderConstantsSet(GxSh_Vertex, 0, reinterpret_cast<const float*>(&viewProj), 4);
 
     const CImVector white = { 0xFF, 0xFF, 0xFF, 0xFF };
     const CImVector tinted = { 0xFF, 0x80, 0xC0, 0xFF };
@@ -344,5 +449,5 @@ void GxuFontSlugDebugDraw(FT_Face face, uint32_t pixelSize) {
     }
 
     g_theGxDevicePtr->RsPop();
-}
 #endif
+}

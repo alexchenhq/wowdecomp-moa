@@ -185,6 +185,14 @@ bool GxuFontSlugExtractGlyph(FT_Face face, uint32_t code, uint32_t pixelSize, SL
         return false;
     }
 
+    // The face is shared by every size of the same font file, so it may have been
+    // left at another size by whoever used it last. The em normalisation below
+    // divides by pixelSize, which is only correct if the outline was loaded at
+    // that size.
+    if (FT_Set_Pixel_Sizes(face, 0, pixelSize) != FT_Err_Ok) {
+        return false;
+    }
+
     if (FT_Load_Glyph(face, index, FT_LOAD_LINEAR_DESIGN | FT_LOAD_PEDANTIC | FT_LOAD_NO_BITMAP | FT_LOAD_NO_HINTING) != 0) {
         return false;
     }

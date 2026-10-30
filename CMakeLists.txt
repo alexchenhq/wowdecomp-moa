@@ -54,6 +54,13 @@ if (WOWDECOMP_DISABLE_SIGNATURE_CHECKS)
     add_compile_definitions(DISABLE_SIGNATURE_CHECKS=1)
 endif ()
 
+# Slug font path. Off by default: the shipping client renders text from distance
+# fields, and the Slug path changes the vertex layout of a font batch outright,
+# so it has to be an explicit choice per build. The definitions themselves are
+# applied in Engine/Source/Gxu/CMakeLists.txt, where the only affected target is.
+option(WOWDECOMP_SLUG_TEXT "Route the UI font through the Slug analytic coverage path" OFF)
+option(WOWDECOMP_SLUG_PROBE "Draw the Slug debug quads in the top left corner" OFF)
+
 # Game identity (build 12340, version 3.3.5, client name) lives in GameVersion.h at the repository root.
 # WaystoneVersion.h is regenerated from git on every build; the login screen shows its build number.
 set(WAYSTONE_VERSION_HEADER ${CMAKE_BINARY_DIR}/generated/WaystoneVersion.h)
