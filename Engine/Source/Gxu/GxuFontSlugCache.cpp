@@ -370,6 +370,7 @@ void LogFaceOnce(const CGxFont* face, bool accepted) {
 }
 
 bool FaceMatchesSlugConfig(const CGxFont* face) {
+#if !GXU_FONT_SLUG_OUTLINED
     // Outlined faces stay on the distance field on purpose. A rim needs distances
     // of one to two pixels, but coverage only carries distance inside half a
     // pixel: past that it saturates and the gradient dies, so anything rebuilt
@@ -378,6 +379,7 @@ bool FaceMatchesSlugConfig(const CGxFont* face) {
     if (face->m_fontFlags & 1) {
         return false;
     }
+#endif
 
 #if GXU_FONT_SLUG_ALL_FACES
     return true;

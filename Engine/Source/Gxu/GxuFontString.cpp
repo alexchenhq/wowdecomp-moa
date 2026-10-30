@@ -521,7 +521,10 @@ void CGxString::InitializeTextLine(const char* text, uint32_t numBytes, CImVecto
                         // baseline. Taking pos.y directly would lift every glyph by
                         // the descent.
                         const float emToPixel = fontPixelHeight;
-                        const float baseline = pos.y + cellHeight - this->m_currentFace->m_baseline * scale;
+                        // cellHeight carries the padding an outlined face adds for
+                        // its rim, so anchoring to it would lift outlined text by a
+                        // pixel or two. The baseline must not move with the flag.
+                        const float baseline = pos.y + fontPixelHeight - this->m_currentFace->m_baseline * scale;
 
                         const float leftEm = slug.m_minX;
                         const float rightEm = slug.m_maxX;
