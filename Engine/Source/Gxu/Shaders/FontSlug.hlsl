@@ -22,6 +22,11 @@ sampler2D CurveTex : register(s0);
 // (1/texWidth, 1/texHeight)
 float4 SlugPage : register(c0);
 
+// Outline: (width in pixels, 0, 0, 0). Zero for a face without an outline, which
+// keeps the plain coverage path in charge.
+float4 OutlineParams : register(c1);
+float4 OutlineColor : register(c2);
+
 float CurveX(float2 p0, float2 p1, float2 p2, float t) {
     float mt = 1.0 - t;
     return mt * mt * p0.x + 2.0 * mt * t * p1.x + t * t * p2.x;
@@ -137,5 +142,26 @@ float4 main(float2 em : TEXCOORD0, float2 slug : TEXCOORD1, float4 color : COLOR
     // Four slices averaged, then the signed sum turned into coverage.
     float inside = saturate(abs(acc * 0.25) * 0.5);
 
-    return float4(color.rgb, color.a * inside);
+    // Coverage is a one pixel ramp, so its screen gradient turns back into a
+    // signed distance: (coverage - 0.5) / |grad| is how far the edge is from this
+    // pixel, in pixels. That is all the distance field used to give us for free,
+    // and it is what an outline needs. Derivatives must be taken in uniform flow,
+    // so this sits after the loop and outside any branch.
+    float2 grad = float2(ddx(inside), ddy(inside));
+    float slope = max(length(grad), 1e-4);
+    float dist = (inside - 0.5) / slope;
+
+    float width = OutlineParams.x;
+    float outlined = step(1e-4, width);
+
+    float body = saturate(dist + 0.5);
+    float extent = saturate(dist + width + 0.5);
+
+    // Without an outline the reconstruction only adds error, so plain coverage
+    // stays in charge. The selects cost two instructions and keep the common case
+    // pixel identical to what it was before outlines existed.
+    float alpha = lerp(inside, extent, outlined);
+    float3 rgb = lerp(color.rgb, OutlineColor.rgb, (1.0 - body) * outlined);
+
+    return float4(rgb, color.a * alpha);
 }

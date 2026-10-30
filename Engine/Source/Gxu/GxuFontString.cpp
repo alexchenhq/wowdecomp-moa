@@ -520,10 +520,25 @@ void CGxString::InitializeTextLine(const char* text, uint32_t numBytes, CImVecto
                         // the descent.
                         const float emToPixel = fontPixelHeight;
                         const float baseline = pos.y + cellHeight - this->m_currentFace->m_baseline * scale;
-                        const float left = pos.x + slug.m_minX * emToPixel;
-                        const float right = pos.x + slug.m_maxX * emToPixel;
-                        const float bottom = baseline + slug.m_minY * emToPixel;
-                        const float top = baseline + slug.m_maxY * emToPixel;
+
+                        // An outline grows outside the glyph, so the quad has to
+                        // leave room for it or the rim is clipped at the quad edge.
+                        // The em coordinates simply extrapolate past the glyph box:
+                        // coverage out there is zero and the distance the shader
+                        // rebuilds from the gradient is negative, which is the rim.
+                        const uint32_t fontFlags = this->m_currentFace->m_fontFlags;
+                        const float outlineWidth = (fontFlags & 1) ? ((fontFlags & 8) ? 2.0f : 1.0f) : 0.0f;
+                        const float padEm = outlineWidth / emToPixel;
+
+                        const float leftEm = slug.m_minX - padEm;
+                        const float rightEm = slug.m_maxX + padEm;
+                        const float bottomEm = slug.m_minY - padEm;
+                        const float topEm = slug.m_maxY + padEm;
+
+                        const float left = pos.x + leftEm * emToPixel;
+                        const float right = pos.x + rightEm * emToPixel;
+                        const float bottom = baseline + bottomEm * emToPixel;
+                        const float top = baseline + topEm * emToPixel;
 
                         VERT vert;
                         vert.m_vc.z = pos.z;
@@ -546,15 +561,15 @@ void CGxString::InitializeTextLine(const char* text, uint32_t numBytes, CImVecto
                         verts[2].m_vc.y = bottom;
                         verts[3].m_vc.y = top;
 
-                        verts[0].m_tc.x = slug.m_minX;
-                        verts[1].m_tc.x = slug.m_minX;
-                        verts[2].m_tc.x = slug.m_maxX;
-                        verts[3].m_tc.x = slug.m_maxX;
+                        verts[0].m_tc.x = leftEm;
+                        verts[1].m_tc.x = leftEm;
+                        verts[2].m_tc.x = rightEm;
+                        verts[3].m_tc.x = rightEm;
 
-                        verts[0].m_tc.y = slug.m_minY;
-                        verts[1].m_tc.y = slug.m_maxY;
-                        verts[2].m_tc.y = slug.m_minY;
-                        verts[3].m_tc.y = slug.m_maxY;
+                        verts[0].m_tc.y = bottomEm;
+                        verts[1].m_tc.y = topEm;
+                        verts[2].m_tc.y = bottomEm;
+                        verts[3].m_tc.y = topEm;
 
                         lastCode = wide;
                         break;
