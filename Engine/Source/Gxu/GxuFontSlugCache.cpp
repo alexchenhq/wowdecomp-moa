@@ -1,3 +1,4 @@
+#include <cstdarg>
 #include <cstdio>
 #include <cstring>
 #include "Engine/Source/Gxu/GxuFontSlugCache.h"
@@ -11,8 +12,26 @@
 #include "Engine/Source/Gx/CGxVertexPCT.h"
 #include "Engine/Source/Services/Texture.h"
 #include "Engine/Source/Storm/H/storm.h"
+#include "Engine/Source/Gxu/GxuFont.h"
 
 namespace {
+
+// The console the client opens only shows crash output, so diagnostics go to a
+// file that can be read afterwards.
+void SlugLog(const char* format, ...) {
+    FILE* file = fopen("sluglab.log", "a");
+
+    if (!file) {
+        return;
+    }
+
+    va_list args;
+    va_start(args, format);
+    vfprintf(file, format, args);
+    va_end(args);
+    fputc('\n', file);
+    fclose(file);
+}
 
 const uint32_t kSlugPageWidth = 256;
 const uint32_t kSlugPageHeight = 256;
@@ -68,8 +87,7 @@ CGxShader* GetSlugShader() {
     shader->m_loaded = 0;
 
     if (!shader->Valid()) {
-        DebugLog("[Slug] pixel shader FAILED to create");
-        fflush(stdout);
+        SlugLog("[Slug] pixel shader FAILED to create");
         delete shader;
         return nullptr;
     }
@@ -119,8 +137,7 @@ bool GxuFontSlugDebugBuild(FT_Face face, uint32_t code, uint32_t pixelSize) {
     s_slugGxTex = TextureGetGxTex(s_slugTexture, 1, nullptr);
 
     if (!s_slugGxTex) {
-        DebugLog("[Slug] curve texture failed to resolve");
-        fflush(stdout);
+        SlugLog("[Slug] curve texture failed to resolve");
         return false;
     }
 
@@ -128,10 +145,9 @@ bool GxuFontSlugDebugBuild(FT_Face face, uint32_t code, uint32_t pixelSize) {
 
     s_slugReady = true;
 
-    DebugLog("[Slug] glyph %c curves=%u texels=%u bounds x %.3f..%.3f y %.3f..%.3f",
+    SlugLog("[Slug] glyph %c curves=%u texels=%u bounds x %.3f..%.3f y %.3f..%.3f",
         static_cast<char>(code), s_slugCurveCount, texels,
         s_slugMinX, s_slugMaxX, s_slugMinY, s_slugMaxY);
-    fflush(stdout);
 
     return true;
 }
@@ -184,8 +200,8 @@ void GxuFontSlugDebugDraw(FT_Face face, uint32_t pixelSize) {
 
     if (!s_loggedDraw) {
         s_loggedDraw = true;
-        DebugLog("[Slug] probe draw reached, quad 60,60 - 280,280");
-        fflush(stdout);
+        SlugLog("[Slug] probe reached, screen %ux%u, quad 60,60 - 280,280",
+            g_widthPixels, g_heightPixels);
     }
 
     // RenderBatch runs many times per frame; draw the probe on a rough fraction of
