@@ -266,11 +266,7 @@ void GxuFontSlugDebugDraw(FT_Face face, uint32_t pixelSize) {
 
     // RenderBatch runs many times per frame; draw the probe on a rough fraction of
     // those calls so it shows up without paying for it dozens of times a frame.
-    static uint32_t s_drawCounter = 0;
-
-    if ((++s_drawCounter & 31) != 1) {
-        return;
-    }
+    // Drawn every batch while testing; the throttle comes back once it is right.
 
     g_theGxDevicePtr->RsPush();
     GxRsSet(GxRs_PixelShader, shader);
