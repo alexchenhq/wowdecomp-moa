@@ -34,6 +34,7 @@ static float s_fontSdfSharpnessSplit = 32.0f;
 static float s_fontSdfRasterScale = 1.0f;
 static float s_fontSdfMaxRasterSize = 64.0f;
 static float s_fontSdfRasterScaleAbove = 32.0f;
+static float s_fontSdfHintMaxSize = 20.0f;
 static bool s_fontSdfConfigLoaded = false;
 
 static void LoadFontSdfConfig() {
@@ -78,6 +79,9 @@ static void LoadFontSdfConfig() {
         } else if (strstr(line, "rasterScale") && value >= 0.25f && value <= 2.0f) {
             s_fontSdfRasterScale = value;
             printf("[FontSDF] rasterScale = %.2f\n", value);
+        } else if (strstr(line, "hintMaxSize") && value >= 0.0f && value <= 128.0f) {
+            s_fontSdfHintMaxSize = value;
+            printf("[FontSDF] hintMaxSize = %.0f\n", value);
         } else if (strstr(line, "rasterScaleAbove") && value >= 0.0f && value <= 128.0f) {
             s_fontSdfRasterScaleAbove = value;
             printf("[FontSDF] rasterScaleAbove = %.0f\n", value);
@@ -123,6 +127,11 @@ float GxuFontSdfMaxRasterSize() {
 float GxuFontSdfRasterScaleAbove() {
     LoadFontSdfConfig();
     return s_fontSdfRasterScaleAbove;
+}
+
+float GxuFontSdfHintMaxSize() {
+    LoadFontSdfConfig();
+    return s_fontSdfHintMaxSize;
 }
 
 static CGxShader* GxuGetFontSdfShader() {
