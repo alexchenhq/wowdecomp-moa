@@ -284,10 +284,14 @@ void GxuFontSlugDebugDraw(FT_Face face, uint32_t pixelSize) {
     const float boxWidth = (s_slugMaxX - s_slugMinX) > 1e-4f ? (s_slugMaxX - s_slugMinX) : 1.0f;
     const float boxHeight = (s_slugMaxY - s_slugMinY) > 1e-4f ? (s_slugMaxY - s_slugMinY) : 1.0f;
 
-    const float x0 = 80.0f;
-    const float y0 = 300.0f;
-    const float x1 = x0 + 220.0f;
-    const float y1 = y0 + 220.0f * (boxHeight / boxWidth);
+    // Centred and large, so any cropping in a screenshot cannot be mistaken for a
+    // missing part of the glyph.
+    const float quadWidth = 0.42f * static_cast<float>(g_widthPixels);
+    const float quadHeight = quadWidth * (boxHeight / boxWidth);
+    const float x0 = 0.5f * (static_cast<float>(g_widthPixels) - quadWidth);
+    const float y0 = 0.5f * (static_cast<float>(g_heightPixels) - quadHeight);
+    const float x1 = x0 + quadWidth;
+    const float y1 = y0 + quadHeight;
 
     CGxBuf* buf = GxBufStream(GxPoolTarget_Vertex, sizeof(CGxVertexPCT), 4);
     CGxVertexPCT* verts = reinterpret_cast<CGxVertexPCT*>(GxBufLock(buf));
