@@ -16,141 +16,407 @@
 //
 
     ps_3_0
-    def c1, 0, -256, 1, 3
-    def c2, 0.5, 1.5, 2.5, 2
-    def c3, 4, 0, 0, 0
-    def c4, 0, -9.99999997e-007, 2000000, 0.5
-    def c5, 1, 0, -1, -0
+    def c1, 3, 0.5, 1.5, 2.5
+    def c2, 0, 9.99999997e-007, 0.375, 0.125
+    def c3, 4, 0.25, 0, 0
+    def c4, 0.5, 0, -256, 1
+    def c5, 1, 0, 2, -1
     defi i0, 255, 0, 0, 0
     dcl_texcoord v0.xy
     dcl_color v1
     dcl_2d s0
     dsx r0.xy, v0
-    dp2add r0.x, r0, r0, c4.x
+    dp2add r0.x, r0, r0, c2.x
     rsq r0.x, r0.x
     rcp r0.x, r0.x
     dsy r0.yz, v0.xxyw
-    dp2add r0.y, r0.yzzw, r0.yzzw, c4.x
+    dp2add r0.y, r0.yzzw, r0.yzzw, c2.x
     rsq r0.y, r0.y
     rcp r0.y, r0.y
     max r1.x, r0.x, r0.y
-    add r0.x, r1.x, c4.y
-    rcp r0.y, r1.x
+    max r0.x, r1.x, c2.y
+    rcp r0.y, r0.x
     add r0.y, r0.y, r0.y
-    cmp r0.x, r0.x, r0.y, c4.z
-    mov r0.w, c4.w
-    mul r1.y, r0.w, c0.w
-    mul r2.y, r0.w, c0.w
-    mul r3.y, r0.w, c0.w
-    mov r0.yz, c4.x
+    mad r0.zw, r0.x, -c2, v0.y
+    mad r1.xy, r0.x, c2.wzzw, v0.y
+    mov r0.x, c4.x
+    mul r2.y, r0.x, c0.w
+    mul r3.y, r0.x, c0.w
+    mul r4.y, r0.x, c0.w
+    mov r1.zw, c2.x
     rep i0
-      mov r0.w, -c1.y
-      break_ge r0.z, r0.w
-      if_ge r0.z, c0.y
-        break_ne c1.z, -c1.z
+      mov r0.x, -c4.z
+      break_ge r1.w, r0.x
+      if_ge r1.w, c0.y
+        break_ne c4.w, -c4.w
       endif
-      mov r0.w, c1.w
-      mad r0.w, r0.z, r0.w, c0.x
-      add r4.xyz, r0.w, c2
-      mul r4.xyz, r4, c0.z
-      mul r1.xzw, r4.x, c5.xyyy
-      texldl r5, r1, s0
-      mul r2.xzw, r4.yyxx, c5.xyyy
+      mov r0.x, c0.x
+      mad r0.x, r1.w, c1.x, r0.x
+      add r5.xyz, r0.x, c1.yzww
+      mul r5.xyz, r5, c0.z
+      mul r2.xzw, r5.x, c5.xyyy
       texldl r6, r2, s0
-      mul r3.xzw, r4.zyxx, c5.xyyy
-      texldl r4, r3, s0
-      mad r0.w, r6.y, -c2.w, r5.y
-      add r0.w, r4.y, r0.w
-      add r1.x, -r5.y, r6.y
-      add r1.z, r1.x, r1.x
-      add r1.w, r5.y, -v0.y
-      if_lt r0_abs.w, -c4.y
-        add r2.x, -r1_abs.z, -c4.y
-        rcp r2.z, r1.z
-        mul r2.w, -r1.w, r2.z
-        mad r3.x, -r1.w, r2.z, -c1.z
-        mad r2.z, -r1.w, -r2.z, c1.z
-        mul r3.z, r2.z, r2.z
-        add r2.z, r2.z, r2.z
-        mul r3.w, r2.w, r2.z
-        mul r3.w, r6.x, r3.w
-        mad r3.z, r3.z, r5.x, r3.w
-        mul r3.w, r2.w, r2.w
-        mad r3.z, r3.w, r4.x, r3.z
-        add r3.w, r2.w, r2.w
-        add r4.z, -r6.y, r4.y
-        mul r3.w, r3.w, r4.z
-        mad r2.z, r2.z, r1.x, r3.w
-        cmp r2.z, r2.z, c5.x, c5.z
-        add r3.z, r3.z, -v0.x
-        mul r3.z, r0.x, r3.z
-        max r4.z, r3.z, -c1.z
-        min r3.z, r4.z, c1.z
-        mad r2.z, r2.z, r3.z, r0.y
-        cmp r3.x, r3.x, c5.w, c5.z
-        cmp r2.w, r2.w, r3.x, c4.x
-        cmp r2.z, r2.w, r0.y, r2.z
-        cmp r0.y, r2.x, r0.y, r2.z
+      mul r3.xzw, r5.yyxx, c5.xyyy
+      texldl r7, r3, s0
+      mul r4.xzw, r5.zyxx, c5.xyyy
+      texldl r5, r4, s0
+      mad r0.x, r7.y, -c5.z, r6.y
+      add r0.x, r5.y, r0.x
+      add r2.x, -r6.y, r7.y
+      add r2.z, r2.x, r2.x
+      add r3.xz, -r0.zyww, r6.y
+      if_lt r0_abs.x, c2.y
+        add r2.w, -r2_abs.z, c2.y
+        rcp r3.w, r2.z
+        mul r4.x, r3.w, -r3.x
+        mad r4.z, -r3.x, r3.w, -c4.w
+        mad r3.w, -r3.x, -r3.w, c4.w
+        add r4.w, r3.w, r3.w
+        add r5.z, r4.x, r4.x
+        add r5.w, -r7.y, r5.y
+        mul r5.z, r5.w, r5.z
+        mad r5.z, r4.w, r2.x, r5.z
+        cmp r5.z, r5.z, c5.x, c5.w
+        mul r3.w, r3.w, r3.w
+        mul r4.w, r4.x, r4.w
+        mul r4.w, r7.x, r4.w
+        mad r3.w, r3.w, r6.x, r4.w
+        mul r4.w, r4.x, r4.x
+        mad r3.w, r4.w, r5.x, r3.w
+        add r3.w, r3.w, -v0.x
+        mul r3.w, r0.y, r3.w
+        max r4.w, r3.w, -c4.w
+        min r3.w, r4.w, c4.w
+        mul r3.w, r3.w, r5.z
+        cmp r4.z, r4.z, -c5.y, -c5.x
+        cmp r4.x, r4.x, r4.z, c2.x
+        cmp r3.w, r4.x, c2.x, r3.w
+        cmp r2.w, r2.w, c2.x, r3.w
       else
-        mul r1.w, r0.w, r1.w
-        mul r1.w, r1.w, c3.x
-        mad r1.z, r1.z, r1.z, -r1.w
-        if_lt -c4.y, r1.z
-          rsq r1.z, r1.z
-          rcp r1.z, r1.z
-          rcp r0.w, r0.w
-          mul r0.w, r0.w, c4.w
-          mad r1.w, r1.x, -c2.w, r1.z
-          mad r1.z, r1.x, -c2.w, -r1.z
-          mul r2.xz, r0.w, r1.wyzw
-          mad r2.w, r1.w, r0.w, -c1.z
-          mad r1.w, r1.w, -r0.w, c1.z
-          mul r3.x, r1.w, r1.w
-          add r1.w, r1.w, r1.w
-          mul r3.z, r2.x, r1.w
-          mul r3.z, r6.x, r3.z
-          mad r3.x, r3.x, r5.x, r3.z
-          mul r3.z, r2.x, r2.x
-          mad r3.x, r3.z, r4.x, r3.x
-          add r3.z, r2.x, r2.x
-          add r3.w, -r6.y, r4.y
-          mul r3.z, r3.w, r3.z
-          mad r1.w, r1.w, r1.x, r3.z
-          cmp r1.w, r1.w, c5.x, c5.z
+        mul r3.x, r0.x, r3.x
+        mul r3.x, r3.x, c3.x
+        mad r3.x, r2.z, r2.z, -r3.x
+        if_lt c2.y, r3.x
+          rsq r3.x, r3.x
+          rcp r3.x, r3.x
+          rcp r3.w, r0.x
+          mul r3.w, r3.w, c4.x
+          mad r4.x, r2.x, -c5.z, r3.x
+          mul r4.z, r3.w, r4.x
+          mad r3.x, r2.x, -c5.z, -r3.x
+          mul r4.w, r3.w, r3.x
+          mad r5.z, r4.x, r3.w, -c4.w
+          mad r4.x, r4.x, -r3.w, c4.w
+          add r5.w, r4.x, r4.x
+          add r6.z, r4.z, r4.z
+          add r6.w, -r7.y, r5.y
+          mul r6.z, r6.w, r6.z
+          mad r6.z, r5.w, r2.x, r6.z
+          cmp r6.z, r6.z, c5.x, c5.w
+          mul r4.x, r4.x, r4.x
+          mul r5.w, r4.z, r5.w
+          mul r5.w, r7.x, r5.w
+          mad r4.x, r4.x, r6.x, r5.w
+          mul r5.w, r4.z, r4.z
+          mad r4.x, r5.w, r5.x, r4.x
+          add r4.x, r4.x, -v0.x
+          mul r4.x, r0.y, r4.x
+          max r5.w, r4.x, -c4.w
+          min r4.x, r5.w, c4.w
+          mul r4.x, r4.x, r6.z
+          cmp r5.z, r5.z, -c5.y, -c5.x
+          cmp r4.z, r4.z, r5.z, c2.x
+          cmp r4.x, r4.z, c2.x, r4.x
+          mad r4.z, r3.x, r3.w, -c4.w
+          mad r3.x, r3.x, -r3.w, c4.w
+          add r3.w, r3.x, r3.x
+          mul r5.z, r2.x, r3.w
+          dp2add r5.z, r6.w, r4.w, r5.z
+          cmp r5.z, r5.z, c5.x, c5.w
+          mul r3.x, r3.x, r3.x
+          mul r3.w, r4.w, r3.w
+          mul r3.w, r7.x, r3.w
+          mad r3.x, r3.x, r6.x, r3.w
+          mul r3.w, r4.w, r4.w
+          mad r3.x, r3.w, r5.x, r3.x
           add r3.x, r3.x, -v0.x
-          mul r3.x, r0.x, r3.x
-          max r4.y, r3.x, -c1.z
-          min r3.x, r4.y, c1.z
-          mad r1.w, r1.w, r3.x, r0.y
-          cmp r2.w, r2.w, c5.w, c5.z
-          cmp r2.x, r2.x, r2.w, c4.x
-          cmp r1.w, r2.x, r0.y, r1.w
-          mad r2.x, r1.z, r0.w, -c1.z
-          mad r0.w, r1.z, -r0.w, c1.z
-          mul r1.z, r0.w, r0.w
-          add r0.w, r0.w, r0.w
-          mul r2.w, r2.z, r0.w
-          mul r2.w, r6.x, r2.w
-          mad r1.z, r1.z, r5.x, r2.w
-          mul r2.w, r2.z, r2.z
-          mad r1.z, r2.w, r4.x, r1.z
-          mul r0.w, r1.x, r0.w
-          dp2add r0.w, r3.w, r2.z, r0.w
-          cmp r0.w, r0.w, c5.x, c5.z
-          add r1.x, r1.z, -v0.x
-          mul r1.x, r0.x, r1.x
-          max r2.w, r1.x, -c1.z
-          min r1.x, r2.w, c1.z
-          mad r0.w, r0.w, r1.x, r1.w
-          cmp r1.x, r2.x, c5.w, c5.z
-          cmp r1.x, r2.z, r1.x, c4.x
-          cmp r0.y, r1.x, r1.w, r0.w
+          mul r3.x, r0.y, r3.x
+          max r5.w, r3.x, -c4.w
+          min r3.x, r5.w, c4.w
+          mad r3.x, r5.z, r3.x, r4.x
+          cmp r3.w, r4.z, -c5.y, -c5.x
+          cmp r3.w, r4.w, r3.w, c2.x
+          cmp r2.w, r3.w, r4.x, r3.x
+        else
+          mov r2.w, c2.x
         endif
       endif
-      add r0.z, r0.z, c1.z
+      add r2.w, r1.z, r2.w
+      if_lt r0_abs.x, c2.y
+        add r3.x, -r2_abs.z, c2.y
+        rcp r3.w, r2.z
+        mul r4.x, r3.w, -r3.z
+        mad r4.z, -r3.z, r3.w, -c4.w
+        mad r3.w, -r3.z, -r3.w, c4.w
+        add r4.w, r3.w, r3.w
+        add r5.z, r4.x, r4.x
+        add r5.w, -r7.y, r5.y
+        mul r5.z, r5.w, r5.z
+        mad r5.z, r4.w, r2.x, r5.z
+        cmp r5.z, r5.z, c5.x, c5.w
+        mul r3.w, r3.w, r3.w
+        mul r4.w, r4.x, r4.w
+        mul r4.w, r7.x, r4.w
+        mad r3.w, r3.w, r6.x, r4.w
+        mul r4.w, r4.x, r4.x
+        mad r3.w, r4.w, r5.x, r3.w
+        add r3.w, r3.w, -v0.x
+        mul r3.w, r0.y, r3.w
+        max r4.w, r3.w, -c4.w
+        min r3.w, r4.w, c4.w
+        mul r3.w, r3.w, r5.z
+        cmp r4.z, r4.z, -c5.y, -c5.x
+        cmp r4.x, r4.x, r4.z, c2.x
+        cmp r3.w, r4.x, c2.x, r3.w
+        cmp r3.x, r3.x, c2.x, r3.w
+      else
+        mul r3.z, r0.x, r3.z
+        mul r3.z, r3.z, c3.x
+        mad r3.z, r2.z, r2.z, -r3.z
+        if_lt c2.y, r3.z
+          rsq r3.z, r3.z
+          rcp r3.z, r3.z
+          rcp r3.w, r0.x
+          mul r3.w, r3.w, c4.x
+          mad r4.x, r2.x, -c5.z, r3.z
+          mul r4.z, r3.w, r4.x
+          mad r3.z, r2.x, -c5.z, -r3.z
+          mul r4.w, r3.w, r3.z
+          mad r5.z, r4.x, r3.w, -c4.w
+          mad r4.x, r4.x, -r3.w, c4.w
+          add r5.w, r4.x, r4.x
+          add r6.z, r4.z, r4.z
+          add r6.w, -r7.y, r5.y
+          mul r6.z, r6.w, r6.z
+          mad r6.z, r5.w, r2.x, r6.z
+          cmp r6.z, r6.z, c5.x, c5.w
+          mul r4.x, r4.x, r4.x
+          mul r5.w, r4.z, r5.w
+          mul r5.w, r7.x, r5.w
+          mad r4.x, r4.x, r6.x, r5.w
+          mul r5.w, r4.z, r4.z
+          mad r4.x, r5.w, r5.x, r4.x
+          add r4.x, r4.x, -v0.x
+          mul r4.x, r0.y, r4.x
+          max r5.w, r4.x, -c4.w
+          min r4.x, r5.w, c4.w
+          mul r4.x, r4.x, r6.z
+          cmp r5.z, r5.z, -c5.y, -c5.x
+          cmp r4.z, r4.z, r5.z, c2.x
+          cmp r4.x, r4.z, c2.x, r4.x
+          mad r4.z, r3.z, r3.w, -c4.w
+          mad r3.z, r3.z, -r3.w, c4.w
+          add r3.w, r3.z, r3.z
+          mul r5.z, r2.x, r3.w
+          dp2add r5.z, r6.w, r4.w, r5.z
+          cmp r5.z, r5.z, c5.x, c5.w
+          mul r3.z, r3.z, r3.z
+          mul r3.w, r4.w, r3.w
+          mul r3.w, r7.x, r3.w
+          mad r3.z, r3.z, r6.x, r3.w
+          mul r3.w, r4.w, r4.w
+          mad r3.z, r3.w, r5.x, r3.z
+          add r3.z, r3.z, -v0.x
+          mul r3.z, r0.y, r3.z
+          max r5.w, r3.z, -c4.w
+          min r3.z, r5.w, c4.w
+          mad r3.z, r5.z, r3.z, r4.x
+          cmp r3.w, r4.z, -c5.y, -c5.x
+          cmp r3.w, r4.w, r3.w, c2.x
+          cmp r3.x, r3.w, r4.x, r3.z
+        else
+          mov r3.x, c2.x
+        endif
+      endif
+      add r2.w, r2.w, r3.x
+      add r3.xz, -r1.xyyw, r6.y
+      if_lt r0_abs.x, c2.y
+        add r3.w, -r2_abs.z, c2.y
+        rcp r4.x, r2.z
+        mul r4.z, -r3.x, r4.x
+        mad r4.w, -r3.x, r4.x, -c4.w
+        mad r4.x, -r3.x, -r4.x, c4.w
+        add r5.zw, r4.xyxz, r4.xyxz
+        add r6.y, -r7.y, r5.y
+        mul r5.w, r5.w, r6.y
+        mad r5.w, r5.z, r2.x, r5.w
+        cmp r5.w, r5.w, c5.x, c5.w
+        mul r4.x, r4.x, r4.x
+        mul r5.z, r4.z, r5.z
+        mul r5.z, r7.x, r5.z
+        mad r4.x, r4.x, r6.x, r5.z
+        mul r5.z, r4.z, r4.z
+        mad r4.x, r5.z, r5.x, r4.x
+        add r4.x, r4.x, -v0.x
+        mul r4.x, r0.y, r4.x
+        max r5.z, r4.x, -c4.w
+        min r4.x, r5.z, c4.w
+        mul r4.x, r4.x, r5.w
+        cmp r4.w, r4.w, -c5.y, -c5.x
+        cmp r4.z, r4.z, r4.w, c2.x
+        cmp r4.x, r4.z, c2.x, r4.x
+        cmp r3.w, r3.w, c2.x, r4.x
+      else
+        mul r3.x, r0.x, r3.x
+        mul r3.x, r3.x, c3.x
+        mad r3.x, r2.z, r2.z, -r3.x
+        if_lt c2.y, r3.x
+          rsq r3.x, r3.x
+          rcp r3.x, r3.x
+          rcp r4.x, r0.x
+          mul r4.x, r4.x, c4.x
+          mad r4.z, r2.x, -c5.z, r3.x
+          mul r4.w, r4.x, r4.z
+          mad r3.x, r2.x, -c5.z, -r3.x
+          mul r5.z, r4.x, r3.x
+          mad r5.w, r4.z, r4.x, -c4.w
+          mad r4.z, r4.z, -r4.x, c4.w
+          add r6.yz, r4.xzww, r4.xzww
+          add r6.w, -r7.y, r5.y
+          mul r6.z, r6.w, r6.z
+          mad r6.z, r6.y, r2.x, r6.z
+          cmp r6.z, r6.z, c5.x, c5.w
+          mul r4.z, r4.z, r4.z
+          mul r6.y, r4.w, r6.y
+          mul r6.y, r7.x, r6.y
+          mad r4.z, r4.z, r6.x, r6.y
+          mul r6.y, r4.w, r4.w
+          mad r4.z, r6.y, r5.x, r4.z
+          add r4.z, r4.z, -v0.x
+          mul r4.z, r0.y, r4.z
+          max r6.y, r4.z, -c4.w
+          min r4.z, r6.y, c4.w
+          mul r4.z, r4.z, r6.z
+          cmp r5.w, r5.w, -c5.y, -c5.x
+          cmp r4.w, r4.w, r5.w, c2.x
+          cmp r4.z, r4.w, c2.x, r4.z
+          mad r4.w, r3.x, r4.x, -c4.w
+          mad r3.x, r3.x, -r4.x, c4.w
+          add r4.x, r3.x, r3.x
+          mul r5.w, r2.x, r4.x
+          dp2add r5.w, r6.w, r5.z, r5.w
+          cmp r5.w, r5.w, c5.x, c5.w
+          mul r3.x, r3.x, r3.x
+          mul r4.x, r5.z, r4.x
+          mul r4.x, r7.x, r4.x
+          mad r3.x, r3.x, r6.x, r4.x
+          mul r4.x, r5.z, r5.z
+          mad r3.x, r4.x, r5.x, r3.x
+          add r3.x, r3.x, -v0.x
+          mul r3.x, r0.y, r3.x
+          max r4.x, r3.x, -c4.w
+          min r3.x, r4.x, c4.w
+          mad r3.x, r5.w, r3.x, r4.z
+          cmp r4.x, r4.w, -c5.y, -c5.x
+          cmp r4.x, r5.z, r4.x, c2.x
+          cmp r3.w, r4.x, r4.z, r3.x
+        else
+          mov r3.w, c2.x
+        endif
+      endif
+      add r2.w, r2.w, r3.w
+      if_lt r0_abs.x, c2.y
+        add r3.x, -r2_abs.z, c2.y
+        rcp r3.w, r2.z
+        mul r4.x, r3.w, -r3.z
+        mad r4.z, -r3.z, r3.w, -c4.w
+        mad r3.w, -r3.z, -r3.w, c4.w
+        add r4.w, r3.w, r3.w
+        add r5.z, r4.x, r4.x
+        add r5.w, -r7.y, r5.y
+        mul r5.z, r5.w, r5.z
+        mad r5.z, r4.w, r2.x, r5.z
+        cmp r5.z, r5.z, c5.x, c5.w
+        mul r3.w, r3.w, r3.w
+        mul r4.w, r4.x, r4.w
+        mul r4.w, r7.x, r4.w
+        mad r3.w, r3.w, r6.x, r4.w
+        mul r4.w, r4.x, r4.x
+        mad r3.w, r4.w, r5.x, r3.w
+        add r3.w, r3.w, -v0.x
+        mul r3.w, r0.y, r3.w
+        max r4.w, r3.w, -c4.w
+        min r3.w, r4.w, c4.w
+        mul r3.w, r3.w, r5.z
+        cmp r4.z, r4.z, -c5.y, -c5.x
+        cmp r4.x, r4.x, r4.z, c2.x
+        cmp r3.w, r4.x, c2.x, r3.w
+        cmp r3.x, r3.x, c2.x, r3.w
+      else
+        mul r3.z, r0.x, r3.z
+        mul r3.z, r3.z, c3.x
+        mad r2.z, r2.z, r2.z, -r3.z
+        if_lt c2.y, r2.z
+          rsq r2.z, r2.z
+          rcp r2.z, r2.z
+          rcp r0.x, r0.x
+          mul r0.x, r0.x, c4.x
+          mad r3.z, r2.x, -c5.z, r2.z
+          mul r3.w, r0.x, r3.z
+          mad r2.z, r2.x, -c5.z, -r2.z
+          mul r4.x, r0.x, r2.z
+          mad r4.z, r3.z, r0.x, -c4.w
+          mad r3.z, r3.z, -r0.x, c4.w
+          add r4.w, r3.z, r3.z
+          add r5.z, r3.w, r3.w
+          add r5.y, -r7.y, r5.y
+          mul r5.z, r5.y, r5.z
+          mad r5.z, r4.w, r2.x, r5.z
+          cmp r5.z, r5.z, c5.x, c5.w
+          mul r3.z, r3.z, r3.z
+          mul r4.w, r3.w, r4.w
+          mul r4.w, r7.x, r4.w
+          mad r3.z, r3.z, r6.x, r4.w
+          mul r4.w, r3.w, r3.w
+          mad r3.z, r4.w, r5.x, r3.z
+          add r3.z, r3.z, -v0.x
+          mul r3.z, r0.y, r3.z
+          max r4.w, r3.z, -c4.w
+          min r3.z, r4.w, c4.w
+          mul r3.z, r3.z, r5.z
+          cmp r4.z, r4.z, -c5.y, -c5.x
+          cmp r3.w, r3.w, r4.z, c2.x
+          cmp r3.z, r3.w, c2.x, r3.z
+          mad r3.w, r2.z, r0.x, -c4.w
+          mad r0.x, r2.z, -r0.x, c4.w
+          add r2.z, r0.x, r0.x
+          mul r2.x, r2.x, r2.z
+          dp2add r2.x, r5.y, r4.x, r2.x
+          cmp r2.x, r2.x, c5.x, c5.w
+          mul r0.x, r0.x, r0.x
+          mul r2.z, r4.x, r2.z
+          mul r2.z, r7.x, r2.z
+          mad r0.x, r0.x, r6.x, r2.z
+          mul r2.z, r4.x, r4.x
+          mad r0.x, r2.z, r5.x, r0.x
+          add r0.x, r0.x, -v0.x
+          mul r0.x, r0.y, r0.x
+          max r2.z, r0.x, -c4.w
+          min r0.x, r2.z, c4.w
+          mad r0.x, r2.x, r0.x, r3.z
+          cmp r2.x, r3.w, -c5.y, -c5.x
+          cmp r2.x, r4.x, r2.x, c2.x
+          cmp r3.x, r2.x, r3.z, r0.x
+        else
+          mov r3.x, c2.x
+        endif
+      endif
+      add r1.z, r2.w, r3.x
+      add r1.w, r1.w, c4.w
     endrep
-    mul_sat r0.x, r0_abs.y, c4.w
+    mul r0.x, r1.z, c3.y
+    mul_sat r0.x, r0_abs.x, c4.x
     mul oC0.w, r0.x, v1.w
     mov oC0.xyz, v1
 
-// approximately 148 instruction slots used (6 texture, 142 arithmetic)
+// approximately 429 instruction slots used (6 texture, 423 arithmetic)
