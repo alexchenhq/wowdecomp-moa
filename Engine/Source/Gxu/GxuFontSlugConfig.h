@@ -22,9 +22,17 @@
 #define GXU_FONT_SLUG_TEXT 0
 #endif
 
-// The single face that goes through Slug while the rest keep using the distance
-// field. Compared without case, as it is stored as the font file path.
+// Which faces the Slug text path takes.
+//
+// ALL_FACES sends every font file through it; the named face is only consulted
+// when ALL_FACES is 0, which is how the first milestone was limited to one font.
+// Outlined faces are excluded either way: coverage only carries distance inside
+// half a pixel, so a rim rebuilt from it stair steps at every size, and the
+// distance field grows one properly.
 #if GXU_FONT_SLUG_TEXT
+#ifndef GXU_FONT_SLUG_ALL_FACES
+#define GXU_FONT_SLUG_ALL_FACES 1
+#endif
 #ifndef GXU_FONT_SLUG_FACE
 #define GXU_FONT_SLUG_FACE "Fonts\\FRIZQT__.TTF"
 #endif
