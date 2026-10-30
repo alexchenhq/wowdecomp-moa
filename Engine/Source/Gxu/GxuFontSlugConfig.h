@@ -36,10 +36,11 @@
 #ifndef GXU_FONT_SLUG_ALL_FACES
 #define GXU_FONT_SLUG_ALL_FACES 1
 #endif
-// Outlined instances stay on the distance field: it grows their rim correctly,
-// and the Slug path has no rim of its own while RIM is 0.
+// Outlined instances go through Slug as well, which means they render as plain
+// text: with RIM at 0 this path draws no rim, and the distance field that used to
+// draw one is no longer involved. Set this to 0 to send them back to the field.
 #ifndef GXU_FONT_SLUG_OUTLINED
-#define GXU_FONT_SLUG_OUTLINED 0
+#define GXU_FONT_SLUG_OUTLINED 1
 #endif
 // Rim pass: an extra draw of the dilated glyph, shaded from a signed distance.
 // The body keeps its coverage shader untouched, which is the whole reason this
