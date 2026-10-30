@@ -4,6 +4,20 @@
 #include <freetype/freetype.h>
 #include <cstdint>
 
+// Switches for the Slug text path, kept as compile time flags so the shipping SDF
+// client is never affected by half finished work.
+//
+//   GXU_FONT_SLUG_PROBE  draws the standalone debug quads
+//   GXU_FONT_SLUG_TEXT   routes real text through Slug (not implemented yet; the
+//                        vertex format change is atomic, see MEMORY.md)
+#ifndef GXU_FONT_SLUG_PROBE
+#define GXU_FONT_SLUG_PROBE 1
+#endif
+
+#ifndef GXU_FONT_SLUG_TEXT
+#define GXU_FONT_SLUG_TEXT 0
+#endif
+
 struct CTexture;
 struct CGxTex;
 

@@ -298,6 +298,11 @@ void GxuFontSlugShaderParams(const SLUGGLYPHINFO& glyph, float* out) {
 }
 
 void GxuFontSlugDebugDraw(FT_Face face, uint32_t pixelSize) {
+#if !GXU_FONT_SLUG_PROBE
+    (void)face;
+    (void)pixelSize;
+    return;
+#else
     // Once per frame: repeated draws accumulate alpha and harden the soft edge.
     static int32_t s_lastFrame = -1;
 
@@ -340,3 +345,4 @@ void GxuFontSlugDebugDraw(FT_Face face, uint32_t pixelSize) {
 
     g_theGxDevicePtr->RsPop();
 }
+#endif
