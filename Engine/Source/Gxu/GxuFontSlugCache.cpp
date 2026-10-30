@@ -297,15 +297,16 @@ void GxuFontSlugDebugDraw(FT_Face face, uint32_t pixelSize) {
 
     // RenderBatch runs many times per frame; draw the probe on a rough fraction of
     // those calls so it shows up without paying for it dozens of times a frame.
-    // Draw roughly once per frame. RenderBatch runs dozens of times per frame and
-    // alpha blending accumulates: repeating the same quad turns a soft 1px edge
-    // into a hard one within a few draws, which is why the antialiasing kept
-    // disappearing.
-    static uint32_t s_drawCounter = 0;
+    // Exactly once per frame. Repeating the quad accumulates alpha and ruins the
+    // soft edge, but a fixed counter based throttle misses frames and flickers,
+    // so gate on the device frame counter instead.
+    static int32_t s_lastFrame = -1;
 
-    if ((++s_drawCounter & 31) != 1) {
+    if (g_theGxDevicePtr->m_frameCount == s_lastFrame) {
         return;
     }
+
+    s_lastFrame = g_theGxDevicePtr->m_frameCount;
 
     g_theGxDevicePtr->RsPush();
     GxRsSet(GxRs_PixelShader, shader);
