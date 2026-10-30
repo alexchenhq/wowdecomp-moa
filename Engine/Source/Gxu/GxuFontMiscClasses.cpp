@@ -525,22 +525,26 @@ void BATCHEDRENDERFONTDESC::RenderBatch() {
     int32_t space = 2048;
 
 #if GXU_FONT_SLUG_TEXT
-    const bool rimFace = slugFace && GxuFontSlugRimEnabled(this->m_face);
-    const uint32_t faceFlags = this->m_face->m_fontFlags;
-    const float slugOutlineWidth = (faceFlags & 1) ? ((faceFlags & 8) ? 2.0f : 1.0f) : 0.0f;
+    // One pass for a Slug face: the rim, when the face has one, is shaded by the
+    // same shader that draws the body, so it is bound here and only once. Pages
+    // only matter to the atlas path.
+    if (slugFace) {
+        const uint32_t faceFlags = this->m_face->m_fontFlags;
+        const float outlineWidth = (faceFlags & 8) ? 2.0f : 1.0f;
+
+        if (GxuFontSlugRimEnabled(this->m_face) && GxuFontSlugBindRim(outlineWidth)) {
+            // rim shader, already bound
+        } else {
+            GxuFontSlugBindBody();
+        }
+    }
 #endif
 
-    // Which lines this batch draws and in what order. The rim has to land before
-    // the body: it fills the grown shape, the body covers all but the outside.
     int32_t pages[8];
     int32_t pageCount = 0;
 
 #if GXU_FONT_SLUG_TEXT
     if (slugFace) {
-        if (rimFace) {
-            pages[pageCount++] = static_cast<int32_t>(GxuFontSlugRimPage());
-        }
-
         pages[pageCount++] = 0;
     } else
 #endif
@@ -554,17 +558,7 @@ void BATCHEDRENDERFONTDESC::RenderBatch() {
         const int32_t texturePage = pages[p];
 
 #if GXU_FONT_SLUG_TEXT
-        if (slugFace) {
-            if (texturePage != 0) {
-                // Without its shader the rim geometry would be shaded as a slightly
-                // larger body, which is worse than no rim at all.
-                if (!GxuFontSlugBindRim(slugOutlineWidth)) {
-                    continue;
-                }
-            } else {
-                GxuFontSlugBindBody();
-            }
-        } else
+        if (!slugFace)
 #endif
         {
             CTexture* texture = this->m_face->m_textureCache[texturePage].m_texture;

@@ -89,6 +89,56 @@ float2 CurveUV(float texel, float invWidth, float invHeight) {
     return float2(t - row + 0.5 * invWidth, row * invHeight + 0.5 * invHeight);
 }
 
+#if RIM
+
+// (width in pixels, 0, 0, 0) and the outline colour, same meaning as the
+// distance field path uses.
+float4 RimParams : register(c1);
+float4 RimColor : register(c2);
+
+float SegmentDistance(float2 p, float2 a, float2 b) {
+    float2 ab = b - a;
+    float denom = max(dot(ab, ab), 1e-12);
+    float t = saturate(dot(p - a, ab) / denom);
+
+    return length(p - (a + ab * t));
+}
+
+// Distance from the point to one quadratic.
+//
+// Two Newton steps on |B(t) - p|^2, started from the projection onto the chord.
+// A polyline was the obvious alternative but it is the expensive one here: eight
+// segments cost about three times what this costs and still under-report the
+// distance by up to 0.03 of a pixel, because a chord sits inside a convex curve.
+// The two endpoint distances are taken as well, so a closest point that falls
+// outside the segment still gives the right answer.
+float CurveDistance(float2 p, float2 p0, float2 p1, float2 p2) {
+    float2 a = p0 - 2.0 * p1 + p2;   // t^2 coefficient
+    float2 b = 2.0 * (p1 - p0);      // t coefficient
+    float2 chord = p2 - p0;
+
+    float t = saturate(dot(p - p0, chord) / max(dot(chord, chord), 1e-12));
+
+    [unroll]
+    for (int k = 0; k < 2; k++) {
+        float2 q = a * (t * t) + b * t + p0;
+        float2 dq = a * (2.0 * t) + b;
+        float2 e = q - p;
+
+        t = saturate(t - dot(e, dq) / max(dot(dq, dq) + dot(e, a * 2.0), 1e-9));
+    }
+
+    float2 closest = a * (t * t) + b * t + p0;
+
+    float dist = length(closest - p);
+    dist = min(dist, length(p - p0));
+    dist = min(dist, length(p - p2));
+
+    return dist;
+}
+
+#endif
+
 float4 main(float2 em : TEXCOORD0, float2 slug : TEXCOORD1, float4 color : COLOR0) : COLOR0 {
     // Per glyph, straight from the vertex: where its curves start and how many.
     float base = slug.x;
@@ -102,14 +152,43 @@ float4 main(float2 em : TEXCOORD0, float2 slug : TEXCOORD1, float4 color : COLOR
     pxSize = max(pxSize, 1e-6);
     float invHalfPixel = 2.0 / pxSize;
 
-    // Four slices inside the pixel. A single centre slice leaves a staircase on
-    // slanted strokes; averaging rows is what removes it.
+    // Scanline slices inside the pixel. A single centre slice leaves a staircase
+    // on slanted strokes; averaging rows is what removes it.
+    //
+    // The rim variant carries the distance in the same loop and runs out of
+    // instruction slots at four, so it takes three at a third of a pixel either
+    // side. Measured against a supersampled reference that costs nothing: 0.003
+    // to 0.014 RMS, against 0.003 to 0.017 for four.
+#if RIM
+    float py0 = em.y - 0.3333333 * pxSize;
+    float py1 = em.y;
+    float py2 = em.y + 0.3333333 * pxSize;
+    const float sliceScale = 1.0 / 3.0;
+#else
     float py0 = em.y - 0.375 * pxSize;
     float py1 = em.y - 0.125 * pxSize;
     float py2 = em.y + 0.125 * pxSize;
     float py3 = em.y + 0.375 * pxSize;
+    const float sliceScale = 0.25;
+#endif
 
     float acc = 0.0;
+    float sliceHigh;
+
+#if RIM
+    // The rim reaches further than the slices, so the loop has to consider a
+    // wider band of curves than the coverage does. Anything farther than the
+    // rim plus a pixel cannot change the result.
+    float reach = (RimParams.x + 1.0) * pxSize;
+    float cullLo = min(py0, em.y - reach);
+    float cullHi = max(py2, em.y + reach);
+    float nearest = reach;
+    sliceHigh = py2;
+#else
+    float cullLo = py0;
+    float cullHi = py3;
+    sliceHigh = py3;
+#endif
 
     for (int i = 0; i < 256; i++) {
         if (float(i) >= count) {
@@ -122,25 +201,50 @@ float4 main(float2 em : TEXCOORD0, float2 slug : TEXCOORD1, float4 color : COLOR
 
         // Cull by y range first: one fetch instead of three plus the root solve.
         // Most segments are nowhere near any given pixel.
-        if (py0 <= span.y && py3 >= span.x) {
+        if (cullLo <= span.y && cullHi >= span.x) {
             float2 p0 = tex2Dlod(CurveTex, float4(CurveUV(texel + 0.0, invWidth, invHeight), 0.0, 0.0)).xy;
             float2 p1 = tex2Dlod(CurveTex, float4(CurveUV(texel + 1.0, invWidth, invHeight), 0.0, 0.0)).xy;
             float2 p2 = tex2Dlod(CurveTex, float4(CurveUV(texel + 2.0, invWidth, invHeight), 0.0, 0.0)).xy;
 
-            acc += SliceAcc(p0, p1, p2, em.x, py0, invHalfPixel);
-            acc += SliceAcc(p0, p1, p2, em.x, py1, invHalfPixel);
-            acc += SliceAcc(p0, p1, p2, em.x, py2, invHalfPixel);
-            acc += SliceAcc(p0, p1, p2, em.x, py3, invHalfPixel);
+            // Coverage only cares about curves that reach the pixel's own rows.
+            if (py0 <= span.y && sliceHigh >= span.x) {
+                acc += SliceAcc(p0, p1, p2, em.x, py0, invHalfPixel);
+                acc += SliceAcc(p0, p1, p2, em.x, py1, invHalfPixel);
+                acc += SliceAcc(p0, p1, p2, em.x, py2, invHalfPixel);
+#if !RIM
+                acc += SliceAcc(p0, p1, p2, em.x, py3, invHalfPixel);
+#endif
+            }
+
+#if RIM
+            float2 lo = min(p0, min(p1, p2));
+            float2 hi = max(p0, max(p1, p2));
+
+            if (em.x >= lo.x - reach && em.x <= hi.x + reach) {
+                nearest = min(nearest, CurveDistance(em, p0, p1, p2));
+            }
+#endif
         }
     }
 
-    // Four slices averaged, then the signed sum turned into coverage.
-    float inside = saturate(abs(acc * 0.25) * 0.5);
+    // Slices averaged, then the signed sum turned into coverage.
+    float inside = saturate(abs(acc * sliceScale) * 0.5);
 
-    // No outline here. Growing one from this coverage looked possible - it is a
-    // one pixel ramp, so its gradient is a distance - but the ramp only carries
-    // distance inside half a pixel, and a rim is one to two pixels out. Measured
-    // at every size, the outer edge came out as a hard threshold, so outlined
-    // faces are kept on the distance field instead (see GxuFontSlugFaceEnabled).
+#if RIM
+    // One pass, one surface, composed the way the distance field path does it:
+    // the coverage says which side of the edge this pixel is on, the distance
+    // says how far out, and the two are combined with a max rather than by
+    // stacking layers. Stacking was what made the stroke look eaten: the rim sat
+    // under the body and showed through its antialiased edge.
+    float side = inside >= 0.5 ? 1.0 : -1.0;
+    float dist = side * nearest;
+
+    float rim = saturate(dist / pxSize + RimParams.x + 0.5);
+    float alpha = max(inside * color.a, rim * RimColor.a);
+    float3 rgb = lerp(RimColor.rgb, color.rgb, inside);
+
+    return float4(rgb, alpha);
+#else
     return float4(color.rgb, color.a * inside);
+#endif
 }

@@ -53,10 +53,6 @@ CGxShader* s_shader = nullptr;
 CGxShader* s_rimShader = nullptr;
 CGxShader* s_vertexShader = nullptr;
 
-// Where the rim geometry lives. Outside the range the atlas allocates, and a
-// fallback atlas quad that ends up here draws nothing: it carries no curves, so
-// its distance comes out as "far away".
-const uint32_t kRimPage = 7;
 
 struct CacheEntry {
     FT_Face m_face;
@@ -524,10 +520,6 @@ bool GxuFontSlugRimEnabled(const CGxFont* face) {
     // Slug - an outlined face that stayed on the field draws its own.
     return face && (face->m_fontFlags & 1) && FaceMatchesSlugConfig(face);
 #endif
-}
-
-uint32_t GxuFontSlugRimPage() {
-    return kRimPage;
 }
 
 bool GxuFontSlugBindRim(float widthPixels) {
