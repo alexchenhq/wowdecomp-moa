@@ -132,6 +132,7 @@ bool GxuFontSlugDebugBuild(FT_Face face, uint32_t code, uint32_t pixelSize) {
     s_slugMaxY = glyph.m_maxY;
 
     s_slugTexture = CreateSlugTexture();
+    SlugLog("[Slug] texture create -> %p", static_cast<void*>(s_slugTexture));
 
     if (!s_slugTexture) {
         return false;
@@ -141,6 +142,7 @@ bool GxuFontSlugDebugBuild(FT_Face face, uint32_t code, uint32_t pixelSize) {
     // binding a CTexture that was never latched faults inside the device. The font
     // atlas does exactly this through UpdateDirty.
     s_slugGxTex = TextureGetGxTex(s_slugTexture, 1, nullptr);
+    SlugLog("[Slug] resolve -> %p", static_cast<void*>(s_slugGxTex));
 
     if (!s_slugGxTex) {
         SlugLog("[Slug] curve texture failed to resolve");
@@ -148,6 +150,7 @@ bool GxuFontSlugDebugBuild(FT_Face face, uint32_t code, uint32_t pixelSize) {
     }
 
     GxTexUpdate(s_slugGxTex, 0, 0, kSlugPageWidth, kSlugPageHeight, 1);
+    SlugLog("[Slug] update issued");
 
     s_slugReady = true;
 
@@ -214,6 +217,15 @@ void GxuFontSlugDebugDraw(FT_Face face, uint32_t pixelSize) {
         s_loggedDraw = true;
         SlugLog("[Slug] probe reached, screen %ux%u, quad 60,60 - 280,280",
             g_widthPixels, g_heightPixels);
+    }
+
+    // The latch may only run once the device is ready, so refresh a few times.
+    static uint32_t s_updateCount = 0;
+
+    if (s_updateCount < 3) {
+        s_updateCount++;
+        GxTexUpdate(s_slugGxTex, 0, 0, kSlugPageWidth, kSlugPageHeight, 1);
+        SlugLog("[Slug] draw-time update %u", s_updateCount);
     }
 
     // RenderBatch runs many times per frame; draw the probe on a rough fraction of
