@@ -10,12 +10,36 @@ namespace {
 struct OutlineCollector {
     std::vector<SLUGCURVE> m_curves;
     float m_current[2];
+    float m_contourStart[2];
     bool m_haveCurrent;
+    bool m_inContour;
     float m_scale;   // 26.6 units -> em
 
-    OutlineCollector() : m_haveCurrent(false), m_scale(0.0f) {
+    OutlineCollector() : m_haveCurrent(false), m_inContour(false), m_scale(0.0f) {
         m_current[0] = 0.0f;
         m_current[1] = 0.0f;
+        m_contourStart[0] = 0.0f;
+        m_contourStart[1] = 0.0f;
+    }
+
+    // FreeType never emits the edge that closes a contour: outlines are implicitly
+    // closed. Without it the crossing count is unbalanced and the fill leaks out of
+    // the glyph, which shows up as a ribbon instead of a letter.
+    void CloseContour() {
+        if (!m_inContour) {
+            return;
+        }
+
+        const float dx = m_contourStart[0] - m_current[0];
+        const float dy = m_contourStart[1] - m_current[1];
+
+        if (dx * dx + dy * dy > 1e-12f) {
+            const float cx = (m_current[0] + m_contourStart[0]) * 0.5f;
+            const float cy = (m_current[1] + m_contourStart[1]) * 0.5f;
+            Push(cx, cy, m_contourStart[0], m_contourStart[1]);
+        }
+
+        m_inContour = false;
     }
 
     static float ToEm(int32_t fixed, float scale) {
@@ -44,9 +68,14 @@ int OutlineMoveTo(FT_Vector* to, void* user) {
         return 0;
     }
 
+    collector->CloseContour();
+
     collector->m_current[0] = OutlineCollector::ToEm(to->x, collector->m_scale);
     collector->m_current[1] = OutlineCollector::ToEm(to->y, collector->m_scale);
+    collector->m_contourStart[0] = collector->m_current[0];
+    collector->m_contourStart[1] = collector->m_current[1];
     collector->m_haveCurrent = true;
+    collector->m_inContour = true;
 
     return 0;
 }
@@ -177,6 +206,8 @@ bool GxuFontSlugExtractGlyph(FT_Face face, uint32_t code, uint32_t pixelSize, SL
     if (FT_Outline_Decompose(&face->glyph->outline, &functions, &collector) != 0) {
         return false;
     }
+
+    collector.CloseContour();
 
     if (collector.m_curves.empty()) {
         return false;
