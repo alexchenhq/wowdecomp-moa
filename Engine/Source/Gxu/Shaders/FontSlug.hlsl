@@ -19,6 +19,10 @@ float4 SlugParams : register(c0);
 // and render state can be verified separately from the coverage math.
 #define SLUG_PROBE_SOLID 0
 
+// Diagnostic switch: 1 paints the first texel of the glyph so the curve texture
+// can be inspected without any coverage maths.
+#define SLUG_SHOW_CURVE 1
+
 float4 main(float2 em : TEXCOORD0, float4 color : COLOR0) : COLOR0 {
 #if SLUG_PROBE_SOLID
     return float4(1.0, 0.0, 1.0, 1.0);
@@ -42,6 +46,13 @@ float4 main(float2 em : TEXCOORD0, float4 color : COLOR0) : COLOR0 {
 
         float4 texelA = tex2Dlod(CurveTex, float4((base + float(i) * 2.0 + 0.5) * invWidth, rowV, 0.0, 0.0));
         float4 texelB = tex2Dlod(CurveTex, float4((base + float(i) * 2.0 + 1.5) * invWidth, rowV, 0.0, 0.0));
+
+#if SLUG_SHOW_CURVE
+        if (i == 0) {
+            // p0.x in red, p0.y in green, p1.x in blue: em space is roughly -0.1..1.0
+            return float4(saturate(texelA.x), saturate(texelA.y), saturate(texelA.z), 1.0);
+        }
+#endif
 
         float2 p0 = texelA.xy;
         float2 p1 = texelA.zw;
