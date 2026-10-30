@@ -152,25 +152,15 @@ float4 main(float2 em : TEXCOORD0, float2 slug : TEXCOORD1, float4 color : COLOR
     pxSize = max(pxSize, 1e-6);
     float invHalfPixel = 2.0 / pxSize;
 
-    // Scanline slices inside the pixel. A single centre slice leaves a staircase
-    // on slanted strokes; averaging rows is what removes it.
-    //
-    // The rim variant carries the distance in the same loop and runs out of
-    // instruction slots at four, so it takes three at a third of a pixel either
-    // side. Measured against a supersampled reference that costs nothing: 0.003
-    // to 0.014 RMS, against 0.003 to 0.017 for four.
-#if RIM
+    // Three scanlines inside the pixel. A single centre slice leaves a staircase
+    // on slanted strokes; averaging rows is what removes it. Four was the number
+    // here for a long time; three at a third of a pixel either side measures the
+    // same against a supersampled reference - 0.003 to 0.014 RMS, against 0.003
+    // to 0.017 for four - and costs a quarter less.
     float py0 = em.y - 0.3333333 * pxSize;
     float py1 = em.y;
     float py2 = em.y + 0.3333333 * pxSize;
     const float sliceScale = 1.0 / 3.0;
-#else
-    float py0 = em.y - 0.375 * pxSize;
-    float py1 = em.y - 0.125 * pxSize;
-    float py2 = em.y + 0.125 * pxSize;
-    float py3 = em.y + 0.375 * pxSize;
-    const float sliceScale = 0.25;
-#endif
 
     float acc = 0.0;
     float sliceHigh;
@@ -186,8 +176,8 @@ float4 main(float2 em : TEXCOORD0, float2 slug : TEXCOORD1, float4 color : COLOR
     sliceHigh = py2;
 #else
     float cullLo = py0;
-    float cullHi = py3;
-    sliceHigh = py3;
+    float cullHi = py2;
+    sliceHigh = py2;
 #endif
 
     for (int i = 0; i < 256; i++) {
@@ -211,9 +201,6 @@ float4 main(float2 em : TEXCOORD0, float2 slug : TEXCOORD1, float4 color : COLOR
                 acc += SliceAcc(p0, p1, p2, em.x, py0, invHalfPixel);
                 acc += SliceAcc(p0, p1, p2, em.x, py1, invHalfPixel);
                 acc += SliceAcc(p0, p1, p2, em.x, py2, invHalfPixel);
-#if !RIM
-                acc += SliceAcc(p0, p1, p2, em.x, py3, invHalfPixel);
-#endif
             }
 
 #if RIM
