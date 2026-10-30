@@ -1,10 +1,15 @@
 #include <cstdarg>
 #include <cstdio>
 #include <cstring>
+#include <vector>
+
 #include "Engine/Source/Gxu/GxuFontSlugCache.h"
 #include "Engine/Source/Gxu/GxuFontSlug.h"
 #include "Engine/Source/Gxu/GxuFontSlugShader.h"
 #include "Engine/Source/Gxu/GxuFontMiscClasses.h"
+#include "Engine/Source/Gxu/GxuFontFace.h"
+#include "Engine/Source/Gxu/GxuFontFont.h"
+#include "Engine/Source/Gxu/GxuFont.h"
 #include "Engine/Source/Gx/Gx.h"
 #include "Engine/Source/Gx/CGxBuf.h"
 #include "Engine/Source/Gx/CGxDevice/CGxDevice.h"
@@ -12,12 +17,16 @@
 #include "Engine/Source/Gx/CGxVertexPCT.h"
 #include "Engine/Source/Services/Texture.h"
 #include "Engine/Source/Storm/H/storm.h"
-#include "Engine/Source/Gxu/GxuFont.h"
 
 namespace {
 
-// The console the client opens only shows crash output, so diagnostics go to a
-// file that can be read afterwards.
+const uint32_t kPageWidth = 256;
+const uint32_t kPageHeight = 256;
+const uint32_t kTexelBytes = 4;          // Gr1616F, two halves per texel
+const uint32_t kTotalTexels = kPageWidth * kPageHeight;
+const uint32_t kTexelsPerCurve = 3;
+
+// The console only shows crash output, so diagnostics go to a file.
 void SlugLog(const char* format, ...) {
     FILE* file = fopen("sluglab.log", "a");
 
@@ -33,72 +42,87 @@ void SlugLog(const char* format, ...) {
     fclose(file);
 }
 
-const uint32_t kSlugPageWidth = 256;
-const uint32_t kSlugPageHeight = 256;
-const uint32_t kSlugTexelBytes = 4;      // Gr1616F (two halves)
+uint16_t s_pageData[kPageWidth * kPageHeight * 2];
 
-// CPU side of the page, uploaded on demand by the latch callback.
-uint16_t s_slugCurveData[kSlugPageWidth * kSlugPageHeight * 2];
+CTexture* s_texture = nullptr;
+CGxTex* s_deviceTexture = nullptr;
+CGxShader* s_shader = nullptr;
 
-CTexture* s_slugTexture = nullptr;
-CGxTex* s_slugGxTex = nullptr;   // resolved device texture, what the state takes
-CGxShader* s_slugShader = nullptr;
+struct CacheEntry {
+    FT_Face m_face;
+    uint32_t m_code;
+    SLUGGLYPHINFO m_info;
+};
 
-uint32_t s_slugCurveCount = 0;
-bool s_slugReady = false;
+std::vector<CacheEntry> s_entries;
+uint32_t s_cursorTexel = 0;
 
-float s_slugMinX = 0.0f;
-float s_slugMinY = 0.0f;
-float s_slugMaxX = 1.0f;
-float s_slugMaxY = 1.0f;
-
-void SlugTextureCallback(EGxTexCommand command, uint32_t width, uint32_t height,
-                         uint32_t face, uint32_t level, void* userArg,
-                         uint32_t& texelStrideInBytes, const void*& texels) {
-    (void)userArg;
-    (void)face;
-    (void)level;
-
-    SlugLog("[Slug] texcallback cmd=%d %ux%u face=%u level=%u", command, width, height, face, level);
-
+void PageCallback(EGxTexCommand command, uint32_t width, uint32_t height,
+                  uint32_t face, uint32_t level, void* userArg,
+                  uint32_t& texelStrideInBytes, const void*& texels) {
     if (command != GxTex_Latch) {
         return;
     }
 
-    texelStrideInBytes = width * kSlugTexelBytes;
-    texels = s_slugCurveData;
-
-    SlugLog("[Slug] latch served stride=%u raw texel0 = %04X %04X %04X %04X",
-        texelStrideInBytes, s_slugCurveData[0], s_slugCurveData[1],
-        s_slugCurveData[2], s_slugCurveData[3]);
+    texelStrideInBytes = width * kTexelBytes;
+    texels = s_pageData;
 }
 
-// Control texture in a format the device definitely accepts, to tell a missing
-// upload path apart from an unsupported format.
-uint32_t s_probe8888[256 * 256];
-
-void Slug8888Callback(EGxTexCommand command, uint32_t width, uint32_t height,
-                      uint32_t face, uint32_t level, void* userArg,
-                      uint32_t& texelStrideInBytes, const void*& texels) {
-    SlugLog("[Slug] 8888 callback cmd=%d", command);
-
-    if (command != GxTex_Latch) {
-        return;
+bool EnsureTexture() {
+    if (s_texture && s_deviceTexture) {
+        return true;
     }
 
-    s_probe8888[0] = 0xFFFFFFFF;
-    texelStrideInBytes = width * 4;
-    texels = s_probe8888;
-}
-
-CTexture* CreateSlugTexture() {
     CGxTexFlags flags(GxTex_Linear, 0, 0, 0, 0, 0, 1, 0, 0, 0);
+    s_texture = TextureCreate(kPageWidth, kPageHeight, GxTex_Gr1616F, GxTex_Gr1616F,
+        flags, nullptr, PageCallback, "GxuFontSlug", 0);
 
-    return TextureCreate(kSlugPageWidth, kSlugPageHeight, GxTex_Gr1616F, GxTex_Gr1616F,
-        flags, nullptr, SlugTextureCallback, "GxuFontSlug", 0);
+    if (!s_texture) {
+        SlugLog("[Slug] curve page creation failed");
+        return false;
+    }
+
+    s_deviceTexture = TextureGetGxTex(s_texture, 1, nullptr);
+
+    if (!s_deviceTexture) {
+        SlugLog("[Slug] curve page resolve failed");
+        return false;
+    }
+
+    return true;
 }
 
-CGxBuf* GetProbeIndexBuffer() {
+void UploadPage() {
+    if (s_deviceTexture) {
+        GxTexUpdate(s_deviceTexture, 0, 0, kPageWidth, kPageHeight, 1);
+    }
+}
+
+CGxShader* GetShader() {
+    if (s_shader) {
+        return s_shader;
+    }
+
+    CGxShader* shader = new CGxShader;
+
+    shader->m_target = GxSh_Pixel;
+    shader->m_code.SetCount(g_gxuFontSlugPixelShaderSize);
+    memcpy(shader->m_code.m_data, g_gxuFontSlugPixelShader, g_gxuFontSlugPixelShaderSize);
+    shader->m_loaded = 0;
+
+    if (!shader->Valid()) {
+        SlugLog("[Slug] pixel shader failed to create");
+        delete shader;
+        return nullptr;
+    }
+
+    SlugLog("[Slug] pixel shader active (ps_3_0)");
+    s_shader = shader;
+
+    return shader;
+}
+
+CGxBuf* GetIndexBuffer() {
     static CGxBuf* s_indexBuf = nullptr;
 
     if (s_indexBuf && s_indexBuf->m_hasData && s_indexBuf->m_valid) {
@@ -117,7 +141,6 @@ CGxBuf* GetProbeIndexBuffer() {
         return nullptr;
     }
 
-    // Same pattern the font batches use: two triangles per quad.
     indices[0] = 0; indices[1] = 2; indices[2] = 1;
     indices[3] = 2; indices[4] = 3; indices[5] = 1;
 
@@ -126,263 +149,51 @@ CGxBuf* GetProbeIndexBuffer() {
     return s_indexBuf;
 }
 
-CGxShader* GetSlugShader() {
-    if (s_slugShader) {
-        return s_slugShader;
-    }
+// One textured quad for a glyph. Screen space has y growing upward and em space is
+// y up as well, so the smaller y takes the glyph bottom.
+void DrawGlyphQuad(const SLUGGLYPHINFO& glyph, float x0, float y0, float width, const CImVector& color) {
+    const float boxWidth = (glyph.m_maxX - glyph.m_minX) > 1e-4f ? (glyph.m_maxX - glyph.m_minX) : 1.0f;
+    const float boxHeight = (glyph.m_maxY - glyph.m_minY) > 1e-4f ? (glyph.m_maxY - glyph.m_minY) : 1.0f;
+    const float height = width * (boxHeight / boxWidth);
 
-    CGxShader* shader = new CGxShader;
-
-    shader->m_target = GxSh_Pixel;
-    shader->m_code.SetCount(g_gxuFontSlugPixelShaderSize);
-    memcpy(shader->m_code.m_data, g_gxuFontSlugPixelShader, g_gxuFontSlugPixelShaderSize);
-    shader->m_loaded = 0;
-
-    if (!shader->Valid()) {
-        SlugLog("[Slug] pixel shader FAILED to create");
-        delete shader;
-        return nullptr;
-    }
-
-    DebugLog("[Slug] pixel shader active (ps_3_0)");
-        fflush(stdout);
-
-    s_slugShader = shader;
-
-    return shader;
-}
-
-} // namespace
-
-bool GxuFontSlugDebugBuild(FT_Face face, uint32_t code, uint32_t pixelSize) {
-    if (!face || s_slugReady) {
-        return s_slugReady;
-    }
-
-    SLUGGLYPH glyph;
-
-    if (!GxuFontSlugExtractGlyph(face, code, pixelSize, &glyph)) {
-        return false;
-    }
-
-    const uint32_t texels = GxuFontSlugPackCurves(glyph, s_slugCurveData, kSlugPageWidth * kSlugPageHeight);
-
-    if (!texels) {
-        return false;
-    }
-
-    s_slugCurveCount = static_cast<uint32_t>(glyph.m_curves.size());
-    s_slugMinX = glyph.m_minX;
-    s_slugMinY = glyph.m_minY;
-    s_slugMaxX = glyph.m_maxX;
-    s_slugMaxY = glyph.m_maxY;
-
-    s_slugTexture = CreateSlugTexture();
-    SlugLog("[Slug] texture create -> %p", static_cast<void*>(s_slugTexture));
-
-    if (!s_slugTexture) {
-        return false;
-    }
-
-    // The texture only becomes a GPU resource when it is resolved and updated;
-    // binding a CTexture that was never latched faults inside the device. The font
-    // atlas does exactly this through UpdateDirty.
-    s_slugGxTex = TextureGetGxTex(s_slugTexture, 1, nullptr);
-    SlugLog("[Slug] resolve -> %p", static_cast<void*>(s_slugGxTex));
-
-    // Control: same call chain, known-good format.
-    {
-        CGxTexFlags controlFlags(GxTex_Linear, 0, 0, 0, 0, 0, 1, 0, 0, 0);
-        CTexture* control = TextureCreate(256, 256, GxTex_Argb8888, GxTex_Argb8888,
-            controlFlags, nullptr, Slug8888Callback, "GxuFontSlugCtl", 0);
-        SlugLog("[Slug] control create -> %p", static_cast<void*>(control));
-
-        if (control) {
-            CGxTex* controlTex = TextureGetGxTex(control, 1, nullptr);
-            SlugLog("[Slug] control resolve -> %p", static_cast<void*>(controlTex));
-
-            if (controlTex) {
-                GxTexUpdate(controlTex, 0, 0, 256, 256, 1);
-                SlugLog("[Slug] control update issued");
-            }
-        }
-    }
-
-    if (!s_slugGxTex) {
-        SlugLog("[Slug] curve texture failed to resolve");
-        return false;
-    }
-
-    GxTexUpdate(s_slugGxTex, 0, 0, kSlugPageWidth, kSlugPageHeight, 1);
-    SlugLog("[Slug] update issued");
-
-    s_slugReady = true;
-
-    for (uint32_t k = 0; k < s_slugCurveCount; k++) {
-        const SLUGCURVE& c = glyph.m_curves[k];
-        SlugLog("[Slug] curve %u: p0(%.3f,%.3f) p1(%.3f,%.3f) p2(%.3f,%.3f)",
-            k, c.m_p0[0], c.m_p0[1], c.m_p1[0], c.m_p1[1], c.m_p2[0], c.m_p2[1]);
-    }
-
-    SlugLog("[Slug] glyph %c curves=%u texels=%u bounds x %.3f..%.3f y %.3f..%.3f",
-        static_cast<char>(code), s_slugCurveCount, texels,
-        s_slugMinX, s_slugMaxX, s_slugMinY, s_slugMaxY);
-
-    return true;
-}
-
-CTexture* GxuFontSlugTexture() {
-    return s_slugTexture;
-}
-
-void GxuFontSlugShaderParams(float* out) {
-    if (!out) {
-        return;
-    }
-
-    out[0] = 0.0f;                                                  // first curve texel
-    out[1] = static_cast<float>(s_slugCurveCount);
-    out[2] = 1.0f / static_cast<float>(kSlugPageWidth);
-    out[3] = 1.0f / static_cast<float>(kSlugPageHeight);
-}
-
-bool GxuFontSlugGlyphBounds(float* minX, float* minY, float* maxX, float* maxY) {
-    if (!s_slugReady) {
-        return false;
-    }
-
-    if (minX) *minX = s_slugMinX;
-    if (minY) *minY = s_slugMinY;
-    if (maxX) *maxX = s_slugMaxX;
-    if (maxY) *maxY = s_slugMaxY;
-
-    return true;
-}
-
-bool GxuFontSlugReady() {
-    return s_slugReady && s_slugTexture != nullptr && GetSlugShader() != nullptr;
-}
-
-void GxuFontSlugDebugDraw(FT_Face face, uint32_t pixelSize) {
-    // The target glyph is fixed for now; switching it later is just a parameter.
-    // R is asymmetric both ways, so it shows at a glance whether the em mapping
-    // flips or mirrors the glyph.
-    if (!GxuFontSlugDebugBuild(face, 'R', pixelSize)) {
-        return;
-    }
-
-    CGxShader* shader = GetSlugShader();
-
-    if (!shader || !s_slugGxTex) {
-        return;
-    }
-
-    static bool s_loggedDraw = false;
-
-    if (!s_loggedDraw) {
-        s_loggedDraw = true;
-        SlugLog("[Slug] probe reached, screen %ux%u, box %.3fx%.3f em",
-            g_widthPixels, g_heightPixels,
-            s_slugMaxX - s_slugMinX, s_slugMaxY - s_slugMinY);
-    }
-
-    // The latch may only run once the device is ready, so refresh a few times.
-    static uint32_t s_updateCount = 0;
-
-    if (s_updateCount < 3) {
-        s_updateCount++;
-        GxTexUpdate(s_slugGxTex, 0, 0, kSlugPageWidth, kSlugPageHeight, 1);
-        SlugLog("[Slug] draw-time update %u", s_updateCount);
-    }
-
-    // RenderBatch runs many times per frame; draw the probe on a rough fraction of
-    // those calls so it shows up without paying for it dozens of times a frame.
-    // Exactly once per frame. Repeating the quad accumulates alpha and ruins the
-    // soft edge, but a fixed counter based throttle misses frames and flickers,
-    // so gate on the device frame counter instead.
-    static int32_t s_lastFrame = -1;
-
-    if (g_theGxDevicePtr->m_frameCount == s_lastFrame) {
-        return;
-    }
-
-    s_lastFrame = g_theGxDevicePtr->m_frameCount;
-
-    g_theGxDevicePtr->RsPush();
-    GxRsSet(GxRs_PixelShader, shader);
-    // The render state takes the resolved CGxTex, not the CTexture wrapper: the
-    // device casts the value straight to CGxTex and reads its flags.
-    GxRsSet(GxRs_Texture0, s_slugGxTex);
-
-    float params[4];
-    GxuFontSlugShaderParams(params);
-    GxShaderConstantsSet(GxSh_Pixel, 0, params, 1);
-
-    // Keep the quad's aspect equal to the glyph's bounding box, otherwise the em
-    // mapping stretches the shape (an 8 is much taller than it is wide).
-    const float boxWidth = (s_slugMaxX - s_slugMinX) > 1e-4f ? (s_slugMaxX - s_slugMinX) : 1.0f;
-    const float boxHeight = (s_slugMaxY - s_slugMinY) > 1e-4f ? (s_slugMaxY - s_slugMinY) : 1.0f;
-
-    // Centred and large, so any cropping in a screenshot cannot be mistaken for a
-    // missing part of the glyph.
-    // Fit inside the screen on both axes: the aspect of a glyph is taller than it
-    // is wide, so a width-only rule can push the quad past the top and bottom.
-    const float aspect = boxHeight / boxWidth;
-    float quadWidth = 0.42f * static_cast<float>(g_widthPixels);
-    float quadHeight = quadWidth * aspect;
-
-    const float maxHeight = 0.80f * static_cast<float>(g_heightPixels);
-
-    if (quadHeight > maxHeight) {
-        quadHeight = maxHeight;
-        quadWidth = quadHeight / aspect;
-    }
-    const float x0 = 0.5f * (static_cast<float>(g_widthPixels) - quadWidth);
-    const float y0 = 0.5f * (static_cast<float>(g_heightPixels) - quadHeight);
-    const float x1 = x0 + quadWidth;
-    const float y1 = y0 + quadHeight;
+    const float x1 = x0 + width;
+    const float y1 = y0 + height;
 
     CGxBuf* buf = GxBufStream(GxPoolTarget_Vertex, sizeof(CGxVertexPCT), 4);
     CGxVertexPCT* verts = reinterpret_cast<CGxVertexPCT*>(GxBufLock(buf));
 
     if (!verts) {
-        g_theGxDevicePtr->RsPop();
         return;
     }
 
-    const CImVector white = { 0xFF, 0xFF, 0xFF, 0xFF };
-
-    // Triangle strip: TL, TR, BL, BR. y grows downward on screen, em space is up.
     const float positions[4][2] = { { x0, y0 }, { x1, y0 }, { x0, y1 }, { x1, y1 } };
-    // Larger y is higher on screen, and em space is y up as well, so the vertex
-    // with the smaller y takes the glyph's bottom (minY). Reversing these two rows
-    // is what turned the R upside down.
     const float coords[4][2] = {
-        { s_slugMinX, s_slugMinY },
-        { s_slugMaxX, s_slugMinY },
-        { s_slugMinX, s_slugMaxY },
-        { s_slugMaxX, s_slugMaxY },
+        { glyph.m_minX, glyph.m_minY },
+        { glyph.m_maxX, glyph.m_minY },
+        { glyph.m_minX, glyph.m_maxY },
+        { glyph.m_maxX, glyph.m_maxY },
     };
 
     for (int i = 0; i < 4; i++) {
         verts[i].p.x = positions[i][0];
         verts[i].p.y = positions[i][1];
         verts[i].p.z = 0.0f;
-        verts[i].c = white;
+        verts[i].c = color;
         verts[i].tc.x = coords[i][0];
         verts[i].tc.y = coords[i][1];
     }
 
     GxBufUnlock(buf, sizeof(CGxVertexPCT) * 4);
 
-    // Indexed draw, exactly like the font batches: a triangle strip would be
-    // ignored because an index buffer is already bound.
-    CGxBuf* indexBuf = GetProbeIndexBuffer();
+    CGxBuf* indexBuf = GetIndexBuffer();
 
     if (!indexBuf) {
-        g_theGxDevicePtr->RsPop();
         return;
     }
+
+    float params[4];
+    GxuFontSlugShaderParams(glyph, params);
+    GxShaderConstantsSet(GxSh_Pixel, 0, params, 1);
 
     GxPrimVertexPtr(buf, GxVBF_PCT);
     g_theGxDevicePtr->PrimIndexPtr(indexBuf);
@@ -395,6 +206,137 @@ void GxuFontSlugDebugDraw(FT_Face face, uint32_t pixelSize) {
     batch.m_maxIndex = 3;
 
     GxDraw(&batch, 1);
+}
+
+} // namespace
+
+bool GxuFontSlugGetGlyph(FT_Face face, uint32_t code, uint32_t pixelSize, SLUGGLYPHINFO* out) {
+    if (!face || !out) {
+        return false;
+    }
+
+    for (const CacheEntry& entry : s_entries) {
+        if (entry.m_face == face && entry.m_code == code) {
+            *out = entry.m_info;
+            return true;
+        }
+    }
+
+    SLUGGLYPH glyph;
+
+    if (!GxuFontSlugExtractGlyph(face, code, pixelSize, &glyph)) {
+        return false;
+    }
+
+    const uint32_t needed = static_cast<uint32_t>(glyph.m_curves.size()) * kTexelsPerCurve;
+
+    if (!needed) {
+        return false;
+    }
+
+    // Flush rather than fragment. A real allocator belongs with the text path; a
+    // reset keeps the layout trivially correct for now.
+    if (s_cursorTexel + needed > kTotalTexels) {
+        SlugLog("[Slug] page full, flushing %u entries", static_cast<uint32_t>(s_entries.size()));
+        s_entries.clear();
+        s_cursorTexel = 0;
+        memset(s_pageData, 0, sizeof(s_pageData));
+    }
+
+    if (!EnsureTexture()) {
+        return false;
+    }
+
+    // Two uint16 per texel, so the byte offset is texel * 2.
+    const uint32_t written = GxuFontSlugPackCurves(glyph, s_pageData + s_cursorTexel * 2, needed);
+
+    if (!written) {
+        return false;
+    }
+
+    CacheEntry entry;
+    entry.m_face = face;
+    entry.m_code = code;
+    entry.m_info.m_baseTexel = s_cursorTexel;
+    entry.m_info.m_curveCount = static_cast<uint32_t>(glyph.m_curves.size());
+    entry.m_info.m_minX = glyph.m_minX;
+    entry.m_info.m_minY = glyph.m_minY;
+    entry.m_info.m_maxX = glyph.m_maxX;
+    entry.m_info.m_maxY = glyph.m_maxY;
+
+    s_entries.push_back(entry);
+    s_cursorTexel += needed;
+
+    UploadPage();
+
+    SlugLog("[Slug] cached %c base=%u curves=%u used=%u/%u",
+        static_cast<char>(code), entry.m_info.m_baseTexel, entry.m_info.m_curveCount,
+        s_cursorTexel, kTotalTexels);
+
+    *out = entry.m_info;
+
+    return true;
+}
+
+CTexture* GxuFontSlugTexture() {
+    return s_texture;
+}
+
+CGxTex* GxuFontSlugDeviceTexture() {
+    return s_deviceTexture;
+}
+
+void GxuFontSlugShaderParams(const SLUGGLYPHINFO& glyph, float* out) {
+    if (!out) {
+        return;
+    }
+
+    out[0] = static_cast<float>(glyph.m_baseTexel);
+    out[1] = static_cast<float>(glyph.m_curveCount);
+    out[2] = 1.0f / static_cast<float>(kPageWidth);
+    out[3] = 1.0f / static_cast<float>(kPageHeight);
+}
+
+void GxuFontSlugDebugDraw(FT_Face face, uint32_t pixelSize) {
+    // Once per frame: repeated draws accumulate alpha and harden the soft edge.
+    static int32_t s_lastFrame = -1;
+
+    if (g_theGxDevicePtr->m_frameCount == s_lastFrame) {
+        return;
+    }
+
+    s_lastFrame = g_theGxDevicePtr->m_frameCount;
+
+    SLUGGLYPHINFO first;
+    SLUGGLYPHINFO second;
+
+    if (!GxuFontSlugGetGlyph(face, 'R', pixelSize, &first)) {
+        return;
+    }
+
+    const bool haveSecond = GxuFontSlugGetGlyph(face, '8', pixelSize, &second);
+
+    CGxShader* shader = GetShader();
+
+    if (!shader || !s_deviceTexture) {
+        return;
+    }
+
+    g_theGxDevicePtr->RsPush();
+    GxRsSet(GxRs_PixelShader, shader);
+    GxRsSet(GxRs_Texture0, s_deviceTexture);
+
+    const CImVector white = { 0xFF, 0xFF, 0xFF, 0xFF };
+    const CImVector tinted = { 0xFF, 0x80, 0xC0, 0xFF };
+
+    const float glyphWidth = 0.18f * static_cast<float>(g_widthPixels);
+    const float baseY = 0.12f * static_cast<float>(g_heightPixels);
+
+    DrawGlyphQuad(first, 0.06f * static_cast<float>(g_widthPixels), baseY, glyphWidth, white);
+
+    if (haveSecond) {
+        DrawGlyphQuad(second, 0.28f * static_cast<float>(g_widthPixels), baseY, glyphWidth, tinted);
+    }
 
     g_theGxDevicePtr->RsPop();
 }
