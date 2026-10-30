@@ -145,7 +145,13 @@ bool CGxFont::GetGlyphData(GLYPHBITMAPDATA* data, uint32_t code) {
         padding = 2;
     }
 
-    return IGxuFontGlyphRenderGlyph(face, this->m_pixelSize, code, this->m_baseline, data, this->m_fontFlags & 2, padding);
+    // MODIFIED: only ask for grid fitting when the raster size still matches the
+    // size the string is laid out at. Once rasterScale shrank the raster, hinting
+    // would fold the outline onto a grid the glyph is no longer drawn on.
+    const bool shrunk = this->m_pixelSize != this->m_logicalPixelSize;
+    const int32_t allowHinting = (!shrunk && this->m_pixelSize <= 20) ? 1 : 0;
+
+    return IGxuFontGlyphRenderGlyph(face, this->m_pixelSize, code, this->m_baseline, data, this->m_fontFlags & 2, padding, allowHinting);
 }
 
 // VERIFY: 3597e899 auto

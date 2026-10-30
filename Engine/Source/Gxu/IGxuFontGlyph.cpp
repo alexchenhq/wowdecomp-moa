@@ -121,23 +121,20 @@ int OutlineCubicTo(FT_Vector* control1, FT_Vector* control2, FT_Vector* to, void
 
 // MODIFIED: split from the original single FREETYPE_RenderGlyph so the caller
 // can inspect the outline between loading and rasterizing.
-int32_t FREETYPE_LoadGlyph(FT_Face face, uint32_t code, bool monochrome, uint32_t pixelSize) {
+int32_t FREETYPE_LoadGlyph(FT_Face face, uint32_t code, bool monochrome, int32_t allowHinting) {
     FT_UInt index = FT_Get_Char_Index(face, code);
 
     if (!index) {
         return 0;
     }
 
-    // MODIFIED: grid-fit small glyphs. Without hinting a stem lands on a
-    // fractional column (3.37, 4.12, ...), so the same stroke comes out a
-    // different width from glyph to glyph and the line looks wavy. Hinting snaps
-    // the outline to whole pixels first, and the distance field is then built
-    // from that snapped outline. Large text is left unhinted so it stays true.
-    const bool gridFit = pixelSize <= 20;
-
+    // MODIFIED: grid fitting is decided by the caller. It helps when the glyph is
+    // rasterised at the size it is shown at, but hurts when the raster was shrunk
+    // to match the display: hinting then folds diagonals onto whole pixels and the
+    // distance field faithfully encodes those steps, which reads as jaggies.
     FT_Int32 flags = FT_LOAD_LINEAR_DESIGN | FT_LOAD_PEDANTIC;
 
-    if (!gridFit) {
+    if (!allowHinting) {
         flags |= FT_LOAD_NO_HINTING;
     }
 
@@ -212,7 +209,7 @@ static void CalculateYOffset(uint32_t pixelSize, int32_t baseline, FT_Face face,
     }
 }
 
-bool IGxuFontGlyphRenderGlyph(FT_Face face, uint32_t pixelSize, uint32_t code, uint32_t baseline, GLYPHBITMAPDATA* dataPtr, int32_t monochrome, uint32_t padding) {
+bool IGxuFontGlyphRenderGlyph(FT_Face face, uint32_t pixelSize, uint32_t code, uint32_t baseline, GLYPHBITMAPDATA* dataPtr, int32_t monochrome, uint32_t padding, int32_t allowHinting) {
     if (!face || !pixelSize || !dataPtr) {
         SErrSetLastError(STORM_ERROR_INVALID_PARAMETER);
         return false;
@@ -222,7 +219,7 @@ bool IGxuFontGlyphRenderGlyph(FT_Face face, uint32_t pixelSize, uint32_t code, u
         return false;
     }
 
-    if (!FREETYPE_LoadGlyph(face, code, monochrome != 0, pixelSize)) {
+    if (!FREETYPE_LoadGlyph(face, code, monochrome != 0, allowHinting)) {
         return false;
     }
 
