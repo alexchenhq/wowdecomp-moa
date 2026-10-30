@@ -26,12 +26,18 @@
 //
 // ALL_FACES sends every font file through it; the named face is only consulted
 // when ALL_FACES is 0, which is how the first milestone was limited to one font.
-// Outlined faces are excluded either way: coverage only carries distance inside
-// half a pixel, so a rim rebuilt from it stair steps at every size, and the
-// distance field grows one properly.
+//
+// OUTLINED takes the outlined instances of those faces as well. The shader has no
+// rim: coverage only carries distance inside half a pixel, and a rim rebuilt from
+// it stair steps at every size (measured), so with this on, outlined text renders
+// as plain text with no rim at all. Off keeps those instances on the distance
+// field, which grows a proper rim.
 #if GXU_FONT_SLUG_TEXT
 #ifndef GXU_FONT_SLUG_ALL_FACES
 #define GXU_FONT_SLUG_ALL_FACES 1
+#endif
+#ifndef GXU_FONT_SLUG_OUTLINED
+#define GXU_FONT_SLUG_OUTLINED 1
 #endif
 #ifndef GXU_FONT_SLUG_FACE
 #define GXU_FONT_SLUG_FACE "Fonts\\FRIZQT__.TTF"
