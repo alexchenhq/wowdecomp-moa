@@ -109,6 +109,18 @@ bool GxuFontSlugDebugBuild(FT_Face face, uint32_t code, uint32_t pixelSize) {
         return false;
     }
 
+    // The texture only becomes a GPU resource when it is resolved and updated;
+    // binding a CTexture that was never latched faults inside the device. The font
+    // atlas does exactly this through UpdateDirty.
+    CGxTex* gxTex = TextureGetGxTex(s_slugTexture, 1, nullptr);
+
+    if (!gxTex) {
+        printf("[Slug] curve texture failed to resolve\n");
+        return false;
+    }
+
+    GxTexUpdate(gxTex, 0, 0, kSlugPageWidth, kSlugPageHeight, 1);
+
     s_slugReady = true;
 
     printf("[Slug] glyph %c: %u curves, %u texels, bounds %.3f..%.3f / %.3f..%.3f\n",
