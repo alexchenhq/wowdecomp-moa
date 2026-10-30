@@ -316,8 +316,18 @@ void GxuFontSlugDebugDraw(FT_Face face, uint32_t pixelSize) {
 
     // Centred and large, so any cropping in a screenshot cannot be mistaken for a
     // missing part of the glyph.
-    const float quadWidth = 0.42f * static_cast<float>(g_widthPixels);
-    const float quadHeight = quadWidth * (boxHeight / boxWidth);
+    // Fit inside the screen on both axes: the aspect of a glyph is taller than it
+    // is wide, so a width-only rule can push the quad past the top and bottom.
+    const float aspect = boxHeight / boxWidth;
+    float quadWidth = 0.42f * static_cast<float>(g_widthPixels);
+    float quadHeight = quadWidth * aspect;
+
+    const float maxHeight = 0.80f * static_cast<float>(g_heightPixels);
+
+    if (quadHeight > maxHeight) {
+        quadHeight = maxHeight;
+        quadWidth = quadHeight / aspect;
+    }
     const float x0 = 0.5f * (static_cast<float>(g_widthPixels) - quadWidth);
     const float y0 = 0.5f * (static_cast<float>(g_heightPixels) - quadHeight);
     const float x1 = x0 + quadWidth;
