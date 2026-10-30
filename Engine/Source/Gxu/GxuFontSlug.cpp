@@ -204,7 +204,9 @@ bool GxuFontSlugExtractGlyph(FT_Face face, uint32_t code, uint32_t pixelSize, SL
 }
 
 uint32_t GxuFontSlugCurveTexels(const SLUGGLYPH& glyph) {
-    return static_cast<uint32_t>(glyph.m_curves.size()) * 2;
+    // Gr1616F stores two halves per texel, so one curve takes three texels:
+    // (p0.x, p0.y), (p1.x, p1.y), (p2.x, p2.y).
+    return static_cast<uint32_t>(glyph.m_curves.size()) * 3;
 }
 
 uint32_t GxuFontSlugPackCurves(const SLUGGLYPH& glyph, uint16_t* dest, uint32_t texelCapacity) {
@@ -220,18 +222,16 @@ uint32_t GxuFontSlugPackCurves(const SLUGGLYPH& glyph, uint16_t* dest, uint32_t 
 
     for (size_t i = 0; i < glyph.m_curves.size(); i++) {
         const SLUGCURVE& curve = glyph.m_curves[i];
-        uint16_t* first = dest + i * 8;
-        uint16_t* second = first + 4;
+        uint16_t* texel = dest + i * 6;
 
-        first[0] = FloatToHalf(curve.m_p0[0]);
-        first[1] = FloatToHalf(curve.m_p0[1]);
-        first[2] = FloatToHalf(curve.m_p1[0]);
-        first[3] = FloatToHalf(curve.m_p1[1]);
+        texel[0] = FloatToHalf(curve.m_p0[0]);
+        texel[1] = FloatToHalf(curve.m_p0[1]);
 
-        second[0] = FloatToHalf(curve.m_p2[0]);
-        second[1] = FloatToHalf(curve.m_p2[1]);
-        second[2] = 0;
-        second[3] = 0;
+        texel[2] = FloatToHalf(curve.m_p1[0]);
+        texel[3] = FloatToHalf(curve.m_p1[1]);
+
+        texel[4] = FloatToHalf(curve.m_p2[0]);
+        texel[5] = FloatToHalf(curve.m_p2[1]);
     }
 
     return needed;

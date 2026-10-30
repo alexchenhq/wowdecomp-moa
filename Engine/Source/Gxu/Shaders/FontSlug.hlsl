@@ -21,7 +21,7 @@ float4 SlugParams : register(c0);
 
 // Diagnostic switch: 1 paints the first texel of the glyph so the curve texture
 // can be inspected without any coverage maths.
-#define SLUG_SHOW_CURVE 1
+#define SLUG_SHOW_CURVE 0
 
 float4 main(float2 em : TEXCOORD0, float4 color : COLOR0) : COLOR0 {
 #if SLUG_PROBE_SOLID
@@ -44,8 +44,10 @@ float4 main(float2 em : TEXCOORD0, float4 color : COLOR0) : COLOR0 {
             break;
         }
 
-        float4 texelA = tex2Dlod(CurveTex, float4((base + float(i) * 2.0 + 0.5) * invWidth, rowV, 0.0, 0.0));
-        float4 texelB = tex2Dlod(CurveTex, float4((base + float(i) * 2.0 + 1.5) * invWidth, rowV, 0.0, 0.0));
+        // Gr1616F: each texel carries two halves, so a curve spans three texels.
+        float4 texelA = tex2Dlod(CurveTex, float4((base + float(i) * 3.0 + 0.5) * invWidth, rowV, 0.0, 0.0));
+        float4 texelB = tex2Dlod(CurveTex, float4((base + float(i) * 3.0 + 1.5) * invWidth, rowV, 0.0, 0.0));
+        float4 texelC = tex2Dlod(CurveTex, float4((base + float(i) * 3.0 + 2.5) * invWidth, rowV, 0.0, 0.0));
 
 #if SLUG_SHOW_CURVE
         if (i == 0) {
@@ -55,8 +57,8 @@ float4 main(float2 em : TEXCOORD0, float4 color : COLOR0) : COLOR0 {
 #endif
 
         float2 p0 = texelA.xy;
-        float2 p1 = texelA.zw;
-        float2 p2 = texelB.xy;
+        float2 p1 = texelB.xy;
+        float2 p2 = texelC.xy;
 
         float a = p0.y - 2.0 * p1.y + p2.y;
         float b = 2.0 * (p1.y - p0.y);
