@@ -58,7 +58,9 @@ enum EGxTexFormat {
     GxTex_Gr1616F = 10,
     GxTex_R32F = 11,
     GxTex_D24X8 = 12,
-    GxTexFormats_Last = 13,
+    // MODIFIED: 4x16-bit float, needed by the Slug curve texture (control points).
+    GxTex_Rgba16F = 13,
+    GxTexFormats_Last = 14,
 };
 
 enum EGxVertexBufferFormat {
