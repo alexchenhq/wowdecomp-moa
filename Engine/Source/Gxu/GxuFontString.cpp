@@ -30,9 +30,24 @@ void CGxString::TexturePageEvicted(uint32_t texturePage) {
 void CGxString::WriteGeometry(CGxFontVertex* buf, int32_t texturePage, int32_t vertIndex, int32_t numVerts) const {
     TEXTLINETEXTURE* textLine = this->m_textLines[texturePage];
 
-    if (textLine) {
-        textLine->WriteGeometry(buf, this->m_fontColor, this->m_shadowOffset, this->m_shadowColor, this->m_viewTranslation, this->m_flags & 1, (this->m_flags >> 5) & 1, vertIndex, numVerts);
+    if (!textLine) {
+        return;
     }
+
+    bool hasShadow = (this->m_flags & 1) != 0;
+
+#if GXU_FONT_SLUG_TEXT && GXU_FONT_SLUG_RIM
+    // The rim line must not take the shadow copy. A shadowed string holds two
+    // quads per glyph, and shading both as rim draws the rim twice, one of them
+    // offset by the shadow - two thin rings a couple of pixels apart, which reads
+    // as a shredded outline. The shadow itself is still drawn, by the body line,
+    // which shades it in the shadow colour as before.
+    if (texturePage == static_cast<int32_t>(GxuFontSlugRimPage())) {
+        hasShadow = false;
+    }
+#endif
+
+    textLine->WriteGeometry(buf, this->m_fontColor, this->m_shadowOffset, this->m_shadowColor, this->m_viewTranslation, hasShadow, (this->m_flags >> 5) & 1, vertIndex, numVerts);
 }
 
 // VERIFY: d917ad36 auto
@@ -142,6 +157,14 @@ void CGxString::InitializeViewTranslation() {
 // VERIFY: 4d328ee6 auto
 // OFFSET: 0x006C63E0
 int32_t CGxString::CalculateVertsNeeded(int32_t texturePage) {
+#if GXU_FONT_SLUG_TEXT && GXU_FONT_SLUG_RIM
+    // The rim line carries one quad per glyph, never a shadow copy: see
+    // WriteGeometry below for why.
+    if (texturePage == static_cast<int32_t>(GxuFontSlugRimPage())) {
+        return this->m_textLines[texturePage]->m_verts.m_count;
+    }
+#endif
+
     if (this->m_flags & 1) {
         return 2 * this->m_textLines[texturePage]->m_verts.m_count;
     }
