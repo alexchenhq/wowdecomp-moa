@@ -35,10 +35,10 @@ void SlugLog(const char* format, ...) {
 
 const uint32_t kSlugPageWidth = 256;
 const uint32_t kSlugPageHeight = 256;
-const uint32_t kSlugTexelBytes = 8;      // RGBA16F
+const uint32_t kSlugTexelBytes = 4;      // Gr1616F (two halves)
 
 // CPU side of the page, uploaded on demand by the latch callback.
-uint16_t s_slugCurveData[kSlugPageWidth * kSlugPageHeight * 4];
+uint16_t s_slugCurveData[kSlugPageWidth * kSlugPageHeight * 2];
 
 CTexture* s_slugTexture = nullptr;
 CGxTex* s_slugGxTex = nullptr;   // resolved device texture, what the state takes
@@ -94,7 +94,7 @@ void Slug8888Callback(EGxTexCommand command, uint32_t width, uint32_t height,
 CTexture* CreateSlugTexture() {
     CGxTexFlags flags(GxTex_Linear, 0, 0, 0, 0, 0, 1, 0, 0, 0);
 
-    return TextureCreate(kSlugPageWidth, kSlugPageHeight, GxTex_Rgba16F, GxTex_Rgba16F,
+    return TextureCreate(kSlugPageWidth, kSlugPageHeight, GxTex_Gr1616F, GxTex_Gr1616F,
         flags, nullptr, SlugTextureCallback, "GxuFontSlug", 0);
 }
 
