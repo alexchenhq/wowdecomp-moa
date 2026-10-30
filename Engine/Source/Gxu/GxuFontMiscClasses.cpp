@@ -4,6 +4,9 @@
 #include <cstdio>
 #include <cstdlib>
 #include "Engine/Source/Gxu/GxuFontMiscClasses.h"
+#include "Engine/Source/Gxu/GxuFontSlugCache.h"
+#include "Engine/Source/Gxu/GxuFontFace.h"
+#include "Engine/Source/Gxu/GxuFontFont.h"
 #include "Engine/Source/Gxu/GxuFontSDFShader.h"
 #include "Engine/Source/Gx/CGxBuf.h"
 #include "Engine/Source/Gx/CGxDevice/CGxDevice.h"
@@ -555,6 +558,11 @@ void BATCHEDRENDERFONTDESC::RenderBatch() {
     g_theGxDevicePtr->RsPop();
 
     GxBufUnlock(buf, 0);
+
+    // MODIFIED: Slug debug path. Draws one glyph straight from its Bezier
+    // outline to prove the curve texture and shader before the real text path
+    // exists. Remove once text goes through Slug.
+    GxuFontSlugDebugDraw(FontFaceGetFace(this->m_face->m_fontFaceHandle), this->m_face->GetPixelSize());
 }
 
 // VERIFY: cb7c9536 manual

@@ -1,5 +1,6 @@
 #include <cmath>
 #include <cstring>
+#include <freetype/ftoutln.h>
 #include "Engine/Source/Gxu/GxuFontSlug.h"
 
 namespace {
