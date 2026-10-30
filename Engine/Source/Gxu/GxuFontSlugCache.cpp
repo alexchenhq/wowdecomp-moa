@@ -98,6 +98,34 @@ CTexture* CreateSlugTexture() {
         flags, nullptr, SlugTextureCallback, "GxuFontSlug", 0);
 }
 
+CGxBuf* GetProbeIndexBuffer() {
+    static CGxBuf* s_indexBuf = nullptr;
+
+    if (s_indexBuf && s_indexBuf->m_hasData && s_indexBuf->m_valid) {
+        return s_indexBuf;
+    }
+
+    s_indexBuf = GxBufStream(GxPoolTarget_Index, sizeof(uint16_t), 6);
+
+    if (!s_indexBuf) {
+        return nullptr;
+    }
+
+    uint16_t* indices = reinterpret_cast<uint16_t*>(GxBufLock(s_indexBuf));
+
+    if (!indices) {
+        return nullptr;
+    }
+
+    // Same pattern the font batches use: two triangles per quad.
+    indices[0] = 0; indices[1] = 2; indices[2] = 1;
+    indices[3] = 2; indices[4] = 3; indices[5] = 1;
+
+    GxBufUnlock(s_indexBuf, sizeof(uint16_t) * 6);
+
+    return s_indexBuf;
+}
+
 CGxShader* GetSlugShader() {
     if (s_slugShader) {
         return s_slugShader;
@@ -322,12 +350,23 @@ void GxuFontSlugDebugDraw(FT_Face face, uint32_t pixelSize) {
     }
 
     GxBufUnlock(buf, sizeof(CGxVertexPCT) * 4);
+
+    // Indexed draw, exactly like the font batches: a triangle strip would be
+    // ignored because an index buffer is already bound.
+    CGxBuf* indexBuf = GetProbeIndexBuffer();
+
+    if (!indexBuf) {
+        g_theGxDevicePtr->RsPop();
+        return;
+    }
+
     GxPrimVertexPtr(buf, GxVBF_PCT);
+    g_theGxDevicePtr->PrimIndexPtr(indexBuf);
 
     CGxBatch batch;
-    batch.m_primType = GxPrim_TriangleStrip;
+    batch.m_primType = GxPrim_Triangles;
     batch.m_start = 0;
-    batch.m_count = 4;
+    batch.m_count = 6;
     batch.m_minIndex = 0;
     batch.m_maxIndex = 3;
 
