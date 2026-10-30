@@ -59,12 +59,18 @@ void SlugTextureCallback(EGxTexCommand command, uint32_t width, uint32_t height,
     (void)face;
     (void)level;
 
+    SlugLog("[Slug] texcallback cmd=%d %ux%u face=%u level=%u", command, width, height, face, level);
+
     if (command != GxTex_Latch) {
         return;
     }
 
     texelStrideInBytes = width * kSlugTexelBytes;
     texels = s_slugCurveData;
+
+    SlugLog("[Slug] latch served stride=%u raw texel0 = %04X %04X %04X %04X",
+        texelStrideInBytes, s_slugCurveData[0], s_slugCurveData[1],
+        s_slugCurveData[2], s_slugCurveData[3]);
 }
 
 CTexture* CreateSlugTexture() {
