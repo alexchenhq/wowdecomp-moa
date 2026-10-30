@@ -24,7 +24,7 @@ const uint32_t kPageWidth = 256;
 const uint32_t kPageHeight = 256;
 const uint32_t kTexelBytes = 4;          // Gr1616F, two halves per texel
 const uint32_t kTotalTexels = kPageWidth * kPageHeight;
-const uint32_t kTexelsPerCurve = 3;
+const uint32_t kTexelsPerCurve = 4;
 
 // The console only shows crash output, so diagnostics go to a file.
 void SlugLog(const char* format, ...) {

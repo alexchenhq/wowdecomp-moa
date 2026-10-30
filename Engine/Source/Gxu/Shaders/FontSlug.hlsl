@@ -96,15 +96,22 @@ float4 main(float2 em : TEXCOORD0, float4 color : COLOR0) : COLOR0 {
             break;
         }
 
-        float texel = base + float(i) * 3.0;
-        float2 p0 = tex2Dlod(CurveTex, float4((texel + 0.5) * invWidth, rowV, 0.0, 0.0)).xy;
-        float2 p1 = tex2Dlod(CurveTex, float4((texel + 1.5) * invWidth, rowV, 0.0, 0.0)).xy;
-        float2 p2 = tex2Dlod(CurveTex, float4((texel + 2.5) * invWidth, rowV, 0.0, 0.0)).xy;
+        // Four texels per curve; the fourth is the segment's vertical extent.
+        float texel = base + float(i) * 4.0;
+        float2 span = tex2Dlod(CurveTex, float4((texel + 3.5) * invWidth, rowV, 0.0, 0.0)).xy;
 
-        acc += SliceAcc(p0, p1, p2, em.x, py0, invHalfPixel);
-        acc += SliceAcc(p0, p1, p2, em.x, py1, invHalfPixel);
-        acc += SliceAcc(p0, p1, p2, em.x, py2, invHalfPixel);
-        acc += SliceAcc(p0, p1, p2, em.x, py3, invHalfPixel);
+        // Cull by y range first: one fetch instead of three plus the root solve.
+        // Most segments are nowhere near any given pixel.
+        if (py0 <= span.y && py3 >= span.x) {
+            float2 p0 = tex2Dlod(CurveTex, float4((texel + 0.5) * invWidth, rowV, 0.0, 0.0)).xy;
+            float2 p1 = tex2Dlod(CurveTex, float4((texel + 1.5) * invWidth, rowV, 0.0, 0.0)).xy;
+            float2 p2 = tex2Dlod(CurveTex, float4((texel + 2.5) * invWidth, rowV, 0.0, 0.0)).xy;
+
+            acc += SliceAcc(p0, p1, p2, em.x, py0, invHalfPixel);
+            acc += SliceAcc(p0, p1, p2, em.x, py1, invHalfPixel);
+            acc += SliceAcc(p0, p1, p2, em.x, py2, invHalfPixel);
+            acc += SliceAcc(p0, p1, p2, em.x, py3, invHalfPixel);
+        }
     }
 
     // Four slices averaged, then the signed sum turned into coverage.
