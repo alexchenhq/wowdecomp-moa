@@ -596,11 +596,12 @@ void CGxString::InitializeTextLine(const char* text, uint32_t numBytes, CImVecto
                         // em coordinates grow with it, which is what lets the rim
                         // shader find a negative distance out there.
                         //
-                        // Strings with a shadow are left alone: they look wrong with
-                        // a rim, and the character select screen was the first place
-                        // to show it. Until the cause is pinned down, those keep the
-                        // plain text they had before the rim pass existed.
-                        if (!(this->m_flags & 1) && GxuFontSlugRimEnabled(this->m_currentFace)) {
+                        // Shadowed strings take it too. They were excluded while the
+                        // rim was misreading curves by a stride and the shadow copy
+                        // was landing in the rim line; both are fixed, and the
+                        // exclusion only made those lines look like they had lost
+                        // their outline.
+                        if (GxuFontSlugRimEnabled(this->m_currentFace)) {
                             const uint32_t faceFlags = this->m_currentFace->m_fontFlags;
                             const float outlineWidth = (faceFlags & 8) ? 2.0f : 1.0f;
                             const float padEm = outlineWidth / emToPixel;
