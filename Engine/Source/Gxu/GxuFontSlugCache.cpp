@@ -335,11 +335,14 @@ void GxuFontSlugDebugDraw(FT_Face face, uint32_t pixelSize) {
 
     // Triangle strip: TL, TR, BL, BR. y grows downward on screen, em space is up.
     const float positions[4][2] = { { x0, y0 }, { x1, y0 }, { x0, y1 }, { x1, y1 } };
+    // Larger y is higher on screen, and em space is y up as well, so the vertex
+    // with the smaller y takes the glyph's bottom (minY). Reversing these two rows
+    // is what turned the R upside down.
     const float coords[4][2] = {
-        { s_slugMinX, s_slugMaxY },
-        { s_slugMaxX, s_slugMaxY },
         { s_slugMinX, s_slugMinY },
         { s_slugMaxX, s_slugMinY },
+        { s_slugMinX, s_slugMaxY },
+        { s_slugMaxX, s_slugMaxY },
     };
 
     for (int i = 0; i < 4; i++) {
