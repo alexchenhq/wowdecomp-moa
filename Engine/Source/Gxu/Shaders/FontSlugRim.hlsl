@@ -137,20 +137,27 @@ float4 main(float2 em : TEXCOORD0, float2 slug : TEXCOORD1, float4 color : COLOR
             break;
         }
 
-        float texel = base + float(i) * 3.0;
+        // Four texels per curve: the three points, then the segment's vertical
+        // extent. Same layout the body shader reads.
+        float texel = base + float(i) * 4.0;
+        float2 span = tex2Dlod(CurveTex, float4(CurveUV(texel + 3.0, invWidth, invHeight), 0.0, 0.0)).xy;
+
+        // A curve that does not reach this scanline cannot cross it (so no
+        // winding) and cannot be within the rim (so no distance either).
+        if (em.y + reach < span.x || em.y - reach > span.y) {
+            continue;
+        }
+
         float2 p0 = tex2Dlod(CurveTex, float4(CurveUV(texel + 0.0, invWidth, invHeight), 0.0, 0.0)).xy;
         float2 p1 = tex2Dlod(CurveTex, float4(CurveUV(texel + 1.0, invWidth, invHeight), 0.0, 0.0)).xy;
         float2 p2 = tex2Dlod(CurveTex, float4(CurveUV(texel + 2.0, invWidth, invHeight), 0.0, 0.0)).xy;
 
-        // The winding needs every curve the ray crosses, so it cannot be skipped;
-        // it is the distance that is culled, by a box around the curve.
         winding += RayWinding(p0, p1, p2, em.x, em.y);
 
         float2 lo = min(p0, min(p1, p2));
         float2 hi = max(p0, max(p1, p2));
 
-        if (em.x >= lo.x - reach && em.x <= hi.x + reach &&
-            em.y >= lo.y - reach && em.y <= hi.y + reach) {
+        if (em.x >= lo.x - reach && em.x <= hi.x + reach) {
             nearest = min(nearest, CurveDistance(em, p0, p1, p2));
         }
     }
