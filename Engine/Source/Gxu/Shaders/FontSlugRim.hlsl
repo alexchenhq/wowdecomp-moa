@@ -43,20 +43,29 @@ float SegmentDistance(float2 p, float2 a, float2 b) {
     return length(p - (a + ab * t));
 }
 
-// Distance from the point to one quadratic, as a four segment polyline. Measured
-// offline against a sixteen segment version: no difference at any size, and the
-// distance only has to be right to within a pixel to place a rim.
+// Distance from the point to one quadratic, as an eight segment polyline.
+//
+// Four was not enough. A chord sits inside a convex curve, so a coarse polyline
+// reports a distance shorter than the truth, and the rim then reaches further
+// out than it should. Measured against the exact distance on the real glyphs,
+// four segments were off by up to 0.15 of a pixel of coverage at the tight
+// curves of n - the arch where it meets the stems - and dropped to 0.034 at
+// eight. Straight edges are exact either way, which is why T, M and N measured
+// at zero and only the rounded letters showed it.
 float CurveDistance(float2 p, float2 p0, float2 p1, float2 p2) {
-    float2 a = p0;
-    float2 b = (p0 * 0.5625 + p1 * 0.375 + p2 * 0.0625);
-    float2 c = (p0 * 0.25 + p1 * 0.5 + p2 * 0.25);
-    float2 d = (p0 * 0.0625 + p1 * 0.375 + p2 * 0.5625);
-    float2 e = p2;
+    float2 a = p0 - 2.0 * p1 + p2;
+    float2 b = 2.0 * (p1 - p0);
+    float2 previous = p0;
+    float dist = 1e9;
 
-    float dist = SegmentDistance(p, a, b);
-    dist = min(dist, SegmentDistance(p, b, c));
-    dist = min(dist, SegmentDistance(p, c, d));
-    dist = min(dist, SegmentDistance(p, d, e));
+    [unroll]
+    for (int k = 1; k <= 8; k++) {
+        float t = float(k) * 0.125;
+        float2 current = a * (t * t) + b * t + p0;
+
+        dist = min(dist, SegmentDistance(p, previous, current));
+        previous = current;
+    }
 
     return dist;
 }

@@ -27,7 +27,7 @@ header.append('// Slug text shaders, compiled from Shaders/*.hlsl with fxc (/O3)
 header.append('//')
 header.append('// Pixel shader: 456 slots: per-curve y range cull and four scanline slices.')
 header.append('// Vertex shader: 8 slots, project and pass TEXCOORD0/TEXCOORD1/COLOR0 through.')
-header.append('// Rim shader: 245 slots, signed distance to the outline for the rim pass.')
+header.append('// Rim shader: 354 slots, signed distance to the outline for the rim pass.')
 header.append('')
 header.append(dump('FontSlug.ps', 'g_gxuFontSlugPixelShader', None,
                    '// FontSlug.ps'))
