@@ -3,8 +3,6 @@
 
 #include <cstdint>
 
-// Generated from Engine/Source/Gxu/Shaders/FontSlug.hlsl
-
 static const uint32_t g_gxuFontSlugPixelShader[] = {
     0xFFFF0300u, 0x002CFFFEu, 0x42415443u, 0x0000001Cu,
     0x00000083u, 0xFFFF0300u, 0x00000002u, 0x0000001Cu,
