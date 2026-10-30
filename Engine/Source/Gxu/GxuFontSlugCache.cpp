@@ -10,6 +10,7 @@
 #include "Engine/Source/Gx/CGxDevice/CGxShader.h"
 #include "Engine/Source/Gx/CGxVertexPCT.h"
 #include "Engine/Source/Services/Texture.h"
+#include "Engine/Source/Storm/H/storm.h"
 
 namespace {
 
@@ -67,12 +68,14 @@ CGxShader* GetSlugShader() {
     shader->m_loaded = 0;
 
     if (!shader->Valid()) {
-        printf("[Slug] pixel shader FAILED to create\n");
+        DebugLog("[Slug] pixel shader FAILED to create");
+        fflush(stdout);
         delete shader;
         return nullptr;
     }
 
-    printf("[Slug] pixel shader active (ps_3_0)\n");
+    DebugLog("[Slug] pixel shader active (ps_3_0)");
+        fflush(stdout);
 
     s_slugShader = shader;
 
@@ -116,7 +119,8 @@ bool GxuFontSlugDebugBuild(FT_Face face, uint32_t code, uint32_t pixelSize) {
     s_slugGxTex = TextureGetGxTex(s_slugTexture, 1, nullptr);
 
     if (!s_slugGxTex) {
-        printf("[Slug] curve texture failed to resolve\n");
+        DebugLog("[Slug] curve texture failed to resolve");
+        fflush(stdout);
         return false;
     }
 
@@ -124,9 +128,10 @@ bool GxuFontSlugDebugBuild(FT_Face face, uint32_t code, uint32_t pixelSize) {
 
     s_slugReady = true;
 
-    printf("[Slug] glyph %c: %u curves, %u texels, bounds %.3f..%.3f / %.3f..%.3f\n",
+    DebugLog("[Slug] glyph %c curves=%u texels=%u bounds x %.3f..%.3f y %.3f..%.3f",
         static_cast<char>(code), s_slugCurveCount, texels,
         s_slugMinX, s_slugMaxX, s_slugMinY, s_slugMaxY);
+    fflush(stdout);
 
     return true;
 }
@@ -173,6 +178,14 @@ void GxuFontSlugDebugDraw(FT_Face face, uint32_t pixelSize) {
 
     if (!shader || !s_slugGxTex) {
         return;
+    }
+
+    static bool s_loggedDraw = false;
+
+    if (!s_loggedDraw) {
+        s_loggedDraw = true;
+        DebugLog("[Slug] probe draw reached, quad 60,60 - 280,280");
+        fflush(stdout);
     }
 
     // RenderBatch runs many times per frame; draw the probe on a rough fraction of
