@@ -489,6 +489,12 @@ void BATCHEDRENDERFONTDESC::RenderBatch() {
 
     CGxShader* sdfShader = GxuGetFontSdfShader();
 
+    // fontFlags bit 0 = outlined, bit 3 = thick outline (two texels instead of
+    // one). Both text paths need this: the distance field grows the rim from the
+    // field, the Slug path rebuilds a distance from the coverage gradient.
+    const uint32_t fontFlags = this->m_face->m_fontFlags;
+    const float outlineWidth = (fontFlags & 1) ? ((fontFlags & 8) ? 2.0f : 1.0f) : 0.0f;
+
     if (!slugFace && sdfShader) {
         GxRsSet(GxRs_PixelShader, sdfShader);
 
@@ -499,12 +505,6 @@ void BATCHEDRENDERFONTDESC::RenderBatch() {
         float atlasSize[4] = { ONEOVERTEXSIZE, ONEOVERTEXSIZE, 256.0f, 256.0f };
         GxShaderConstantsSet(GxSh_Pixel, 0, atlasSize, 1);
 
-        // c1 = (outline width in texels, outline alpha). The distance field holds
-        // the glyph body only, so the rim has to be expanded here. fontFlags bit
-        // 0 = outlined, bit 3 = thick outline (two texels instead of one).
-        const uint32_t fontFlags = this->m_face->m_fontFlags;
-        const float outlineWidth = (fontFlags & 1) ? ((fontFlags & 8) ? 2.0f : 1.0f) : 0.0f;
-
         // Small text needs a wider ramp to hide the quantised edge on diagonals;
         // large text reads as soft with the same ramp, so it gets a tighter one.
         // Each font face has its own raster size, so this is decided per batch.
@@ -514,6 +514,12 @@ void BATCHEDRENDERFONTDESC::RenderBatch() {
             : GxuFontSdfSharpnessLarge();
 
         float outlineParams[4] = { outlineWidth, 0.47f, 0.0f, sharpness };
+        float outlineColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+
+        GxShaderConstantsSet(GxSh_Pixel, 1, outlineParams, 1);
+        GxShaderConstantsSet(GxSh_Pixel, 2, outlineColor, 1);
+    } else if (slugFace) {
+        float outlineParams[4] = { outlineWidth, 0.0f, 0.0f, 0.0f };
         float outlineColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
         GxShaderConstantsSet(GxSh_Pixel, 1, outlineParams, 1);
