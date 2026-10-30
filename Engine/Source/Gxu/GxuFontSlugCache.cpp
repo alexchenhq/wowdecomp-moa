@@ -338,15 +338,38 @@ void GxuFontSlugPageConstants(float* out) {
     out[3] = 0.0f;
 }
 
-bool GxuFontSlugFaceEnabled(const CGxFont* face) {
-#if !GXU_FONT_SLUG_TEXT
-    (void)face;
-    return false;
-#else
-    if (!face) {
-        return false;
+#if GXU_FONT_SLUG_TEXT
+
+namespace {
+
+// One line per face, the first time text from it is laid out: which file, what
+// flags, what raster size, and whether Slug took it. Answering "why is this
+// text not going through Slug" by reasoning about the client's data is hopeless
+// (the font objects live in the MPQs), and this costs a pointer scan.
+void LogFaceOnce(const CGxFont* face, bool accepted) {
+    static const CGxFont* s_seen[64];
+    static uint32_t s_seenCount = 0;
+
+    for (uint32_t i = 0; i < s_seenCount; i++) {
+        if (s_seen[i] == face) {
+            return;
+        }
     }
 
+    if (s_seenCount >= 64) {
+        return;
+    }
+
+    s_seen[s_seenCount++] = face;
+
+    CGxFont* mutableFace = const_cast<CGxFont*>(face);
+
+    SlugLog("[Slug] face '%s' flags=0x%X px=%u -> %s",
+        mutableFace->GetName(), face->m_fontFlags,
+        mutableFace->GetPixelSize(), accepted ? "slug" : "sdf");
+}
+
+bool FaceMatchesSlugConfig(const CGxFont* face) {
     // Outlined faces stay on the distance field on purpose. A rim needs distances
     // of one to two pixels, but coverage only carries distance inside half a
     // pixel: past that it saturates and the gradient dies, so anything rebuilt
@@ -380,6 +403,25 @@ bool GxuFontSlugFaceEnabled(const CGxFont* face) {
     }
 
     return *name == 0 && *wanted == 0;
+}
+
+} // namespace
+
+#endif
+
+bool GxuFontSlugFaceEnabled(const CGxFont* face) {
+#if !GXU_FONT_SLUG_TEXT
+    (void)face;
+    return false;
+#else
+    if (!face) {
+        return false;
+    }
+
+    const bool accepted = FaceMatchesSlugConfig(face);
+    LogFaceOnce(face, accepted);
+
+    return accepted;
 #endif
 }
 
