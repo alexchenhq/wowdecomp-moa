@@ -265,7 +265,9 @@ bool GxuFontSlugReady() {
 
 void GxuFontSlugDebugDraw(FT_Face face, uint32_t pixelSize) {
     // The target glyph is fixed for now; switching it later is just a parameter.
-    if (!GxuFontSlugDebugBuild(face, '8', pixelSize)) {
+    // R is asymmetric both ways, so it shows at a glance whether the em mapping
+    // flips or mirrors the glyph.
+    if (!GxuFontSlugDebugBuild(face, 'R', pixelSize)) {
         return;
     }
 
