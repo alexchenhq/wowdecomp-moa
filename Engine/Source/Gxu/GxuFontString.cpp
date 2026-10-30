@@ -530,10 +530,22 @@ void CGxString::InitializeTextLine(const char* text, uint32_t numBytes, CImVecto
                         // pixel or two. The baseline must not move with the flag.
                         const float baseline = pos.y + fontPixelHeight - this->m_currentFace->m_baseline * scale;
 
-                        const float leftEm = slug.m_minX;
-                        const float rightEm = slug.m_maxX;
-                        const float bottomEm = slug.m_minY;
-                        const float topEm = slug.m_maxY;
+                        // A rim grows outside the glyph, so the quad has to leave
+                        // room for it or the top and bottom of every letter gets cut
+                        // off flush with the glyph box. The em coordinates grow with
+                        // the quad, so the distance stays correct out there.
+                        float padEm = 0.0f;
+
+                        if (GxuFontSlugRimEnabled(this->m_currentFace)) {
+                            const uint32_t faceFlags = this->m_currentFace->m_fontFlags;
+                            const float outlineWidth = (faceFlags & 8) ? 2.0f : 1.0f;
+                            padEm = outlineWidth / emToPixel;
+                        }
+
+                        const float leftEm = slug.m_minX - padEm;
+                        const float rightEm = slug.m_maxX + padEm;
+                        const float bottomEm = slug.m_minY - padEm;
+                        const float topEm = slug.m_maxY + padEm;
 
                         const float left = pos.x + leftEm * emToPixel;
                         const float right = pos.x + rightEm * emToPixel;
