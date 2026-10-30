@@ -50,29 +50,33 @@ float4 main(float2 em : TEXCOORD0, float4 color : COLOR0) : COLOR0 {
         float c = p0.y - em.y;
 
         if (abs(a) < 1e-6) {
+            // Degenerate quadratic: a straight edge.
             if (abs(b) > 1e-6) {
                 float t = -c / b;
 
-                if (t >= 0.0 && t <= 1.0 && CurveX(p0, p1, p2, t) > em.x) {
+                if (t >= 0.0 && t < 1.0 && CurveX(p0, p1, p2, t) > em.x) {
                     winding += CurveWinding(p0, p1, p2, t);
                 }
             }
         } else {
             float disc = b * b - 4.0 * a * c;
 
-            if (disc >= 0.0) {
+            // Root eligibility, the part of Slug that is easy to get wrong: a
+            // tangent touch (disc near zero) must contribute nothing, and shared
+            // endpoints between neighbouring curves must be counted exactly once,
+            // hence the half open interval [0, 1).
+            if (disc > 1e-6) {
                 float sq = sqrt(disc);
                 float inv2a = 0.5 / a;
 
                 float r0 = (-b + sq) * inv2a;
                 float r1 = (-b - sq) * inv2a;
 
-                // Both roots count: an S shaped segment crosses the ray twice.
-                if (r0 >= 0.0 && r0 <= 1.0 && CurveX(p0, p1, p2, r0) > em.x) {
+                if (r0 >= 0.0 && r0 < 1.0 && CurveX(p0, p1, p2, r0) > em.x) {
                     winding += CurveWinding(p0, p1, p2, r0);
                 }
 
-                if (r1 >= 0.0 && r1 <= 1.0 && CurveX(p0, p1, p2, r1) > em.x) {
+                if (r1 >= 0.0 && r1 < 1.0 && CurveX(p0, p1, p2, r1) > em.x) {
                     winding += CurveWinding(p0, p1, p2, r1);
                 }
             }

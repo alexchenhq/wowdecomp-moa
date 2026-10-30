@@ -190,7 +190,7 @@ bool GxuFontSlugDebugBuild(FT_Face face, uint32_t code, uint32_t pixelSize) {
 
     s_slugReady = true;
 
-    for (uint32_t k = 0; k < 3 && k < s_slugCurveCount; k++) {
+    for (uint32_t k = 0; k < s_slugCurveCount; k++) {
         const SLUGCURVE& c = glyph.m_curves[k];
         SlugLog("[Slug] curve %u: p0(%.3f,%.3f) p1(%.3f,%.3f) p2(%.3f,%.3f)",
             k, c.m_p0[0], c.m_p0[1], c.m_p1[0], c.m_p1[1], c.m_p2[0], c.m_p2[1]);
