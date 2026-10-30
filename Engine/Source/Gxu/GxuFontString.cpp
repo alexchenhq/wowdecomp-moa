@@ -34,18 +34,7 @@ void CGxString::WriteGeometry(CGxFontVertex* buf, int32_t texturePage, int32_t v
         return;
     }
 
-    bool hasShadow = (this->m_flags & 1) != 0;
-
-#if GXU_FONT_SLUG_TEXT && GXU_FONT_SLUG_RIM
-    // The rim line must not take the shadow copy. A shadowed string holds two
-    // quads per glyph, and shading both as rim draws the rim twice, one of them
-    // offset by the shadow - two thin rings a couple of pixels apart, which reads
-    // as a shredded outline. The shadow itself is still drawn, by the body line,
-    // which shades it in the shadow colour as before.
-    if (texturePage == static_cast<int32_t>(GxuFontSlugRimPage())) {
-        hasShadow = false;
-    }
-#endif
+    const bool hasShadow = (this->m_flags & 1) != 0;
 
     textLine->WriteGeometry(buf, this->m_fontColor, this->m_shadowOffset, this->m_shadowColor, this->m_viewTranslation, hasShadow, (this->m_flags >> 5) & 1, vertIndex, numVerts);
 }
@@ -157,14 +146,6 @@ void CGxString::InitializeViewTranslation() {
 // VERIFY: 4d328ee6 auto
 // OFFSET: 0x006C63E0
 int32_t CGxString::CalculateVertsNeeded(int32_t texturePage) {
-#if GXU_FONT_SLUG_TEXT && GXU_FONT_SLUG_RIM
-    // The rim line carries one quad per glyph, never a shadow copy: see
-    // WriteGeometry below for why.
-    if (texturePage == static_cast<int32_t>(GxuFontSlugRimPage())) {
-        return this->m_textLines[texturePage]->m_verts.m_count;
-    }
-#endif
-
     if (this->m_flags & 1) {
         return 2 * this->m_textLines[texturePage]->m_verts.m_count;
     }
@@ -590,60 +571,7 @@ void CGxString::InitializeTextLine(const char* text, uint32_t numBytes, CImVecto
                         verts[2].m_tc.y = bottomEm;
                         verts[3].m_tc.y = topEm;
 
-#if GXU_FONT_SLUG_RIM
-                        // Rim: the same quad grown by the outline width, in its own
-                        // line so the body line and its shader stay untouched. The
-                        // em coordinates grow with it, which is what lets the rim
-                        // shader find a negative distance out there.
-                        //
-                        // Shadowed strings take it too. They were excluded while the
-                        // rim was misreading curves by a stride and the shadow copy
-                        // was landing in the rim line; both are fixed, and the
-                        // exclusion only made those lines look like they had lost
-                        // their outline.
-                        if (GxuFontSlugRimEnabled(this->m_currentFace)) {
-                            const uint32_t faceFlags = this->m_currentFace->m_fontFlags;
-                            const float outlineWidth = (faceFlags & 8) ? 2.0f : 1.0f;
-                            const float padEm = outlineWidth / emToPixel;
 
-                            const uint32_t rimPage = GxuFontSlugRimPage();
-
-                            if (!this->m_textLines[rimPage]) {
-                                this->m_textLines[rimPage] = TEXTLINETEXTURE::NewTextLineTexture();
-                            }
-
-                            TEXTLINETEXTURE* rimLine = this->m_textLines[rimPage];
-                            *texturePagesUsed |= 1 << rimPage;
-
-                            const float rimLeft = left - outlineWidth;
-                            const float rimRight = right + outlineWidth;
-                            const float rimBottom = bottom - outlineWidth;
-                            const float rimTop = top + outlineWidth;
-
-                            uint32_t rimIndex = rimLine->m_verts.Add(4, 0, &vert);
-                            VERT* rim = &rimLine->m_verts.m_data[rimIndex];
-
-                            rim[0].m_vc.x = rimLeft;
-                            rim[1].m_vc.x = rimLeft;
-                            rim[2].m_vc.x = rimRight;
-                            rim[3].m_vc.x = rimRight;
-
-                            rim[0].m_vc.y = rimBottom;
-                            rim[1].m_vc.y = rimTop;
-                            rim[2].m_vc.y = rimBottom;
-                            rim[3].m_vc.y = rimTop;
-
-                            rim[0].m_tc.x = leftEm - padEm;
-                            rim[1].m_tc.x = leftEm - padEm;
-                            rim[2].m_tc.x = rightEm + padEm;
-                            rim[3].m_tc.x = rightEm + padEm;
-
-                            rim[0].m_tc.y = bottomEm - padEm;
-                            rim[1].m_tc.y = topEm + padEm;
-                            rim[2].m_tc.y = bottomEm - padEm;
-                            rim[3].m_tc.y = topEm + padEm;
-                        }
-#endif
 
                         lastCode = wide;
                         break;
