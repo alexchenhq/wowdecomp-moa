@@ -45,6 +45,13 @@ float4 main(float2 em : TEXCOORD0, float4 color : COLOR0) : COLOR0 {
         float2 p1 = tex2Dlod(CurveTex, float4((texel + 1.5) * invWidth, rowV, 0.0, 0.0)).xy;
         float2 p2 = tex2Dlod(CurveTex, float4((texel + 2.5) * invWidth, rowV, 0.0, 0.0)).xy;
 
+#if SLUG_SHOW_CURVE
+        if (i == 0) {
+            // R = p0.x, G = p0.y, B = p1.x. CPU reports p0(0.285, 0.724) p1.x 0.379.
+            return float4(p0.x, p0.y, p1.x, 1.0);
+        }
+#endif
+
         float a = p0.y - 2.0 * p1.y + p2.y;
         float b = 2.0 * (p1.y - p0.y);
         float c = p0.y - em.y;
