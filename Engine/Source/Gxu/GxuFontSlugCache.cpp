@@ -73,6 +73,24 @@ void SlugTextureCallback(EGxTexCommand command, uint32_t width, uint32_t height,
         s_slugCurveData[2], s_slugCurveData[3]);
 }
 
+// Control texture in a format the device definitely accepts, to tell a missing
+// upload path apart from an unsupported format.
+uint32_t s_probe8888[256 * 256];
+
+void Slug8888Callback(EGxTexCommand command, uint32_t width, uint32_t height,
+                      uint32_t face, uint32_t level, void* userArg,
+                      uint32_t& texelStrideInBytes, const void*& texels) {
+    SlugLog("[Slug] 8888 callback cmd=%d", command);
+
+    if (command != GxTex_Latch) {
+        return;
+    }
+
+    s_probe8888[0] = 0xFFFFFFFF;
+    texelStrideInBytes = width * 4;
+    texels = s_probe8888;
+}
+
 CTexture* CreateSlugTexture() {
     CGxTexFlags flags(GxTex_Linear, 0, 0, 0, 0, 0, 1, 0, 0, 0);
 
@@ -143,6 +161,24 @@ bool GxuFontSlugDebugBuild(FT_Face face, uint32_t code, uint32_t pixelSize) {
     // atlas does exactly this through UpdateDirty.
     s_slugGxTex = TextureGetGxTex(s_slugTexture, 1, nullptr);
     SlugLog("[Slug] resolve -> %p", static_cast<void*>(s_slugGxTex));
+
+    // Control: same call chain, known-good format.
+    {
+        CGxTexFlags controlFlags(GxTex_Linear, 0, 0, 0, 0, 0, 1, 0, 0, 0);
+        CTexture* control = TextureCreate(256, 256, GxTex_Argb8888, GxTex_Argb8888,
+            controlFlags, nullptr, Slug8888Callback, "GxuFontSlugCtl", 0);
+        SlugLog("[Slug] control create -> %p", static_cast<void*>(control));
+
+        if (control) {
+            CGxTex* controlTex = TextureGetGxTex(control, 1, nullptr);
+            SlugLog("[Slug] control resolve -> %p", static_cast<void*>(controlTex));
+
+            if (controlTex) {
+                GxTexUpdate(controlTex, 0, 0, 256, 256, 1);
+                SlugLog("[Slug] control update issued");
+            }
+        }
+    }
 
     if (!s_slugGxTex) {
         SlugLog("[Slug] curve texture failed to resolve");
