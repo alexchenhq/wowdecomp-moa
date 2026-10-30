@@ -30,6 +30,12 @@ struct SLUGGLYPHINFO {
 // Packs the glyph if needed and returns where its curves live.
 bool GxuFontSlugGetGlyph(FT_Face face, uint32_t code, uint32_t pixelSize, SLUGGLYPHINFO* out);
 
+// Called when a face that uses Slug could not get a glyph out of its outline
+// (spaces have none). Logged once per face, because the glyph then falls back to
+// an atlas quad and is invisible on a Slug face - a character going missing with
+// no trace is the one failure mode that cannot be diagnosed from outside.
+void GxuFontSlugNoteGlyphFailure(const CGxFont* face, uint32_t code);
+
 // Texture holding the curves (wrapper and the device texture the state wants).
 CTexture* GxuFontSlugTexture();
 CGxTex* GxuFontSlugDeviceTexture();

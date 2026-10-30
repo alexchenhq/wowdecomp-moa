@@ -379,6 +379,9 @@ bool FaceMatchesSlugConfig(const CGxFont* face) {
         return false;
     }
 
+#if GXU_FONT_SLUG_ALL_FACES
+    return true;
+#else
     // GetName is a plain accessor that predates this work; it is not const only
     // because the decompiled class never needed it to be.
     const char* name = const_cast<CGxFont*>(face)->GetName();
@@ -403,6 +406,7 @@ bool FaceMatchesSlugConfig(const CGxFont* face) {
     }
 
     return *name == 0 && *wanted == 0;
+#endif
 }
 
 } // namespace
@@ -422,6 +426,35 @@ bool GxuFontSlugFaceEnabled(const CGxFont* face) {
     LogFaceOnce(face, accepted);
 
     return accepted;
+#endif
+}
+
+void GxuFontSlugNoteGlyphFailure(const CGxFont* face, uint32_t code) {
+#if !GXU_FONT_SLUG_TEXT
+    (void)face;
+    (void)code;
+#else
+    if (!face) {
+        return;
+    }
+
+    static const CGxFont* s_warned[32];
+    static uint32_t s_warnedCount = 0;
+
+    for (uint32_t i = 0; i < s_warnedCount; i++) {
+        if (s_warned[i] == face) {
+            return;
+        }
+    }
+
+    if (s_warnedCount >= 32) {
+        return;
+    }
+
+    s_warned[s_warnedCount++] = face;
+
+    SlugLog("[Slug] face '%s' glyph U+%04X has no outline, left on the atlas (blank on a slug face)",
+        const_cast<CGxFont*>(face)->GetName(), code);
 #endif
 }
 

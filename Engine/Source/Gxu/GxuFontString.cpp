@@ -469,6 +469,8 @@ void CGxString::InitializeTextLine(const char* text, uint32_t numBytes, CImVecto
                         if (GxuFontSlugGetGlyph(face, wide, this->m_currentFace->GetPixelSize(), &slug)) {
                             texturePage = 0;
                             slugGlyph = true;
+                        } else {
+                            GxuFontSlugNoteGlyphFailure(this->m_currentFace, wide);
                         }
                     }
 #endif
