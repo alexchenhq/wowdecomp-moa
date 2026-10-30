@@ -1,10 +1,14 @@
 // Analytic glyph coverage from quadratic Bezier outlines (Slug idea; reference
 // shaders by Eric Lengyel, MIT licence, patent dedicated to the public domain).
 //
-// Layout: one curve per three texels of a Gr1616F page, (p0.xy) (p1.xy) (p2.xy),
-// em space with y up. Coverage comes from casting a horizontal ray per pixel,
-// accumulating a signed winding number, and turning those crossings into partial
-// coverage so edges fade instead of stepping.
+// Layout: one curve per four texels of a Gr1616F page, (p0.xy) (p1.xy) (p2.xy)
+// (minY, maxY), em space with y up. Coverage comes from casting a horizontal ray
+// per pixel, accumulating a signed winding number, and turning those crossings
+// into partial coverage so edges fade instead of stepping.
+//
+// Where the glyph lives used to arrive in c0, which meant one draw per glyph.
+// The base texel and the curve count now come from the vertex (TEXCOORD1), so a
+// whole string can be drawn in one batch; only the page size stays constant.
 //
 // ps_3_0 constraints, learned the hard way:
 //   - tex2Dlod is mandatory. tex2D needs gradients, gradients cannot live in a
@@ -15,8 +19,8 @@
 
 sampler2D CurveTex : register(s0);
 
-// (firstCurveTexel, curveCount, 1/texWidth, 1/texHeight)
-float4 SlugParams : register(c0);
+// (1/texWidth, 1/texHeight)
+float4 SlugPage : register(c0);
 
 float CurveX(float2 p0, float2 p1, float2 p2, float t) {
     float mt = 1.0 - t;
@@ -71,11 +75,27 @@ float SliceAcc(float2 p0, float2 p1, float2 p2, float px, float py, float invHal
     return acc;
 }
 
-float4 main(float2 em : TEXCOORD0, float4 color : COLOR0) : COLOR0 {
-    float base = SlugParams.x;
-    float count = SlugParams.y;
-    float invWidth = SlugParams.z;
-    float rowV = 0.5 * SlugParams.w;
+// Curve texel index -> texcoord on the page.
+//
+// The curves are packed as one linear run of texels, so the index has to be
+// folded back into (column, row) here: past one row the raw index is longer than
+// a row and the fetch would land on whatever wraps around. A curve whose four
+// texels straddle a row boundary still addresses correctly because every texel
+// goes through this.
+float2 CurveUV(float texel, float invWidth, float invHeight) {
+    float t = texel * invWidth;
+    float row = floor(t);
+
+    return float2(t - row + 0.5 * invWidth, row * invHeight + 0.5 * invHeight);
+}
+
+float4 main(float2 em : TEXCOORD0, float2 slug : TEXCOORD1, float4 color : COLOR0) : COLOR0 {
+    // Per glyph, straight from the vertex: where its curves start and how many.
+    float base = slug.x;
+    float count = slug.y;
+
+    float invWidth = SlugPage.x;
+    float invHeight = SlugPage.y;
 
     // Pixel footprint in em units, taken once outside the loop.
     float pxSize = max(length(ddx(em)), length(ddy(em)));
@@ -98,14 +118,14 @@ float4 main(float2 em : TEXCOORD0, float4 color : COLOR0) : COLOR0 {
 
         // Four texels per curve; the fourth is the segment's vertical extent.
         float texel = base + float(i) * 4.0;
-        float2 span = tex2Dlod(CurveTex, float4((texel + 3.5) * invWidth, rowV, 0.0, 0.0)).xy;
+        float2 span = tex2Dlod(CurveTex, float4(CurveUV(texel + 3.0, invWidth, invHeight), 0.0, 0.0)).xy;
 
         // Cull by y range first: one fetch instead of three plus the root solve.
         // Most segments are nowhere near any given pixel.
         if (py0 <= span.y && py3 >= span.x) {
-            float2 p0 = tex2Dlod(CurveTex, float4((texel + 0.5) * invWidth, rowV, 0.0, 0.0)).xy;
-            float2 p1 = tex2Dlod(CurveTex, float4((texel + 1.5) * invWidth, rowV, 0.0, 0.0)).xy;
-            float2 p2 = tex2Dlod(CurveTex, float4((texel + 2.5) * invWidth, rowV, 0.0, 0.0)).xy;
+            float2 p0 = tex2Dlod(CurveTex, float4(CurveUV(texel + 0.0, invWidth, invHeight), 0.0, 0.0)).xy;
+            float2 p1 = tex2Dlod(CurveTex, float4(CurveUV(texel + 1.0, invWidth, invHeight), 0.0, 0.0)).xy;
+            float2 p2 = tex2Dlod(CurveTex, float4(CurveUV(texel + 2.0, invWidth, invHeight), 0.0, 0.0)).xy;
 
             acc += SliceAcc(p0, p1, p2, em.x, py0, invHalfPixel);
             acc += SliceAcc(p0, p1, p2, em.x, py1, invHalfPixel);

@@ -4,8 +4,10 @@
 #include "Engine/Source/Gxu/GxuFontString.h"
 #include "Engine/Source/Gxu/GxuFontFont.h"
 #include "Engine/Source/Gxu/GxuFont.h"
+#include "Engine/Source/Gxu/GxuFontFace.h"
 #include "Engine/Source/Gxu/GxuFontUtil.h"
 #include "Engine/Source/Gxu/GxuFontMiscClasses.h"
+#include "Engine/Source/Gxu/GxuFontSlugCache.h"
 #include "Engine/Source/Storm/H/storm.h"
 #include "Engine/Source/Tempest/CRect.h"
 
@@ -25,7 +27,7 @@ void CGxString::TexturePageEvicted(uint32_t texturePage) {
 
 // VERIFY: 491c16e5 manual
 // OFFSET: 0x006C5E90
-void CGxString::WriteGeometry(CGxVertexPCT* buf, int32_t texturePage, int32_t vertIndex, int32_t numVerts) const {
+void CGxString::WriteGeometry(CGxFontVertex* buf, int32_t texturePage, int32_t vertIndex, int32_t numVerts) const {
     TEXTLINETEXTURE* textLine = this->m_textLines[texturePage];
 
     if (textLine) {
@@ -452,6 +454,25 @@ void CGxString::InitializeTextLine(const char* text, uint32_t numBytes, CImVecto
                     }
 
                     uint32_t texturePage = desc->m_textureNumber;
+
+#if GXU_FONT_SLUG_TEXT
+                    // Slug glyphs carry their outline instead of an atlas cell, so
+                    // they all live on one line: there is no page to split them
+                    // across. A glyph the outline path cannot take keeps its atlas
+                    // page and is drawn by the distance field as usual.
+                    SLUGGLYPHINFO slug;
+                    bool slugGlyph = false;
+
+                    if (GxuFontSlugFaceEnabled(this->m_currentFace)) {
+                        FT_Face face = FontFaceGetFace(this->m_currentFace->m_fontFaceHandle);
+
+                        if (GxuFontSlugGetGlyph(face, wide, this->m_currentFace->GetPixelSize(), &slug)) {
+                            texturePage = 0;
+                            slugGlyph = true;
+                        }
+                    }
+#endif
+
                     *texturePagesUsed |= 1 << texturePage;
 
                     if (!this->m_textLines[texturePage]) {
@@ -486,12 +507,74 @@ void CGxString::InitializeTextLine(const char* text, uint32_t numBytes, CImVecto
 
                     pos.x = x + pos.x;
 
+#if GXU_FONT_SLUG_TEXT
+                    if (slugGlyph) {
+                        // The quad is the glyph's own bounding box in em space,
+                        // laid out from the baseline. em * pixelHeight is what
+                        // turns em units into screen pixels, the same factor the
+                        // atlas path gets from scale for the cell.
+                        //
+                        // The baseline sits inside the cell exactly as the atlas
+                        // path puts it: cellHeight above pos.y, less the face's
+                        // baseline. Taking pos.y directly would lift every glyph by
+                        // the descent.
+                        const float emToPixel = fontPixelHeight;
+                        const float baseline = pos.y + cellHeight - this->m_currentFace->m_baseline * scale;
+                        const float left = pos.x + slug.m_minX * emToPixel;
+                        const float right = pos.x + slug.m_maxX * emToPixel;
+                        const float bottom = baseline + slug.m_minY * emToPixel;
+                        const float top = baseline + slug.m_maxY * emToPixel;
+
+                        VERT vert;
+                        vert.m_vc.z = pos.z;
+                        vert.m_tc2.x = static_cast<float>(slug.m_baseTexel);
+                        vert.m_tc2.y = static_cast<float>(slug.m_curveCount);
+
+                        uint32_t vertIndex = textLine->m_verts.Add(4, 0, &vert);
+                        VERT* verts = &textLine->m_verts.m_data[vertIndex];
+
+                        // Corner order matches the atlas quad, because the shared
+                        // index buffer assumes 0 and 2 are the bottom pair and 1
+                        // and 3 the top one.
+                        verts[0].m_vc.x = left;
+                        verts[1].m_vc.x = left;
+                        verts[2].m_vc.x = right;
+                        verts[3].m_vc.x = right;
+
+                        verts[0].m_vc.y = bottom;
+                        verts[1].m_vc.y = top;
+                        verts[2].m_vc.y = bottom;
+                        verts[3].m_vc.y = top;
+
+                        verts[0].m_tc.x = slug.m_minX;
+                        verts[1].m_tc.x = slug.m_minX;
+                        verts[2].m_tc.x = slug.m_maxX;
+                        verts[3].m_tc.x = slug.m_maxX;
+
+                        verts[0].m_tc.y = slug.m_minY;
+                        verts[1].m_tc.y = slug.m_maxY;
+                        verts[2].m_tc.y = slug.m_minY;
+                        verts[3].m_tc.y = slug.m_maxY;
+
+                        lastCode = wide;
+                        break;
+                    }
+#endif
+
                     VERT vert;
                     vert.m_vc.x = pos.x;
                     vert.m_vc.y = pos.y;
                     vert.m_vc.z = pos.z;
                     vert.m_tc.x = 0.0f;
                     vert.m_tc.y = 0.0f;
+#if GXU_FONT_SLUG_TEXT
+                    // An atlas quad has no curves. Zeroing the count keeps the Slug
+                    // shader from walking whatever happened to be in the struct,
+                    // which is what a glyph without an outline (space, a bitmap
+                    // only face) ends up as on a face that otherwise uses Slug.
+                    vert.m_tc2.x = 0.0f;
+                    vert.m_tc2.y = 0.0f;
+#endif
                     vert.m_vc.x = this->m_currentFace->GetGlyphBearing(desc, (flags >> 7) & 1, this->m_currentFontHeight) + pos.x;
 
                     float width = desc->m_bitmapData.m_glyphCellWidth * scale;

@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <cstdint>
 #include "Engine/Source/Gxu/Types.h"
+#include "Engine/Source/Gxu/GxuFontSlugConfig.h"
 #include "Engine/Source/Storm/H/stpl.h"
 #include "Engine/Source/Tempest/C2Vector.h"
 #include "Engine/Source/Tempest/C3Vector.h"
@@ -14,6 +15,20 @@ class CGxVertexPCT;
 struct CGxFont;
 struct CGxString;
 struct TEXTLINETEXTURE;
+
+// A font batch either carries one texture coordinate or two, never both: the two
+// layouts need different vertex declarations, so the choice is made per build.
+// With Slug enabled the second coordinate holds (curve base texel, curve count)
+// for each glyph, which is what lets a whole string be drawn in one batch.
+#if GXU_FONT_SLUG_TEXT
+#include "Engine/Source/Gx/CGxVertexPCT2.h"
+typedef CGxVertexPCT2 CGxFontVertex;
+#define GXU_FONT_VERTEX_FORMAT GxVBF_PCT2
+#else
+#include "Engine/Source/Gx/CGxVertexPCT.h"
+typedef CGxVertexPCT CGxFontVertex;
+#define GXU_FONT_VERTEX_FORMAT GxVBF_PCT
+#endif
 
 struct GXUEMBEDDEDTEXTUREINFO {
     /* 0000 */ float m_lineHeight;
@@ -103,12 +118,17 @@ struct CGxString : public TSLinkedNode<CGxString> {
     void SetStringPosition(const C3Vector& position);
     void TexturePageEvicted(uint32_t texturePage);
     void Tick();
-    void WriteGeometry(CGxVertexPCT* buf, int32_t texturePage, int32_t vertIndex, int32_t numVerts) const;
+    void WriteGeometry(CGxFontVertex* buf, int32_t texturePage, int32_t vertIndex, int32_t numVerts) const;
 };
 
 struct VERT {
     /* 0000 */ C3Vector m_vc;
     /* 000C */ C2Vector m_tc;
+#if GXU_FONT_SLUG_TEXT
+    // Slug only: (curve base texel, curve count) for this glyph. Copied into the
+    // second texture coordinate of every vertex of the quad.
+    /* NEW */ C2Vector m_tc2;
+#endif
 };
 
 #endif
