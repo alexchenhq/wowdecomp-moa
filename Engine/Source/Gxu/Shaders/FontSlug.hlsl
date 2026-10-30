@@ -12,15 +12,26 @@
 
 sampler2D CurveTex : register(s0);
 
-// (firstCurveTexel, curveCount, 1/texWidth, 0)
+// (firstCurveTexel, curveCount, 1/texWidth, 1/texHeight)
 float4 SlugParams : register(c0);
 
+// Diagnostic switch: 1 makes the probe draw a solid magenta box so the geometry
+// and render state can be verified separately from the coverage math.
+#define SLUG_PROBE_SOLID 0
+
 float4 main(float2 em : TEXCOORD0, float4 color : COLOR0) : COLOR0 {
+#if SLUG_PROBE_SOLID
+    return float4(1.0, 0.0, 1.0, 1.0);
+#endif
     // ps_3_0 has no integer arithmetic or bitwise ops, so everything is float and
     // the parity is recovered with frac(x * 0.5).
     float base = SlugParams.x;
     float count = SlugParams.y;
     float invWidth = SlugParams.z;
+
+    // Curves are packed along row 0, so sample the centre of that row. v = 0.5
+    // would read the middle row of the page, which is unused.
+    float rowV = 0.5 * SlugParams.w;
 
     float crossings = 0.0;
 
@@ -29,8 +40,8 @@ float4 main(float2 em : TEXCOORD0, float4 color : COLOR0) : COLOR0 {
             break;
         }
 
-        float4 texelA = tex2Dlod(CurveTex, float4((base + float(i) * 2.0 + 0.5) * invWidth, 0.5, 0.0, 0.0));
-        float4 texelB = tex2Dlod(CurveTex, float4((base + float(i) * 2.0 + 1.5) * invWidth, 0.5, 0.0, 0.0));
+        float4 texelA = tex2Dlod(CurveTex, float4((base + float(i) * 2.0 + 0.5) * invWidth, rowV, 0.0, 0.0));
+        float4 texelB = tex2Dlod(CurveTex, float4((base + float(i) * 2.0 + 1.5) * invWidth, rowV, 0.0, 0.0));
 
         float2 p0 = texelA.xy;
         float2 p1 = texelA.zw;
