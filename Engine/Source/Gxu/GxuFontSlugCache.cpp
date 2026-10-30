@@ -164,7 +164,7 @@ void GxuFontSlugShaderParams(float* out) {
     out[0] = 0.0f;                                                  // first curve texel
     out[1] = static_cast<float>(s_slugCurveCount);
     out[2] = 1.0f / static_cast<float>(kSlugPageWidth);
-    out[3] = 0.0f;
+    out[3] = 1.0f / static_cast<float>(kSlugPageHeight);
 }
 
 bool GxuFontSlugGlyphBounds(float* minX, float* minY, float* maxX, float* maxY) {

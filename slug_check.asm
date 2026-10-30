@@ -16,63 +16,64 @@
 //
 
     ps_3_0
-    def c1, 0.5, 0, 1, 0
-    def c2, -256, 2, 0.5, 1.5
-    def c3, -9.99999997e-007, 9.99999997e-007, 4, 0
+    def c1, -256, 2, 0.5, 1.5
+    def c2, -9.99999997e-007, 9.99999997e-007, 4, 0
+    def c3, 0.5, 0, 1, 0
     defi i0, 255, 0, 0, 0
     dcl_texcoord v0.xy
     dcl_color v1
     dcl_2d s0
-    mov r0.zw, c1.xyxy
-    mov r1.y, c1.z
-    mov r1.zw, c1.y
+    mov r0.xy, c3
+    mul r0.zw, r0.xyxy, c0.w
+    mov r1.y, c3.z
+    mov r1.zw, c3.y
     rep i0
-      mov r2.x, -c2.x
+      mov r2.x, -c1.x
       break_ge r1.w, r2.x
       if_ge r1.w, c0.y
-        break_ne c1.z, -c1.z
+        break_ne c3.z, -c3.z
       endif
-      mov r2.y, c2.y
+      mov r2.y, c1.y
       mad r2.x, r1.w, r2.y, c0.x
-      add r2.xy, r2.x, c2.zwzw
+      add r2.xy, r2.x, c1.zwzw
       mul r0.xy, r2, c0.z
       texldl r2, r0.xzww, s0
       texldl r3, r0.yzww, s0
-      mad r0.x, r2.w, -c2.y, r2.y
+      mad r0.x, r2.w, -c1.y, r2.y
       add r0.x, r3.y, r0.x
       add r0.y, -r2.y, r2.w
       add r2.w, r0.y, r0.y
       add r2.y, r2.y, -v0.y
-      add r3.y, r0_abs.x, c3.x
-      add r3.z, -r2_abs.w, c3.y
+      add r3.y, r0_abs.x, c2.x
+      add r3.z, -r2_abs.w, c2.y
       rcp r3.w, r2.w
       mul r4.x, -r2.y, r3.w
-      mad r3.w, -r2.y, -r3.w, c1.z
-      cmp r3.w, r3.w, c1.z, c1.y
-      cmp r4.y, r4.x, r3.w, c1.y
-      cmp r3.zw, r3.z, c1.y, r4.xyxy
+      mad r3.w, -r2.y, -r3.w, c3.z
+      cmp r3.w, r3.w, c3.z, c3.y
+      cmp r4.y, r4.x, r3.w, c3.y
+      cmp r3.zw, r3.z, c3.y, r4.xyxy
       mul r2.y, r0.x, r2.y
-      mul r2.y, r2.y, c3.z
+      mul r2.y, r2.y, c2.z
       mad r2.y, r2.w, r2.w, -r2.y
       rsq r2.w, r2.y
       rcp r2.w, r2.w
-      mad r4.x, r0.y, -c2.y, r2.w
+      mad r4.x, r0.y, -c1.y, r2.w
       add r0.x, r0.x, r0.x
       rcp r0.x, r0.x
       mul r4.y, r0.x, r4.x
-      mad r0.y, r0.y, -c2.y, -r2.w
+      mad r0.y, r0.y, -c1.y, -r2.w
       mul r1.x, r0.x, r0.y
-      mad r2.w, r4.x, -r0.x, c1.z
-      cmp r2.w, r2.w, c1.z, c1.y
-      cmp r5.y, r4.y, r2.w, c1.y
-      cmp r5.x, -r5.y, c1.y, r4.y
-      mad r0.x, r0.y, -r0.x, c1.z
-      cmp r0.x, r0.x, -c1.z, -c1.y
-      cmp r0.x, r1.x, r0.x, c1.y
+      mad r2.w, r4.x, -r0.x, c3.z
+      cmp r2.w, r2.w, c3.z, c3.y
+      cmp r5.y, r4.y, r2.w, c3.y
+      cmp r5.x, -r5.y, c3.y, r4.y
+      mad r0.x, r0.y, -r0.x, c3.z
+      cmp r0.x, r0.x, -c3.z, -c3.y
+      cmp r0.x, r1.x, r0.x, c3.y
       cmp r0.xy, r0.x, r5, r1
-      cmp r0.xy, r2.y, r0, c1.y
+      cmp r0.xy, r2.y, r0, c3.y
       cmp r0.xy, r3.y, r0, r3.zwzw
-      add r1.x, -r0.x, c1.z
+      add r1.x, -r0.x, c3.z
       mul r2.y, r1.x, r1.x
       mul r2.x, r2.x, r2.y
       mul r1.x, r0.x, r1.x
@@ -80,14 +81,14 @@
       mul r0.x, r0.x, r0.x
       mad r0.x, r0.x, r3.x, r1.x
       add r0.x, -r0.x, v0.x
-      add r1.x, r1.z, c1.z
+      add r1.x, r1.z, c3.z
       cmp r0.x, r0.x, r1.z, r1.x
       cmp r1.z, -r0.y, r1.z, r0.x
-      add r1.w, r1.w, c1.z
+      add r1.w, r1.w, c3.z
     endrep
-    mul r0.x, r1.z, c1.x
+    mul r0.x, r1.z, c3.x
     frc r0.x, r0.x
-    dp2add oC0.w, r0.x, v1.w, c1.y
+    dp2add oC0.w, r0.x, v1.w, c3.y
     mov oC0.xyz, v1
 
-// approximately 79 instruction slots used (4 texture, 75 arithmetic)
+// approximately 80 instruction slots used (4 texture, 76 arithmetic)
