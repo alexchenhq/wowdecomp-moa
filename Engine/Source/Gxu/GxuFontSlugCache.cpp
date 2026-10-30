@@ -21,6 +21,7 @@ const uint32_t kSlugTexelBytes = 8;      // RGBA16F
 uint16_t s_slugCurveData[kSlugPageWidth * kSlugPageHeight * 4];
 
 CTexture* s_slugTexture = nullptr;
+CGxTex* s_slugGxTex = nullptr;   // resolved device texture, what the state takes
 CGxShader* s_slugShader = nullptr;
 
 uint32_t s_slugCurveCount = 0;
@@ -112,14 +113,14 @@ bool GxuFontSlugDebugBuild(FT_Face face, uint32_t code, uint32_t pixelSize) {
     // The texture only becomes a GPU resource when it is resolved and updated;
     // binding a CTexture that was never latched faults inside the device. The font
     // atlas does exactly this through UpdateDirty.
-    CGxTex* gxTex = TextureGetGxTex(s_slugTexture, 1, nullptr);
+    s_slugGxTex = TextureGetGxTex(s_slugTexture, 1, nullptr);
 
-    if (!gxTex) {
+    if (!s_slugGxTex) {
         printf("[Slug] curve texture failed to resolve\n");
         return false;
     }
 
-    GxTexUpdate(gxTex, 0, 0, kSlugPageWidth, kSlugPageHeight, 1);
+    GxTexUpdate(s_slugGxTex, 0, 0, kSlugPageWidth, kSlugPageHeight, 1);
 
     s_slugReady = true;
 
@@ -170,7 +171,7 @@ void GxuFontSlugDebugDraw(FT_Face face, uint32_t pixelSize) {
 
     CGxShader* shader = GetSlugShader();
 
-    if (!shader || !s_slugTexture) {
+    if (!shader || !s_slugGxTex) {
         return;
     }
 
@@ -184,7 +185,9 @@ void GxuFontSlugDebugDraw(FT_Face face, uint32_t pixelSize) {
 
     g_theGxDevicePtr->RsPush();
     GxRsSet(GxRs_PixelShader, shader);
-    GxRsSet(GxRs_Texture0, s_slugTexture);
+    // The render state takes the resolved CGxTex, not the CTexture wrapper: the
+    // device casts the value straight to CGxTex and reads its flags.
+    GxRsSet(GxRs_Texture0, s_slugGxTex);
 
     float params[4];
     GxuFontSlugShaderParams(params);
