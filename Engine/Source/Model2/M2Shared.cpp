@@ -1642,8 +1642,29 @@ int32_t CM2Shared::LoadSkinProfile(uint32_t profile) {
 
 // INLINED
 uint32_t CM2Shared::GetSkinProfileIndex(uint32_t maxBones) {
-    for (uint32_t i = 0; i < this->m_data->m_numSkinProfiles; i++) {
-        if (s_skinProfileBoneCounts[4 - this->m_data->m_numSkinProfiles + i] <= maxBones) {
+    // MODIFIED: s_skinProfileBoneCounts has exactly four entries and the index
+    // below is computed from m_numSkinProfiles, but that field is a plain scalar
+    // that M2Init never range-checks. Third-party model packs routinely carry a
+    // different value there, and 4 - count + i then lands outside the table, so
+    // the lookup read a wild address and took the client down. Clamp to the range
+    // the table actually covers instead of trusting the header.
+    uint32_t profileCount = this->m_data->m_numSkinProfiles;
+
+    if (profileCount == 0) {
+        profileCount = 1;
+    } else if (profileCount > 4) {
+        profileCount = 4;
+    }
+
+    if (this->m_data->m_numSkinProfiles != profileCount) {
+        DebugLog("Odd skin profile count %u in %s, clamped to %u",
+            this->m_data->m_numSkinProfiles, this->m_fileName, profileCount);
+    }
+
+    for (uint32_t i = 0; i < profileCount; i++) {
+        const uint32_t index = 4 - profileCount + i;
+
+        if (index < 4 && s_skinProfileBoneCounts[index] <= maxBones) {
             return i;
         }
     }
