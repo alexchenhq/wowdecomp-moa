@@ -50,7 +50,7 @@
 // Parked. The pass works, but its rim never matched the distance field closely
 // enough to be worth keeping on, and the body shader is the part that matters.
 #ifndef GXU_FONT_SLUG_RIM
-#define GXU_FONT_SLUG_RIM 1
+#define GXU_FONT_SLUG_RIM 0
 #endif
 #ifndef GXU_FONT_SLUG_FACE
 #define GXU_FONT_SLUG_FACE "Fonts\\FRIZQT__.TTF"
