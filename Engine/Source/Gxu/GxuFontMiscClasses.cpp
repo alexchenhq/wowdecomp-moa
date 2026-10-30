@@ -27,12 +27,12 @@ static CGxShader* s_gxuFontSdfShader = nullptr;
 // MODIFIED: edge sharpness is a taste knob, so it is read from FontSDF.cfg next
 // to the executable instead of being compiled in.
 //    sharpness = 1.35     >1 crisper (can alias), <1 softer
-static float s_fontSdfSharpness = 1.35f;
+static float s_fontSdfSharpness = 1.20f;
 static float s_fontSdfSharpnessSmall = 1.20f;
 static float s_fontSdfSharpnessLarge = 1.50f;
 static float s_fontSdfSharpnessSplit = 32.0f;
-static float s_fontSdfRasterScale = 1.0f;
-static float s_fontSdfMaxRasterSize = 64.0f;
+static float s_fontSdfRasterScale = 0.64f;
+static float s_fontSdfMaxRasterSize = 32.0f;
 static float s_fontSdfRasterScaleAbove = 32.0f;
 static float s_fontSdfHintMaxSize = 20.0f;
 static bool s_fontSdfConfigLoaded = false;
