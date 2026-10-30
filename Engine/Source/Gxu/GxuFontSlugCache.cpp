@@ -251,8 +251,9 @@ void GxuFontSlugDebugDraw(FT_Face face, uint32_t pixelSize) {
 
     if (!s_loggedDraw) {
         s_loggedDraw = true;
-        SlugLog("[Slug] probe reached, screen %ux%u, quad 60,60 - 280,280",
-            g_widthPixels, g_heightPixels);
+        SlugLog("[Slug] probe reached, screen %ux%u, box %.3fx%.3f em",
+            g_widthPixels, g_heightPixels,
+            s_slugMaxX - s_slugMinX, s_slugMaxY - s_slugMinY);
     }
 
     // The latch may only run once the device is ready, so refresh a few times.
@@ -278,11 +279,15 @@ void GxuFontSlugDebugDraw(FT_Face face, uint32_t pixelSize) {
     GxuFontSlugShaderParams(params);
     GxShaderConstantsSet(GxSh_Pixel, 0, params, 1);
 
-    // A fixed screen-space box, in the same pixel space the font batches use.
-    const float x0 = 60.0f;
-    const float y0 = 60.0f;
+    // Keep the quad's aspect equal to the glyph's bounding box, otherwise the em
+    // mapping stretches the shape (an 8 is much taller than it is wide).
+    const float boxWidth = (s_slugMaxX - s_slugMinX) > 1e-4f ? (s_slugMaxX - s_slugMinX) : 1.0f;
+    const float boxHeight = (s_slugMaxY - s_slugMinY) > 1e-4f ? (s_slugMaxY - s_slugMinY) : 1.0f;
+
+    const float x0 = 80.0f;
+    const float y0 = 300.0f;
     const float x1 = x0 + 220.0f;
-    const float y1 = y0 + 220.0f;
+    const float y1 = y0 + 220.0f * (boxHeight / boxWidth);
 
     CGxBuf* buf = GxBufStream(GxPoolTarget_Vertex, sizeof(CGxVertexPCT), 4);
     CGxVertexPCT* verts = reinterpret_cast<CGxVertexPCT*>(GxBufLock(buf));
