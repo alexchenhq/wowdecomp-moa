@@ -521,19 +521,10 @@ void CGxString::InitializeTextLine(const char* text, uint32_t numBytes, CImVecto
                         const float emToPixel = fontPixelHeight;
                         const float baseline = pos.y + cellHeight - this->m_currentFace->m_baseline * scale;
 
-                        // An outline grows outside the glyph, so the quad has to
-                        // leave room for it or the rim is clipped at the quad edge.
-                        // The em coordinates simply extrapolate past the glyph box:
-                        // coverage out there is zero and the distance the shader
-                        // rebuilds from the gradient is negative, which is the rim.
-                        const uint32_t fontFlags = this->m_currentFace->m_fontFlags;
-                        const float outlineWidth = (fontFlags & 1) ? ((fontFlags & 8) ? 2.0f : 1.0f) : 0.0f;
-                        const float padEm = outlineWidth / emToPixel;
-
-                        const float leftEm = slug.m_minX - padEm;
-                        const float rightEm = slug.m_maxX + padEm;
-                        const float bottomEm = slug.m_minY - padEm;
-                        const float topEm = slug.m_maxY + padEm;
+                        const float leftEm = slug.m_minX;
+                        const float rightEm = slug.m_maxX;
+                        const float bottomEm = slug.m_minY;
+                        const float topEm = slug.m_maxY;
 
                         const float left = pos.x + leftEm * emToPixel;
                         const float right = pos.x + rightEm * emToPixel;
