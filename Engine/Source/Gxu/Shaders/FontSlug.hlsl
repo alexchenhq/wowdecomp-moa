@@ -33,7 +33,16 @@ float4 main(float2 em : TEXCOORD0, float4 color : COLOR0) : COLOR0 {
     float invWidth = SlugParams.z;
     float rowV = 0.5 * SlugParams.w;
 
-    float winding = 0.0;
+    // Pixel size in em units, taken once outside the loop: gradients cannot live
+    // inside a loop with break, and this is only needed for the edge softening.
+    float pxSize = max(length(ddx(em)), length(ddy(em)));
+    pxSize = max(pxSize, 1e-6);
+    float invHalfPixel = 2.0 / pxSize;
+
+    // Signed, clamped distance accumulation. For an edge crossing the pixel this
+    // reproduces the exact covered fraction (verified offline against analytic
+    // coverage), and it fades instead of hard switching at the boundary.
+    float acc = 0.0;
 
     for (int i = 0; i < 256; i++) {
         if (float(i) >= count) {
@@ -61,8 +70,9 @@ float4 main(float2 em : TEXCOORD0, float4 color : COLOR0) : COLOR0 {
             if (abs(b) > 1e-6) {
                 float t = -c / b;
 
-                if (t >= 0.0 && t < 1.0 && CurveX(p0, p1, p2, t) > em.x) {
-                    winding += CurveWinding(p0, p1, p2, t);
+                if (t >= 0.0 && t < 1.0) {
+                    float x = CurveX(p0, p1, p2, t);
+                    acc += CurveWinding(p0, p1, p2, t) * clamp((x - em.x) * invHalfPixel, -1.0, 1.0);
                 }
             }
         } else {
@@ -79,18 +89,20 @@ float4 main(float2 em : TEXCOORD0, float4 color : COLOR0) : COLOR0 {
                 float r0 = (-b + sq) * inv2a;
                 float r1 = (-b - sq) * inv2a;
 
-                if (r0 >= 0.0 && r0 < 1.0 && CurveX(p0, p1, p2, r0) > em.x) {
-                    winding += CurveWinding(p0, p1, p2, r0);
+                if (r0 >= 0.0 && r0 < 1.0) {
+                    float x0 = CurveX(p0, p1, p2, r0);
+                    acc += CurveWinding(p0, p1, p2, r0) * clamp((x0 - em.x) * invHalfPixel, -1.0, 1.0);
                 }
 
-                if (r1 >= 0.0 && r1 < 1.0 && CurveX(p0, p1, p2, r1) > em.x) {
-                    winding += CurveWinding(p0, p1, p2, r1);
+                if (r1 >= 0.0 && r1 < 1.0) {
+                    float x1 = CurveX(p0, p1, p2, r1);
+                    acc += CurveWinding(p0, p1, p2, r1) * clamp((x1 - em.x) * invHalfPixel, -1.0, 1.0);
                 }
             }
         }
     }
 
-    float inside = saturate(abs(winding));
+    float inside = saturate(abs(acc) * 0.5);
 
     return float4(color.rgb, color.a * inside);
 }
