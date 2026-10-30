@@ -48,10 +48,25 @@ void GxuFontSlugPageConstants(float* out);
 // the distance field in the same build.
 bool GxuFontSlugFaceEnabled(const CGxFont* face);
 
+// True when this face wants a rim pass: it is outlined, and the rim shader is
+// built in. The rim geometry lives on its own line, so the body line stays
+// exactly what it was.
+bool GxuFontSlugRimEnabled(const CGxFont* face);
+
+// Line index the rim geometry is stored on. High enough that the atlas never
+// hands it out; a stray atlas quad that lands there shades to zero because it
+// carries no curves.
+uint32_t GxuFontSlugRimPage();
+
 // Binds the Slug vertex shader, pixel shader and curve page. Call inside an
 // RsPush, before drawing. False when the path is not available, in which case the
 // caller must fall back to the distance field.
 bool GxuFontSlugBeginBatch();
+
+// Rim pass: its own pixel shader plus the outline width it should draw. Bind
+// after BeginBatch, draw the rim line, then bind the body again.
+bool GxuFontSlugBindRim(float widthPixels);
+bool GxuFontSlugBindBody();
 
 // Debug probe: draws a couple of glyphs, once per frame. Remove once text goes
 // through Slug.

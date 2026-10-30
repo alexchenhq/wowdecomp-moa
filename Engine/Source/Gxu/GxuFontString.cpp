@@ -567,6 +567,55 @@ void CGxString::InitializeTextLine(const char* text, uint32_t numBytes, CImVecto
                         verts[2].m_tc.y = bottomEm;
                         verts[3].m_tc.y = topEm;
 
+#if GXU_FONT_SLUG_RIM
+                        // Rim: the same quad grown by the outline width, in its own
+                        // line so the body line and its shader stay untouched. The
+                        // em coordinates grow with it, which is what lets the rim
+                        // shader find a negative distance out there.
+                        if (GxuFontSlugRimEnabled(this->m_currentFace)) {
+                            const uint32_t faceFlags = this->m_currentFace->m_fontFlags;
+                            const float outlineWidth = (faceFlags & 8) ? 2.0f : 1.0f;
+                            const float padEm = outlineWidth / emToPixel;
+
+                            const uint32_t rimPage = GxuFontSlugRimPage();
+
+                            if (!this->m_textLines[rimPage]) {
+                                this->m_textLines[rimPage] = TEXTLINETEXTURE::NewTextLineTexture();
+                            }
+
+                            TEXTLINETEXTURE* rimLine = this->m_textLines[rimPage];
+                            *texturePagesUsed |= 1 << rimPage;
+
+                            const float rimLeft = left - outlineWidth;
+                            const float rimRight = right + outlineWidth;
+                            const float rimBottom = bottom - outlineWidth;
+                            const float rimTop = top + outlineWidth;
+
+                            uint32_t rimIndex = rimLine->m_verts.Add(4, 0, &vert);
+                            VERT* rim = &rimLine->m_verts.m_data[rimIndex];
+
+                            rim[0].m_vc.x = rimLeft;
+                            rim[1].m_vc.x = rimLeft;
+                            rim[2].m_vc.x = rimRight;
+                            rim[3].m_vc.x = rimRight;
+
+                            rim[0].m_vc.y = rimBottom;
+                            rim[1].m_vc.y = rimTop;
+                            rim[2].m_vc.y = rimBottom;
+                            rim[3].m_vc.y = rimTop;
+
+                            rim[0].m_tc.x = leftEm - padEm;
+                            rim[1].m_tc.x = leftEm - padEm;
+                            rim[2].m_tc.x = rightEm + padEm;
+                            rim[3].m_tc.x = rightEm + padEm;
+
+                            rim[0].m_tc.y = bottomEm - padEm;
+                            rim[1].m_tc.y = topEm + padEm;
+                            rim[2].m_tc.y = bottomEm - padEm;
+                            rim[3].m_tc.y = topEm + padEm;
+                        }
+#endif
+
                         lastCode = wide;
                         break;
                     }

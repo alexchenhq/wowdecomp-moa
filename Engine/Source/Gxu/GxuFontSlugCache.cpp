@@ -50,7 +50,13 @@ uint16_t s_pageData[kPageWidth * kPageHeight * 2];
 CTexture* s_texture = nullptr;
 CGxTex* s_deviceTexture = nullptr;
 CGxShader* s_shader = nullptr;
+CGxShader* s_rimShader = nullptr;
 CGxShader* s_vertexShader = nullptr;
+
+// Where the rim geometry lives. Outside the range the atlas allocates, and a
+// fallback atlas quad that ends up here draws nothing: it carries no curves, so
+// its distance comes out as "far away".
+const uint32_t kRimPage = 7;
 
 struct CacheEntry {
     FT_Face m_face;
@@ -132,6 +138,30 @@ CGxShader* GetShader() {
 
     SlugLog("[Slug] pixel shader active (ps_3_0, texcoord1 for the glyph base)");
     s_shader = shader;
+
+    return shader;
+}
+
+CGxShader* GetRimShader() {
+    if (s_rimShader) {
+        return s_rimShader;
+    }
+
+    CGxShader* shader = new CGxShader;
+
+    shader->m_target = GxSh_Pixel;
+    shader->m_code.SetCount(g_gxuFontSlugRimShaderSize);
+    memcpy(shader->m_code.m_data, g_gxuFontSlugRimShader, g_gxuFontSlugRimShaderSize);
+    shader->m_loaded = 0;
+
+    if (!shader->Valid()) {
+        SlugLog("[Slug] rim shader failed to create");
+        delete shader;
+        return nullptr;
+    }
+
+    SlugLog("[Slug] rim shader active (ps_3_0, signed distance)");
+    s_rimShader = shader;
 
     return shader;
 }
@@ -476,6 +506,68 @@ bool GxuFontSlugBeginBatch() {
     GxRsSet(GxRs_VertexShader, vertexShader);
     GxRsSet(GxRs_PixelShader, shader);
     GxRsSet(GxRs_Texture0, s_deviceTexture);
+
+    float params[4];
+    GxuFontSlugPageConstants(params);
+    GxShaderConstantsSet(GxSh_Pixel, 0, params, 1);
+
+    return true;
+#endif
+}
+
+bool GxuFontSlugRimEnabled(const CGxFont* face) {
+#if !GXU_FONT_SLUG_TEXT || !GXU_FONT_SLUG_RIM
+    (void)face;
+    return false;
+#else
+    // Only outlined faces want a rim, and only if this face actually went through
+    // Slug - an outlined face that stayed on the field draws its own.
+    return face && (face->m_fontFlags & 1) && FaceMatchesSlugConfig(face);
+#endif
+}
+
+uint32_t GxuFontSlugRimPage() {
+    return kRimPage;
+}
+
+bool GxuFontSlugBindRim(float widthPixels) {
+#if !GXU_FONT_SLUG_TEXT || !GXU_FONT_SLUG_RIM
+    (void)widthPixels;
+    return false;
+#else
+    CGxShader* shader = GetRimShader();
+
+    if (!shader || !s_deviceTexture) {
+        return false;
+    }
+
+    GxRsSet(GxRs_PixelShader, shader);
+
+    float params[4];
+    GxuFontSlugPageConstants(params);
+    GxShaderConstantsSet(GxSh_Pixel, 0, params, 1);
+
+    float rimParams[4] = { widthPixels, 0.0f, 0.0f, 0.0f };
+    float rimColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+
+    GxShaderConstantsSet(GxSh_Pixel, 1, rimParams, 1);
+    GxShaderConstantsSet(GxSh_Pixel, 2, rimColor, 1);
+
+    return true;
+#endif
+}
+
+bool GxuFontSlugBindBody() {
+#if !GXU_FONT_SLUG_TEXT
+    return false;
+#else
+    CGxShader* shader = GetShader();
+
+    if (!shader) {
+        return false;
+    }
+
+    GxRsSet(GxRs_PixelShader, shader);
 
     float params[4];
     GxuFontSlugPageConstants(params);

@@ -23,16 +23,18 @@ header.append('#define ENGINE_SOURCE_GXU_GXUFONTSLUGSHADER_H')
 header.append('')
 header.append('#include <cstdint>')
 header.append('')
-header.append('// Slug text shaders, compiled from Shaders/FontSlug.hlsl and')
-header.append('// Shaders/FontSlugVS.hlsl with fxc (/T ps_3_0, /T vs_3_0, /O3).')
+header.append('// Slug text shaders, compiled from Shaders/*.hlsl with fxc (/O3).')
 header.append('//')
 header.append('// Pixel shader: 456 slots: per-curve y range cull and four scanline slices.')
 header.append('// Vertex shader: 8 slots, project and pass TEXCOORD0/TEXCOORD1/COLOR0 through.')
+header.append('// Rim shader: 245 slots, signed distance to the outline for the rim pass.')
 header.append('')
 header.append(dump('FontSlug.ps', 'g_gxuFontSlugPixelShader', None,
                    '// FontSlug.ps'))
 header.append(dump('FontSlugVS.ps', 'g_gxuFontSlugVertexShader', None,
                    '// FontSlugVS.ps'))
+header.append(dump('FontSlugRim.ps', 'g_gxuFontSlugRimShader', None,
+                   '// FontSlugRim.ps'))
 header.append('#endif')
 header.append('')
 
