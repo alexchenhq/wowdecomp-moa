@@ -447,37 +447,44 @@ void CGxString::InitializeTextLine(const char* text, uint32_t numBytes, CImVecto
                 }
 
                 default: {
-                    CHARCODEDESC* desc = this->m_currentFace->NewCodeDesc(wide);
-
-                    if (!desc) {
-                        desc = this->m_currentFace->NewCodeDesc('?');
-
-                        if (!desc) {
-                            break;
-                        }
-                    }
-
-                    uint32_t texturePage = desc->m_textureNumber;
-
+                    uint32_t texturePage = 0;
+                    CHARCODEDESC* desc = nullptr;
+                    bool slugGlyph = false;
 #if GXU_FONT_SLUG_TEXT
                     // Slug glyphs carry their outline instead of an atlas cell, so
                     // they all live on one line: there is no page to split them
                     // across. A glyph the outline path cannot take keeps its atlas
                     // page and is drawn by the distance field as usual.
                     SLUGGLYPHINFO slug;
-                    bool slugGlyph = false;
 
                     if (GxuFontSlugFaceEnabled(this->m_currentFace)) {
                         FT_Face face = FontFaceGetFace(this->m_currentFace->m_fontFaceHandle);
 
                         if (GxuFontSlugGetGlyph(face, wide, this->m_currentFace->GetPixelSize(), &slug)) {
-                            texturePage = 0;
                             slugGlyph = true;
                         } else {
                             GxuFontSlugNoteGlyphFailure(this->m_currentFace, wide);
                         }
                     }
 #endif
+
+                    // Ask for an atlas cell only when the glyph actually needs one.
+                    // On a Slug face the descriptor's bitmap was built and never
+                    // used: every new glyph was being rasterised into the atlas and
+                    // then drawn from its outline anyway.
+                    if (!slugGlyph) {
+                        desc = this->m_currentFace->NewCodeDesc(wide);
+
+                        if (!desc) {
+                            desc = this->m_currentFace->NewCodeDesc('?');
+
+                            if (!desc) {
+                                break;
+                            }
+                        }
+
+                        texturePage = desc->m_textureNumber;
+                    }
 
                     *texturePagesUsed |= 1 << texturePage;
 

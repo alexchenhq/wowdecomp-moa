@@ -31,6 +31,10 @@ const uint32_t kTexelsPerCurve = 4;
 
 // The console only shows crash output, so diagnostics go to a file.
 void SlugLog(const char* format, ...) {
+#if !GXU_FONT_SLUG_LOG
+    (void)format;
+    return;
+#else
     FILE* file = fopen("sluglab.log", "a");
 
     if (!file) {
@@ -43,6 +47,7 @@ void SlugLog(const char* format, ...) {
     va_end(args);
     fputc('\n', file);
     fclose(file);
+#endif
 }
 
 uint16_t s_pageData[kPageWidth * kPageHeight * 2];
@@ -375,6 +380,16 @@ namespace {
 void LogFaceOnce(const CGxFont* face, bool accepted) {
     static const CGxFont* s_seen[64];
     static uint32_t s_seenCount = 0;
+
+    // The common case is one face per string, so a single pointer check keeps
+    // this off the per-glyph path almost all the time.
+    static const CGxFont* s_last = nullptr;
+
+    if (s_last == face) {
+        return;
+    }
+
+    s_last = face;
 
     for (uint32_t i = 0; i < s_seenCount; i++) {
         if (s_seen[i] == face) {

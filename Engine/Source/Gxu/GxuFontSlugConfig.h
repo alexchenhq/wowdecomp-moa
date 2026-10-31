@@ -22,6 +22,12 @@
 #define GXU_FONT_SLUG_TEXT 0
 #endif
 
+// Diagnostics. Off by default: the per-glyph log opens and closes a file every
+// time, and this sits in the render path.
+#ifndef GXU_FONT_SLUG_LOG
+#define GXU_FONT_SLUG_LOG 0
+#endif
+
 // Which faces the Slug text path takes.
 //
 // ALL_FACES sends every font file through it; the named face is only consulted
