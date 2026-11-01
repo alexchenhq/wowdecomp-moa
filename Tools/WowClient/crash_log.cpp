@@ -140,7 +140,13 @@ static struct CrashLogInit {
         DeleteFileA(s_logPath);
         s_logFile = CreateFileA(s_logPath, FILE_APPEND_DATA, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, nullptr, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 
-        if (AllocConsole()) {
+        // The console is opt-in. It used to be allocated on every launch, which
+        // put a black window on screen before the game drew anything; everything
+        // it showed is already in the log file next to the exe. Set
+        // WOWCLIENT_CONSOLE=1 to bring it back when a crash needs reading live.
+        char wantConsole[8] = {};
+
+        if (GetEnvironmentVariableA("WOWCLIENT_CONSOLE", wantConsole, sizeof(wantConsole)) && wantConsole[0] == '1' && AllocConsole()) {
             SetConsoleTitleA("WowClient");
             s_console = CreateFileA("CONOUT$", GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, 0, nullptr);
         }
