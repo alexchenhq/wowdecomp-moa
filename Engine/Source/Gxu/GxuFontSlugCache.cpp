@@ -119,6 +119,21 @@ void FlushPageIfDirty() {
     }
 }
 
+// SM3 for the D3D9 backends, SM5 DXBC for D3D11. The device exists before any
+// text is laid out, so asking it here is safe and settles the choice once.
+bool WantsSM5() {
+    return g_theGxDevicePtr && g_theGxDevicePtr->DeviceApi() == GxApi_D3d11;
+}
+
+void UseSlugCode(CGxShader* shader, const uint32_t* sm3, uint32_t sm3Size, const uint32_t* sm5, uint32_t sm5Size) {
+    const bool useSM5 = WantsSM5();
+    const uint32_t size = useSM5 ? sm5Size : sm3Size;
+
+    shader->m_code.SetCount(size);
+    memcpy(shader->m_code.m_data, useSM5 ? sm5 : sm3, size);
+    shader->m_loaded = 0;
+}
+
 CGxShader* GetShader() {
     if (s_shader) {
         return s_shader;
@@ -127,9 +142,7 @@ CGxShader* GetShader() {
     CGxShader* shader = new CGxShader;
 
     shader->m_target = GxSh_Pixel;
-    shader->m_code.SetCount(g_gxuFontSlugPixelShaderSize);
-    memcpy(shader->m_code.m_data, g_gxuFontSlugPixelShader, g_gxuFontSlugPixelShaderSize);
-    shader->m_loaded = 0;
+    UseSlugCode(shader, g_gxuFontSlugPixelShader, g_gxuFontSlugPixelShaderSize, g_gxuFontSlugPixelShaderSM5, g_gxuFontSlugPixelShaderSM5Size);
 
     if (!shader->Valid()) {
         SlugLog("[Slug] pixel shader failed to create");
@@ -151,9 +164,7 @@ CGxShader* GetRimShader() {
     CGxShader* shader = new CGxShader;
 
     shader->m_target = GxSh_Pixel;
-    shader->m_code.SetCount(g_gxuFontSlugRimShaderSize);
-    memcpy(shader->m_code.m_data, g_gxuFontSlugRimShader, g_gxuFontSlugRimShaderSize);
-    shader->m_loaded = 0;
+    UseSlugCode(shader, g_gxuFontSlugRimShader, g_gxuFontSlugRimShaderSize, g_gxuFontSlugRimShaderSM5, g_gxuFontSlugRimShaderSM5Size);
 
     if (!shader->Valid()) {
         SlugLog("[Slug] rim shader failed to create");
@@ -178,9 +189,7 @@ CGxShader* GetVertexShader() {
     CGxShader* shader = new CGxShader;
 
     shader->m_target = GxSh_Vertex;
-    shader->m_code.SetCount(g_gxuFontSlugVertexShaderSize);
-    memcpy(shader->m_code.m_data, g_gxuFontSlugVertexShader, g_gxuFontSlugVertexShaderSize);
-    shader->m_loaded = 0;
+    UseSlugCode(shader, g_gxuFontSlugVertexShader, g_gxuFontSlugVertexShaderSize, g_gxuFontSlugVertexShaderSM5, g_gxuFontSlugVertexShaderSM5Size);
 
     if (!shader->Valid()) {
         SlugLog("[Slug] vertex shader failed to create");

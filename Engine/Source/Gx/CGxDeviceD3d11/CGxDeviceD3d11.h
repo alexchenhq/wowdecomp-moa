@@ -248,6 +248,7 @@ class CGxDeviceD3d11 : public CGxDevice {
     void ITexForceRecreation(int32_t all);
     TexData* ITexEnsure(CGxTex* texId);
     ShaderData* ICompileShader(const std::string& hlsl, const char* target, const D3d9ShaderInfo& info, const char* name);
+    ShaderData* ICreateShaderFromDxbc(const uint8_t* code, uint32_t size, bool pixel, const char* name);
     void IShaderCreateFor(CGxShader* shader);
     void IReleaseShaders();
     void IReleaseShaderData(CGxShader* shader);

@@ -582,6 +582,44 @@ CGxDeviceD3d11::ShaderData* CGxDeviceD3d11::ICompileShader(const std::string& hl
     return data;
 }
 
+// A shader that already arrives as DXBC skips the SM3 decompiler: our own font
+// shaders are compiled to ps_5_0 / vs_5_0 at build time, and the translator is a
+// reconstruction that does not have to understand everything. Bytecode from fxc
+// is exact, so hand it to D3D as it is.
+CGxDeviceD3d11::ShaderData* CGxDeviceD3d11::ICreateShaderFromDxbc(const uint8_t* code, uint32_t size, bool pixel, const char* name) {
+    ID3DBlob* blob = nullptr;
+
+    if (FAILED(D3DCreateBlob(size, &blob)) || !blob) {
+        return nullptr;
+    }
+
+    memcpy(blob->GetBufferPointer(), code, size);
+
+    ShaderData* data = new ShaderData();
+    snprintf(data->m_name, sizeof(data->m_name), "%s", name);
+    data->m_blob = blob;
+
+    HRESULT hr;
+
+    if (pixel) {
+        ID3D11PixelShader* shader = nullptr;
+        hr = this->m_d3dDevice->CreatePixelShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &shader);
+        data->m_shader = shader;
+    } else {
+        ID3D11VertexShader* shader = nullptr;
+        hr = this->m_d3dDevice->CreateVertexShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &shader);
+        data->m_shader = shader;
+    }
+
+    if (FAILED(hr) || !data->m_shader) {
+        Rel(data->m_blob);
+        delete data;
+        return nullptr;
+    }
+
+    return data;
+}
+
 void CGxDeviceD3d11::IShaderCreateFor(CGxShader* shader) {
     shader->m_valid = 0;
     shader->m_apiSpecific = nullptr;
@@ -609,6 +647,17 @@ void CGxDeviceD3d11::IShaderCreateFor(CGxShader* shader) {
     if (found != this->m_shaderCache.end()) {
         shader->m_apiSpecific = found->second;
         shader->m_valid = found->second != nullptr;
+        return;
+    }
+
+    if (size >= 4 && code[0] == 'D' && code[1] == 'X' && code[2] == 'B' && code[3] == 'C') {
+        ShaderData* dxbc = this->ICreateShaderFromDxbc(code, size, shader->m_target == GxSh_Pixel, key);
+
+        D3d11Log("CGxDeviceD3d11: shader '%s' (%s, %u bytes, DXBC passthrough) -> %s", shader->m_key.m_str ? shader->m_key.m_str : "?", shader->m_target == GxSh_Pixel ? "ps" : "vs", size, dxbc ? "ok" : "FAILED");
+
+        this->m_shaderCache[key] = dxbc;
+        shader->m_apiSpecific = dxbc;
+        shader->m_valid = dxbc != nullptr;
         return;
     }
 
