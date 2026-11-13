@@ -150,7 +150,7 @@ CGxShader* GetShader() {
         return nullptr;
     }
 
-    SlugLog("[Slug] pixel shader active (ps_3_0, texcoord1 for the glyph base)");
+    SlugLog("[Slug] pixel shader active (%s, api=%d)", WantsSM5() ? "ps_5_0" : "ps_3_0", (int)g_theGxDevicePtr->DeviceApi());
     s_shader = shader;
 
     return shader;
@@ -172,7 +172,7 @@ CGxShader* GetRimShader() {
         return nullptr;
     }
 
-    SlugLog("[Slug] rim shader active (ps_3_0, signed distance)");
+    SlugLog("[Slug] rim shader active (%s)", WantsSM5() ? "ps_5_0" : "ps_3_0");
     s_rimShader = shader;
 
     return shader;
@@ -197,7 +197,7 @@ CGxShader* GetVertexShader() {
         return nullptr;
     }
 
-    SlugLog("[Slug] vertex shader active (vs_3_0)");
+    SlugLog("[Slug] vertex shader active (%s)", WantsSM5() ? "vs_5_0" : "vs_3_0");
     s_vertexShader = shader;
 
     return shader;
@@ -526,6 +526,15 @@ bool GxuFontSlugBeginBatch() {
     GxRsSet(GxRs_VertexShader, vertexShader);
     GxRsSet(GxRs_PixelShader, shader);
     GxRsSet(GxRs_Texture0, s_deviceTexture);
+
+    static int s_bindLogged = 0;
+
+    if (s_bindLogged < 3) {
+        s_bindLogged++;
+        SlugLog("[Slug] begin batch: api=%d vs=%d ps=%d tex=%d sm5=%d",
+            (int)g_theGxDevicePtr->DeviceApi(), vertexShader->m_valid ? 1 : 0, shader->m_valid ? 1 : 0,
+            s_deviceTexture ? 1 : 0, WantsSM5() ? 1 : 0);
+    }
 
     float params[4];
     GxuFontSlugPageConstants(params);

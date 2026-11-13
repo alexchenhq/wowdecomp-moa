@@ -452,6 +452,21 @@ CGxFontVertex* BATCHEDRENDERFONTDESC::UnlockVertexPtrAndRender(CGxBuf*& buf, int
         batch.m_minIndex = 0;
         batch.m_maxIndex = count - 1;
 
+        {
+            static int s_fontDrawLogged = 0;
+
+            if (s_fontDrawLogged < 4) {
+                s_fontDrawLogged++;
+                float page[4];
+                GxuFontSlugPageConstants(page);
+                if (FILE* f = fopen("sluglab.log", "a")) {
+                    fprintf(f, "[Slug] font draw: api=%d verts=%u tris=%u invW=%.8f invH=%.8f tex=%p\n",
+                        (int)g_theGxDevicePtr->DeviceApi(), count, batch.m_count, page[0], page[1], (void*)GxuFontSlugTexture());
+                    fclose(f);
+                }
+            }
+        }
+
         GxDraw(&batch, 1);
     }
 

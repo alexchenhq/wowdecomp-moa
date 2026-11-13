@@ -562,6 +562,19 @@ void CGxDeviceD3d11::IBindVertexInput(ShaderData* vs) {
 
     ID3D11InputLayout* layout = this->IGetInputLayout(vs->m_inputs, vs->m_blob, elements, elementCount, hash);
 
+    {
+        static int s_layoutLogged = 0;
+
+        if (s_layoutLogged < 4 && this->m_primVertexFormat == 9) {
+            s_layoutLogged++;
+            D3d11Log("font layout: fmt %d stride %u elems %u layout %p vs %s", this->m_primVertexFormat, this->m_primVertexSize, elementCount, static_cast<void*>(layout), vs->m_name);
+
+            for (uint32_t e = 0; e < elementCount; e++) {
+                D3d11Log("   elem %u: %s%u fmt %d off %u slot %u", e, elements[e].SemanticName, elements[e].SemanticIndex, static_cast<int>(elements[e].Format), elements[e].AlignedByteOffset, elements[e].InputSlot);
+            }
+        }
+    }
+
     if (layout != this->m_curLayout) {
         this->m_d3dContext->IASetInputLayout(layout);
         this->m_curLayout = layout;
@@ -729,6 +742,24 @@ void CGxDeviceD3d11::Draw(CGxBatch* batch, int32_t count) {
 
     if (batch->m_primType >= GxPrims_Last || !batch->m_count) {
         return;
+    }
+
+    // Every draw of the first frame or two, in order: the font batch is small and
+    // arrives late, so a cap that the scene geometry fills first never reaches it.
+    {
+        static int s_seqLogged = 0;
+
+        // Models are stride 48 and there are thousands of them; the UI and the
+        // font batch are everything else, so skip the scene entirely.
+        if (s_seqLogged < 24 && this->m_primVertexSize != 48) {
+            s_seqLogged++;
+            ShaderData* seqVs = this->IBoundVertexShader();
+            ShaderData* seqPs = this->IBoundPixelShader();
+            D3d11Log("seq %d: prim %u count %u start %u stride %u fmt %d vs %s ps %s",
+                s_seqLogged, batch->m_primType, batch->m_count, batch->m_start,
+                this->m_primVertexSize, this->m_primVertexFormat,
+                seqVs ? seqVs->m_name : "FF", seqPs ? seqPs->m_name : "FF");
+        }
     }
 
     static int32_t s_skipFrom = -1;

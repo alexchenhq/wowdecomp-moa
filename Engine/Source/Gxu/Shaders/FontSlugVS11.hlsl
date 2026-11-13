@@ -9,7 +9,10 @@
 cbuffer Constants : register(b0) { float4 c[256]; };
 
 struct SLUGVSIN {
-    float4 p : POSITION;
+    // Three floats, not four: the stream carries a C3Vector, and SM4+ input
+    // layouts are strict about it where D3D9 quietly padded. A float4 here made
+    // CreateInputLayout fail, and a failed layout draws nothing at all.
+    float3 p : POSITION;
     float4 c : COLOR0;
     float2 t0 : TEXCOORD0;
     float2 t1 : TEXCOORD1;
@@ -26,7 +29,7 @@ SLUGVSOUT main(SLUGVSIN input) {
     SLUGVSOUT output;
 
     // Text geometry is already in screen space; only the projection is left.
-    float4 p = float4(input.p.xyz, 1.0);
+    float4 p = float4(input.p, 1.0);
 
     output.p.x = dot(p, c[0]);
     output.p.y = dot(p, c[1]);
