@@ -281,6 +281,17 @@ LRESULT CALLBACK CGxDeviceD3d11::WindowProcD3d11(HWND hwnd, UINT message, WPARAM
                 return DefWindowProcA(hwnd, message, wparam, lparam);
             }
 
+            // The D3D11 caps report no hardware cursor (m_hwCursor = 0), so the
+            // client draws its own software cursor every frame. Letting
+            // DefWindowProcA apply the window class cursor here stacks a second,
+            // system cursor on top of it. Match the D3D9 backend: hide it in the
+            // client area and stop default handling, but keep the system cursor
+            // on the non-client area (title bar / sizing borders).
+            if (LOWORD(lparam) == HTCLIENT) {
+                SetCursor(nullptr);
+                return 1;
+            }
+
             break;
 
         case WM_DISPLAYCHANGE:

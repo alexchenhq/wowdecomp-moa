@@ -127,7 +127,13 @@ float CurveDistance(float2 p, float2 p0, float2 p1, float2 p2) {
 
 #endif
 
-float4 main(float2 em : TEXCOORD0, float2 slug : TEXCOORD1, float4 color : TEXCOORD2) : SV_Target {
+float4 main(float4 pos : SV_Position, float4 packed : TEXCOORD0, float4 color : TEXCOORD2) : SV_Target {
+    // SV_Position must be the first input so the D3D11 signature lines up with
+    // the vertex shader output register-for-register. Without it fxc assigns
+    // TEXCOORD0 to register 0 and the pixel shader reads SV_Position instead.
+    // em and the curve descriptor share one interpolator; see FontSlugVS11.hlsl.
+    float2 em = packed.xy;
+    float2 slug = packed.zw;
 #if SOLID_RED
     // bisect switch: prove the quad reaches the screen before looking at coverage
     return float4(1.0, 0.0, 0.0, 1.0);
@@ -209,12 +215,6 @@ float4 main(float2 em : TEXCOORD0, float2 slug : TEXCOORD1, float4 color : TEXCO
     }
 
     float inside = saturate(abs(acc * 0.25) * 0.5);
-
-#if DEBUG_VIZ
-    // R = page constants arrived (saturates to 1 when c[0].x is 1/512),
-    // G = coverage, B = curve count reached the shader (slug.y / 64).
-    return float4(saturate(SlugPage.x * 512.0), inside, saturate(count / 64.0), 1.0);
-#endif
 
 #if RIM
     // One pass, one surface, composed the way the distance field path does it:

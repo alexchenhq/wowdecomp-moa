@@ -64,8 +64,14 @@ bool GxuFontSlugBeginBatch();
 bool GxuFontSlugBindRim(float widthPixels);
 bool GxuFontSlugBindBody();
 
-// Debug probe: draws a couple of glyphs, once per frame. Remove once text goes
-// through Slug.
+// Optional standalone probe, gated by GXU_FONT_SLUG_PROBE. Not called in the
+// shipping build; kept for isolating curve page / shader problems.
 void GxuFontSlugDebugDraw(FT_Face face, uint32_t pixelSize);
+
+// Called only from the D3D11 teardown path. The Slug shaders are module-level
+// CGxShader objects outside the device's shader list, so when a format change
+// destroys the device their cached ShaderData handles must be dropped or the
+// next text batch binds a freed D3D11 shader object.
+void GxuFontSlugOnDeviceReset();
 
 #endif

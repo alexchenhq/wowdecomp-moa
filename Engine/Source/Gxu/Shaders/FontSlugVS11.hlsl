@@ -18,11 +18,14 @@ struct SLUGVSIN {
     float2 t1 : TEXCOORD1;
 };
 
+// Everything the pixel shader needs rides TEXCOORD0 as one float4:
+// xy = em coords, zw = (curve base texel, curve count). Keeping the glyph data
+// in a single interpolator avoids depending on how TEXCOORD0/1 pack across the
+// VS/PS signature link; FontSlug11.hlsl reads the same float4.
 struct SLUGVSOUT {
     float4 p : SV_Position;
+    float4 t0 : TEXCOORD0;
     float4 c : TEXCOORD2;
-    float2 t0 : TEXCOORD0;
-    float2 t1 : TEXCOORD1;
 };
 
 SLUGVSOUT main(SLUGVSIN input) {
@@ -36,9 +39,8 @@ SLUGVSOUT main(SLUGVSIN input) {
     output.p.z = dot(p, c[2]);
     output.p.w = dot(p, c[3]);
 
+    output.t0 = float4(input.t0, input.t1);
     output.c = input.c;
-    output.t0 = input.t0;
-    output.t1 = input.t1;
 
     return output;
 }

@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include "Engine/Source/Gxu/GxuFontMiscClasses.h"
 #include "Engine/Source/Gxu/GxuFontSlugCache.h"
+#include "Engine/Source/Gxu/GxuFontSlugConfig.h"
 #include "Engine/Source/Gxu/GxuFontFace.h"
 #include "Engine/Source/Gxu/GxuFontFont.h"
 #include "Engine/Source/Gxu/GxuFontSDFShader.h"
@@ -452,6 +453,7 @@ CGxFontVertex* BATCHEDRENDERFONTDESC::UnlockVertexPtrAndRender(CGxBuf*& buf, int
         batch.m_minIndex = 0;
         batch.m_maxIndex = count - 1;
 
+#if GXU_FONT_SLUG_LOG
         {
             static int s_fontDrawLogged = 0;
 
@@ -466,6 +468,7 @@ CGxFontVertex* BATCHEDRENDERFONTDESC::UnlockVertexPtrAndRender(CGxBuf*& buf, int
                 }
             }
         }
+#endif
 
         GxDraw(&batch, 1);
     }
@@ -626,10 +629,6 @@ void BATCHEDRENDERFONTDESC::RenderBatch() {
 
     GxBufUnlock(buf, 0);
 
-    // MODIFIED: Slug debug path. Draws one glyph straight from its Bezier
-    // outline to prove the curve texture and shader before the real text path
-    // exists. Remove once text goes through Slug.
-    GxuFontSlugDebugDraw(FontFaceGetFace(this->m_face->m_fontFaceHandle), this->m_face->GetPixelSize());
 }
 
 // VERIFY: cb7c9536 manual

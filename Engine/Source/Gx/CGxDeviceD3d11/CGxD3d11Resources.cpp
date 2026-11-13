@@ -722,6 +722,10 @@ void CGxDeviceD3d11::IShaderReload(CGxShader* shader, const char* path, const ch
     this->IShaderCreateFor(shader);
 }
 
+// Implemented in Gxu. Declared here rather than including a Gxu header so the
+// device layer stays independent of the layers above it; resolves at link time.
+void GxuFontSlugOnDeviceReset();
+
 void CGxDeviceD3d11::IReleaseShaders() {
     for (int32_t target = 0; target < GxShTargets_Last; target++) {
         TSHashTable<CGxShader, HASHKEY_STRI>& list = this->m_shaderList[target];
@@ -742,6 +746,10 @@ void CGxDeviceD3d11::IReleaseShaders() {
     }
 
     this->m_shaderCache.clear();
+
+    // Slug keeps its shaders outside m_shaderList, so it never sees the loop
+    // above. Tell it to drop the now-freed handles before the new device comes up.
+    GxuFontSlugOnDeviceReset();
 }
 
 void CGxDeviceD3d11::IReleaseResources(int32_t freeTextures) {

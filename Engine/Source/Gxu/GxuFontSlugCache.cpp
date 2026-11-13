@@ -57,6 +57,7 @@ CGxTex* s_deviceTexture = nullptr;
 CGxShader* s_shader = nullptr;
 CGxShader* s_rimShader = nullptr;
 CGxShader* s_vertexShader = nullptr;
+CGxBuf* s_indexBuf = nullptr;
 
 
 struct CacheEntry {
@@ -136,7 +137,8 @@ void UseSlugCode(CGxShader* shader, const uint32_t* sm3, uint32_t sm3Size, const
 
 CGxShader* GetShader() {
     if (s_shader) {
-        return s_shader;
+        // Valid() rebuilds against the new device when a reset cleared m_loaded.
+        return s_shader->Valid() ? s_shader : nullptr;
     }
 
     CGxShader* shader = new CGxShader;
@@ -158,7 +160,7 @@ CGxShader* GetShader() {
 
 CGxShader* GetRimShader() {
     if (s_rimShader) {
-        return s_rimShader;
+        return s_rimShader->Valid() ? s_rimShader : nullptr;
     }
 
     CGxShader* shader = new CGxShader;
@@ -183,7 +185,7 @@ CGxShader* GetRimShader() {
 // carries its own. It only has to reproject and pass the interpolators through.
 CGxShader* GetVertexShader() {
     if (s_vertexShader) {
-        return s_vertexShader;
+        return s_vertexShader->Valid() ? s_vertexShader : nullptr;
     }
 
     CGxShader* shader = new CGxShader;
@@ -204,8 +206,6 @@ CGxShader* GetVertexShader() {
 }
 
 CGxBuf* GetIndexBuffer() {
-    static CGxBuf* s_indexBuf = nullptr;
-
     if (s_indexBuf && s_indexBuf->m_hasData && s_indexBuf->m_valid) {
         return s_indexBuf;
     }
@@ -288,6 +288,27 @@ void DrawGlyphQuad(const SLUGGLYPHINFO& glyph, float x0, float y0, float width, 
 }
 
 } // namespace
+
+// A D3D11 format change destroys the device and IReleaseShaders() deletes every
+// device-owned ShaderData. These CGxShader objects are not in the device shader
+// list, so their cached handles would dangle. Dropping them lets the next
+// Get*Shader() call (which now goes through Valid()) rebuild on the new device.
+void GxuFontSlugOnDeviceReset() {
+    CGxShader* shaders[] = { s_shader, s_rimShader, s_vertexShader };
+
+    for (CGxShader* shader : shaders) {
+        if (shader) {
+            shader->m_apiSpecific = nullptr;
+            shader->m_loaded = 0;
+            shader->m_valid = 0;
+        }
+    }
+
+    // The index buffer lives in a device pool and the curve page lives in a
+    // device texture; both are recreated, so refill and re-upload them.
+    s_indexBuf = nullptr;
+    s_pageDirty = true;
+}
 
 bool GxuFontSlugGetGlyph(FT_Face face, uint32_t code, uint32_t pixelSize, SLUGGLYPHINFO* out) {
     if (!face || !out) {
