@@ -424,8 +424,6 @@ void CGxDeviceD3d11::IUpdateFixedFunctionConstants() {
 
         switch (texGen) {
             case GxTexGen_ObjectLinear:
-            case GxTexGen_EyeLinear:
-            case GxTexGen_Unk3:
                 mode = 1.0f;
                 break;
 

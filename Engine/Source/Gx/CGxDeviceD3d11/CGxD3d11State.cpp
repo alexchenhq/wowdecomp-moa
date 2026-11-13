@@ -606,7 +606,7 @@ void CGxDeviceD3d11::IStateSync() {
     this->ISetScissor();
 
     ID3D11BlendState* blend = this->IGetBlendState();
-    float blendFactor = this->m_appRenderStates[Unk84].m_value.m_data.f[0];
+    float blendFactor = this->m_appRenderStates[GxRs_BlendFactor].m_value.m_data.f[0];
     float factor[4] = { blendFactor, blendFactor, blendFactor, blendFactor };
 
     if (blend != this->m_curBlend || blendFactor != this->m_curBlendFactor) {
